@@ -1,11 +1,24 @@
 import { NextResponse } from "next/server"
 import { db } from "@/db"
-import { programs } from "@/db/schema"
+import { programs, programDays, dayExercises } from "@/db/schema"
+
+type ProgramDay = {
+  dayNumber: number
+  name: string
+  focus: string
+  exercises: {
+    exerciseId: number
+    sets: number
+    reps: string
+    restTime: string
+    orderIndex: number
+  }[]
+}
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, description, difficulty, duration } = body
+    const { name, description, difficulty, duration, days } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
@@ -16,21 +29,63 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "La difficulté est requise" }, { status: 400 })
     }
 
-    // Create a proper Date object for createdAt
-    const now = new Date()
+    // Vérifier qu'il y a au moins un jour d'entraînement
+    if (!days || !Array.isArray(days) || days.length === 0) {
+      return NextResponse.json(
+        { error: "Au moins un jour d'entraînement est requis" },
+        { status: 400 }
+      )
+    }
 
-    const newProgram = await db
-      .insert(programs)
-      .values({
-        name,
-        description: description || null,
-        difficulty,
-        duration: duration || null,
-        createdAt: now, // Use the Date object directly
+    // Utiliser une transaction pour garantir l'intégrité des données
+    return await db.transaction(async (tx) => {
+      // Créer le programme
+      const [newProgram] = await tx
+        .insert(programs)
+        .values({
+          name,
+          description: description || null,
+          difficulty,
+          duration: duration || null,
+          createdAt: new Date(),
+        })
+        .returning()
+
+      // Créer les jours de programme
+      for (const day of days as ProgramDay[]) {
+        // Créer le jour
+        const [newDay] = await tx
+          .insert(programDays)
+          .values({
+            programId: newProgram.id,
+            dayNumber: day.dayNumber,
+            name: day.name,
+            focus: day.focus || null,
+            createdAt: new Date(),
+          })
+          .returning()
+
+        // Créer les exercices associés à ce jour
+        if (day.exercises && day.exercises.length > 0) {
+          const exercisesValues = day.exercises.map((exercise) => ({
+            dayId: newDay.id,
+            exerciseId: exercise.exerciseId,
+            sets: exercise.sets,
+            reps: exercise.reps,
+            restTime: exercise.restTime || null,
+            orderIndex: exercise.orderIndex,
+            createdAt: new Date(),
+          }))
+
+          await tx.insert(dayExercises).values(exercisesValues)
+        }
+      }
+
+      return NextResponse.json({
+        ...newProgram,
+        message: "Programme créé avec succès"
       })
-      .returning()
-
-    return NextResponse.json(newProgram[0])
+    })
   } catch (error) {
     console.error("Error creating program:", error)
     return NextResponse.json({ error: "Erreur lors de la création du programme" }, { status: 500 })
