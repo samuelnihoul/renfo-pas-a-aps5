@@ -235,15 +235,19 @@ export default function NewProgramPage() {
         ? Math.max(...day.exercises.map(ex => ex.orderIndex)) + 1
         : 0
 
-      day.exercises.push({
-        exerciseId: tempExercise.exerciseId,
-        exerciseName: selectedExercise.name,
-        sets: tempExercise.sets,
-        reps: tempExercise.reps,
-        restTime: tempExercise.restTime,
-        orderIndex: orderIndex,
-        muscleGroup: selectedExercise.muscleGroup
-      })
+      // Create a new exercises array instead of mutating the existing one
+      day.exercises = [
+        ...day.exercises,
+        {
+          exerciseId: tempExercise.exerciseId,
+          exerciseName: selectedExercise.name,
+          sets: tempExercise.sets,
+          reps: tempExercise.reps,
+          restTime: tempExercise.restTime,
+          orderIndex: orderIndex,
+          muscleGroup: selectedExercise.muscleGroup
+        }
+      ]
 
       return newDays
     })
