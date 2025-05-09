@@ -1,6 +1,7 @@
 "use client"
 
-import type React from "react"
+import React from "react"
+import type { ComponentType } from "react"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -49,6 +50,7 @@ type DayExercise = {
 }
 
 export default function EditProgramPage({ params }: { params: { id: string } }) {
+  const id = React.use(params.id as any) as string
   const router = useRouter()
   const [program, setProgram] = useState<Program | null>(null)
   const [loading, setLoading] = useState(true)
@@ -61,7 +63,7 @@ export default function EditProgramPage({ params }: { params: { id: string } }) 
     const fetchProgram = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/programs/${params.id}`)
+        const response = await fetch(`/api/programs/${id}`)
         if (response.ok) {
           const data = await response.json()
           setProgram(data)
@@ -80,11 +82,11 @@ export default function EditProgramPage({ params }: { params: { id: string } }) 
     }
 
     fetchProgram()
-  }, [params.id])
+  }, [id])
 
   const fetchDayExercises = async (dayId: number) => {
     try {
-      const response = await fetch(`/api/programs/${params.id}/days/${dayId}/exercises`)
+      const response = await fetch(`/api/programs/${id}/days/${dayId}/exercises`)
       if (response.ok) {
         const data = await response.json()
         setDayExercises(data)
@@ -121,7 +123,7 @@ export default function EditProgramPage({ params }: { params: { id: string } }) 
 
     setSaving(true)
     try {
-      const response = await fetch(`/api/admin/programs/${params.id}`, {
+      const response = await fetch(`/api/admin/programs/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -276,9 +278,8 @@ export default function EditProgramPage({ params }: { params: { id: string } }) 
                     {program.days.map((day) => (
                       <button
                         key={day.id}
-                        className={`w-full text-left px-4 py-3 hover:bg-muted transition-colors ${
-                          selectedDay?.id === day.id ? "bg-muted" : ""
-                        }`}
+                        className={`w-full text-left px-4 py-3 hover:bg-muted transition-colors ${selectedDay?.id === day.id ? "bg-muted" : ""
+                          }`}
                         onClick={() => handleDaySelect(day)}
                       >
                         <div className="font-medium">{day.name}</div>

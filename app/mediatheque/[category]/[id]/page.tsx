@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Info, Play } from "lucide-react"
@@ -10,19 +11,21 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function ExercisePage({ params }: { params: { category: string; id: string } }) {
+  const id = React.use(params.id as any) as string
+  const category = React.use(params.category as any) as string
   const { fetchExerciseDetails } = useData()
   const [exercise, setExercise] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   // Capitaliser la première lettre de la catégorie
-  const categoryName = params.category.charAt(0).toUpperCase() + params.category.slice(1)
+  const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
 
   useEffect(() => {
     const loadExercise = async () => {
       try {
         setLoading(true)
-        const exerciseData = await fetchExerciseDetails(Number.parseInt(params.id))
+        const exerciseData = await fetchExerciseDetails(Number.parseInt(id))
         if (exerciseData) {
           setExercise(exerciseData)
           setError(null)
@@ -38,7 +41,7 @@ export default function ExercisePage({ params }: { params: { category: string; i
     }
 
     loadExercise()
-  }, [params.id, fetchExerciseDetails])
+  }, [id, fetchExerciseDetails])
 
   if (loading) {
     return (
@@ -51,7 +54,7 @@ export default function ExercisePage({ params }: { params: { category: string; i
   if (error || !exercise) {
     return (
       <div className="container px-4 py-8 mx-auto">
-        <Link href={`/mediatheque/${params.category}`}>
+        <Link href={`/mediatheque/${category}`}>
           <Button variant="ghost" size="sm" className="mb-2 pl-0">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour
@@ -65,7 +68,7 @@ export default function ExercisePage({ params }: { params: { category: string; i
   return (
     <div className="container px-4 py-8 mx-auto">
       <header className="mb-6">
-        <Link href={`/mediatheque/${params.category}`}>
+        <Link href={`/mediatheque/${category}`}>
           <Button variant="ghost" size="sm" className="mb-2 pl-0">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour

@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, ChevronDown, ChevronUp, Info, Play } from "lucide-react"
@@ -11,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 export default function SessionPage({ params }: { params: { id: string; day: string } }) {
+  const id = React.use(params.id as any) as string
+  const day = React.use(params.day as any) as string
   const { fetchDayExercises, fetchProgramDetails } = useData()
   const [currentExercise, setCurrentExercise] = useState(0)
   const [dayExercises, setDayExercises] = useState<any[]>([])
@@ -25,22 +28,22 @@ export default function SessionPage({ params }: { params: { id: string; day: str
         setLoading(true)
 
         // Charger les détails du programme pour obtenir le jour
-        const program = await fetchProgramDetails(Number.parseInt(params.id))
+        const program = await fetchProgramDetails(Number.parseInt(id))
         if (!program) {
           setError("Programme non trouvé")
           return
         }
 
-        const day = program.days.find((d: any) => d.id === Number.parseInt(params.day))
-        if (!day) {
+        const dayObj = program.days.find((d: any) => d.id === Number.parseInt(day))
+        if (!dayObj) {
           setError("Jour d'entraînement non trouvé")
           return
         }
 
-        setProgramDay(day)
+        setProgramDay(dayObj)
 
         // Charger les exercices du jour
-        const exercises = await fetchDayExercises(Number.parseInt(params.id), Number.parseInt(params.day))
+        const exercises = await fetchDayExercises(Number.parseInt(id), Number.parseInt(day))
         if (exercises.length === 0) {
           setError("Aucun exercice trouvé pour ce jour")
           return
@@ -57,7 +60,7 @@ export default function SessionPage({ params }: { params: { id: string; day: str
     }
 
     loadData()
-  }, [params.id, params.day, fetchDayExercises, fetchProgramDetails])
+  }, [id, day, fetchDayExercises, fetchProgramDetails])
 
   const handleExerciseChange = (index: number) => {
     setCurrentExercise(index)
@@ -80,7 +83,7 @@ export default function SessionPage({ params }: { params: { id: string; day: str
   if (error || !programDay || dayExercises.length === 0) {
     return (
       <div className="container px-4 py-8 mx-auto">
-        <Link href={`/programmes/${params.id}`}>
+        <Link href={`/programmes/${id}`}>
           <Button variant="ghost" size="sm" className="mb-2 pl-0">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour au programme
@@ -94,7 +97,7 @@ export default function SessionPage({ params }: { params: { id: string; day: str
   return (
     <div className="container px-0 py-4 mx-auto h-screen flex flex-col">
       <header className="px-4 mb-4">
-        <Link href={`/programmes/${params.id}`}>
+        <Link href={`/programmes/${id}`}>
           <Button variant="ghost" size="sm" className="mb-2 pl-0">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour au programme

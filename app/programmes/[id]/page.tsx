@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import Link from "next/link"
 import { ArrowLeft, Calendar } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function ProgrammePage({ params }: { params: { id: string } }) {
+  const id = React.use(params.id as any) as string
   const { fetchProgramDetails } = useData()
   const [program, setProgram] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -18,7 +20,7 @@ export default function ProgrammePage({ params }: { params: { id: string } }) {
     const loadProgram = async () => {
       try {
         setLoading(true)
-        const programData = await fetchProgramDetails(Number.parseInt(params.id))
+        const programData = await fetchProgramDetails(Number.parseInt(id))
         if (programData) {
           setProgram(programData)
           setError(null)
@@ -34,7 +36,7 @@ export default function ProgrammePage({ params }: { params: { id: string } }) {
     }
 
     loadProgram()
-  }, [params.id, fetchProgramDetails])
+  }, [id, fetchProgramDetails])
 
   if (loading) {
     return (
@@ -88,7 +90,7 @@ export default function ProgrammePage({ params }: { params: { id: string } }) {
 
       <div className="space-y-4">
         {program.days.map((day: any) => (
-          <Link href={`/programmes/${params.id}/session/${day.id}`} key={day.id}>
+          <Link href={`/programmes/${id}/session/${day.id}`} key={day.id}>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2">
