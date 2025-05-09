@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import Link from "next/link"
 import { ArrowLeft, Play } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -9,13 +10,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function CategoryPage({ params }: { params: { category: string } }) {
+  const category = React.use(params.category as any) as string
   const { fetchExercisesByMuscleGroup } = useData()
   const [exercises, setExercises] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   // Capitaliser la première lettre de la catégorie
-  const categoryName = params.category.charAt(0).toUpperCase() + params.category.slice(1)
+  const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
 
   useEffect(() => {
     const loadExercises = async () => {
@@ -72,7 +74,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
 
       <div className="space-y-4">
         {exercises.map((exercise) => (
-          <Link href={`/mediatheque/${params.category}/${exercise.id}`} key={exercise.id}>
+          <Link href={`/mediatheque/${category}/${exercise.id}`} key={exercise.id}>
             <Card>
               <div className="relative">
                 <img

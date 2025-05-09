@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
@@ -48,6 +49,7 @@ const exerciseSchema = z.object({
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
 export default function EditExercisePage({ params }: { params: { id: string } }) {
+    const id = React.use(params.id as any) as string
     const router = useRouter()
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
@@ -64,14 +66,12 @@ export default function EditExercisePage({ params }: { params: { id: string } })
             instructions: "",
             videoUrl: "",
         },
-    })
-
-    // Récupérer les données de l'exercice au chargement
+    })    // Récupérer les données de l'exercice au chargement
     useEffect(() => {
         const fetchExercise = async () => {
             try {
                 setLoading(true)
-                const response = await fetch(`/api/admin/exercises/${params.id}`)
+                const response = await fetch(`/api/admin/exercises/${id}`)
 
                 if (!response.ok) {
                     // Si l'exercice n'existe pas ou autre erreur
@@ -101,14 +101,14 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         }
 
         fetchExercise()
-    }, [params.id, form])
+    }, [id, form])
 
     // Soumission du formulaire
     const onSubmit = async (data: ExerciseFormValues) => {
         setSubmitting(true)
 
         try {
-            const response = await fetch(`/api/admin/exercises/${params.id}`, {
+            const response = await fetch(`/api/admin/exercises/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
