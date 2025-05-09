@@ -35,12 +35,10 @@ export async function POST(request: Request) {
         { error: "Au moins un jour d'entraînement est requis" },
         { status: 400 }
       )
-    }
-
-    // Utiliser une transaction pour garantir l'intégrité des données
-    return await db.transaction(async (tx) => {
+    }    // Créer le programme sans utiliser de transaction (non supporté par neon-http)
+    try {
       // Créer le programme
-      const [newProgram] = await tx
+      const [newProgram] = await db
         .insert(programs)
         .values({
           name,
@@ -54,7 +52,7 @@ export async function POST(request: Request) {
       // Créer les jours de programme
       for (const day of days as ProgramDay[]) {
         // Créer le jour
-        const [newDay] = await tx
+        const [newDay] = await db
           .insert(programDays)
           .values({
             programId: newProgram.id,
@@ -77,7 +75,7 @@ export async function POST(request: Request) {
             createdAt: new Date(),
           }))
 
-          await tx.insert(dayExercises).values(exercisesValues)
+          await db.insert(dayExercises).values(exercisesValues)
         }
       }
 
@@ -85,7 +83,11 @@ export async function POST(request: Request) {
         ...newProgram,
         message: "Programme créé avec succès"
       })
-    })
+    } catch (innerError) {
+      // Si une erreur se produit lors de la création, on la remonte
+      console.error("Error in program creation process:", innerError)
+      throw innerError
+    }
   } catch (error) {
     console.error("Error creating program:", error)
     return NextResponse.json({ error: "Erreur lors de la création du programme" }, { status: 500 })
