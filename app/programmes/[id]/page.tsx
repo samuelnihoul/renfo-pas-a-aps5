@@ -9,8 +9,9 @@ import { useData } from "@/components/data-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function ProgrammePage({ params }: { params: { id: string } }) {
-  const id = params.id
+export default function ProgrammePage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
+  const unwrappedParams = React.use(params as Promise<{ id: string }>)
+  const id = unwrappedParams.id
   const { fetchProgramDetails } = useData()
   const [program, setProgram] = useState<any>(null)
   const [loading, setLoading] = useState(true)
