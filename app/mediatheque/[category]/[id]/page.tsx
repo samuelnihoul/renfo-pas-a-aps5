@@ -11,8 +11,8 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function ExercisePage({ params }: { params: { category: string; id: string } }) {
-  const id = React.use(params.id as any) as string
-  const category = React.use(params.category as any) as string
+  const id = params.id
+  const category = params.category
   const { fetchExerciseDetails } = useData()
   const [exercise, setExercise] = useState<any>(null)
   const [loading, setLoading] = useState(true)

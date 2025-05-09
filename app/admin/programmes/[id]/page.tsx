@@ -50,7 +50,7 @@ type DayExercise = {
 }
 
 export default function EditProgramPage({ params }: { params: { id: string } }) {
-  const id = React.use(params.id as any) as string
+  const id = params.id
   const router = useRouter()
   const [program, setProgram] = useState<Program | null>(null)
   const [loading, setLoading] = useState(true)

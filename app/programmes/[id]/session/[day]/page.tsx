@@ -12,8 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 export default function SessionPage({ params }: { params: { id: string; day: string } }) {
-  const id = React.use(params.id as any) as string
-  const day = React.use(params.day as any) as string
+  const id = params.id
+  const day = params.day
   const { fetchDayExercises, fetchProgramDetails } = useData()
   const [currentExercise, setCurrentExercise] = useState(0)
   const [dayExercises, setDayExercises] = useState<any[]>([])

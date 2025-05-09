@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function ProgrammePage({ params }: { params: { id: string } }) {
-  const id = React.use(params.id as any) as string
+  const id = params.id
   const { fetchProgramDetails } = useData()
   const [program, setProgram] = useState<any>(null)
   const [loading, setLoading] = useState(true)
