@@ -219,7 +219,6 @@ export default function NewProgramPage() {
       exerciseId: id,
     }))
   }
-
   const addExerciseToDay = () => {
     if (currentDayIndex === null || tempExercise.exerciseId === 0) return
 
@@ -229,6 +228,12 @@ export default function NewProgramPage() {
     setProgramDays((prev) => {
       const newDays = [...prev]
       const day = newDays[currentDayIndex]
+
+      // Vérifier si l'exercice n'est pas déjà dans le jour pour éviter les doublons
+      if (day.exercises.some(ex => ex.exerciseId === tempExercise.exerciseId)) {
+        // L'exercice existe déjà, retourner l'état inchangé
+        return prev
+      }
 
       // Calculer le nouvel index d'ordre
       const orderIndex = day.exercises.length > 0
@@ -660,7 +665,18 @@ export default function NewProgramPage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={addExerciseDialogOpen} onOpenChange={setAddExerciseDialogOpen}>
+      <Dialog open={addExerciseDialogOpen} onOpenChange={(open) => {
+        // Si on ferme la boîte de dialogue, réinitialisons également l'exercice temporaire
+        if (!open) {
+          setTempExercise({
+            exerciseId: 0,
+            sets: 3,
+            reps: "10",
+            restTime: "60s",
+          });
+        }
+        setAddExerciseDialogOpen(open);
+      }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Ajouter un exercice</DialogTitle>
@@ -771,9 +787,11 @@ export default function NewProgramPage() {
               onClick={() => setAddExerciseDialogOpen(false)}
             >
               Annuler
-            </Button>
-            <Button
-              onClick={addExerciseToDay}
+            </Button>            <Button
+              onClick={() => {
+                addExerciseToDay();
+                // Ne pas fermer ici car c'est déjà fait dans addExerciseToDay
+              }}
               disabled={tempExercise.exerciseId === 0}
             >
               <Save className="mr-2 h-4 w-4" />
