@@ -117,6 +117,18 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         }
     }
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0];
+            setVideoFile(file);
+            
+            // Create preview URL
+            const fileURL = URL.createObjectURL(file);
+            setPreviewUrl(fileURL);
+            setUploadStatus("idle");
+        }
+    }
+
     const handleVideoUrlChange = (url: string) => {
         form.setValue("videoUrl", url)
     }
@@ -381,9 +393,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
-
-                            <div className="space-y-2">
+                            />                            <div className="space-y-2">
                                 <FormLabel htmlFor="video-upload">Télécharger une vidéo</FormLabel>
                                 <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
                                     {previewUrl ? (
@@ -401,9 +411,9 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                                 Supprimer
                                             </Button>
                                         </div>
-                                    ) : field.value ? (
+                                    ) : form.watch("videoUrl") ? (
                                         <div className="w-full">
-                                            <video src={field.value} controls className="w-full h-48 object-cover rounded-md mb-2" />
+                                            <video src={form.watch("videoUrl")} controls className="w-full h-48 object-cover rounded-md mb-2" />
                                             <Button
                                                 type="button"
                                                 variant="outline"

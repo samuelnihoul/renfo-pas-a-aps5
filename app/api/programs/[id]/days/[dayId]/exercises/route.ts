@@ -4,8 +4,9 @@ import { dayExercises, exercises } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function GET(request: Request, { params }: { params: { id: string; dayId: string } }) {
+  const paramsAwaited = await params
   try {
-    const dayId = Number.parseInt(params.dayId)
+    const dayId = Number.parseInt(paramsAwaited.dayId)
 
     if (isNaN(dayId)) {
       return NextResponse.json({ error: "Invalid day ID" }, { status: 400 })

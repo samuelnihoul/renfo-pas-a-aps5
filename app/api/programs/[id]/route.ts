@@ -4,8 +4,9 @@ import { programs, programDays } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
+  const paramsAwaited = await params
   try {
-    const id = Number.parseInt(params.id)
+    const id = Number.parseInt(paramsAwaited.id)
 
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 })
