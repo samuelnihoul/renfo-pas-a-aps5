@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import VideoUpload from "@/components/video-upload"
 import {
     Card,
     CardContent,
@@ -54,6 +55,8 @@ export default function EditExercisePage({ params }: { params: { id: string } })
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [videoFile, setVideoFile] = useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
     // Configuration du formulaire
     const form = useForm<ExerciseFormValues>({
@@ -103,17 +106,50 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         fetchExercise()
     }, [id, form])
 
-    // Soumission du formulaire
+    // Gérer le téléchargement de fichier vidéo
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setVideoFile(file)
+            const url = URL.createObjectURL(file)
+            setPreviewUrl(url)
+            // Nous ne mettons pas à jour le formulaire ici, car nous voulons uploader la vidéo lors de la soumission
+        }
+    }    // Soumission du formulaire
     const onSubmit = async (data: ExerciseFormValues) => {
         setSubmitting(true)
 
         try {
+            let finalVideoUrl = data.videoUrl;
+
+            // Si un fichier vidéo a été sélectionné, on l'upload d'abord
+            if (videoFile) {
+                const uploadFormData = new FormData();
+                uploadFormData.append("video", videoFile);
+
+                const uploadResponse = await fetch("/api/upload/video", {
+                    method: "POST",
+                    body: uploadFormData,
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorData = await uploadResponse.json();
+                    throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
+                }
+
+                const uploadData = await uploadResponse.json();
+                finalVideoUrl = uploadData.fileUrl;
+            }
+
             const response = await fetch(`/api/admin/exercises/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    ...data,
+                    videoUrl: finalVideoUrl,
+                }),
             })
 
             if (!response.ok) {
@@ -306,6 +342,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                                 placeholder="https://example.com/video.mp4"
                                                 {...field}
                                                 value={field.value || ""}
+                                                disabled={!!previewUrl}
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -315,6 +352,65 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                     </FormItem>
                                 )}
                             />
+
+                            <div className="space-y-2">
+                                <FormLabel htmlFor="video-upload">Télécharger une vidéo</FormLabel>
+                                <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
+                                    {previewUrl ? (
+                                        <div className="w-full">
+                                            <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setVideoFile(null);
+                                                    setPreviewUrl(null);
+                                                }}
+                                            >
+                                                Supprimer
+                                            </Button>
+                                        </div>
+                                    ) : field.value ? (
+                                        <div className="w-full">
+                                            <video src={field.value} controls className="w-full h-48 object-cover rounded-md mb-2" />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    form.setValue("videoUrl", "");
+                                                }}
+                                            >
+                                                Supprimer la vidéo existante
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex flex-col items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-muted-foreground mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                </svg>
+                                                <p className="text-sm text-muted-foreground mb-2">
+                                                    Glissez-déposez ou cliquez pour sélectionner une vidéo
+                                                </p>
+                                                <Input id="video-upload" type="file" accept="video/*" onChange={handleFileChange} className="hidden" />
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        document.getElementById("video-upload")?.click();
+                                                    }}
+                                                >
+                                                    Sélectionner un fichier
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-2">Formats acceptés: MP4, WebM. Taille maximale: 50MB</p>
+                            </div>
                         </CardContent>
 
                         <CardFooter className="flex justify-between">

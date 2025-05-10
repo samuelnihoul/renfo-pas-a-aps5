@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Upload } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
+import VideoUpload from "@/components/video-upload"
 
 export default function NewExercisePage() {
   const router = useRouter()
@@ -60,19 +61,11 @@ export default function NewExercisePage() {
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleFileChange = (file: File | null) => {
     if (file) {
       setVideoFile(file)
-      const url = URL.createObjectURL(file)
-      setPreviewUrl(url)
-
-      // Dans un environnement réel, vous téléchargeriez le fichier et obtiendriez une URL
-      // Pour l'instant, nous allons simplement utiliser l'URL locale pour la démonstration
-      setFormData((prev) => ({
-        ...prev,
-        videoUrl: url,
-      }))
+      // Ne pas définir videoUrl - nous attendrons de soumettre le formulaire
+      // pour obtenir l'URL réelle après upload
     }
   }
 
@@ -105,40 +98,62 @@ export default function NewExercisePage() {
     setLoading(true)
 
     try {
-      // Dans un environnement réel, vous téléchargeriez d'abord la vidéo
-      // puis utiliseriez l'URL retournée dans les données du formulaire
+      let finalVideoUrl = formData.videoUrl;
 
+      // Si un fichier vidéo a été sélectionné, on l'upload d'abord
+      if (videoFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("video", videoFile);
+
+        const uploadResponse = await fetch("/api/upload/video", {
+          method: "POST",
+          body: uploadFormData,
+        });
+
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json();
+          throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
+        }
+
+        const uploadData = await uploadResponse.json();
+        finalVideoUrl = uploadData.fileUrl;
+      }
+
+      // Création de l'exercice avec l'URL de la vidéo
       const response = await fetch("/api/admin/exercises", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
-      })
+        body: JSON.stringify({
+          ...formData,
+          videoUrl: finalVideoUrl,
+        }),
+      });
 
       if (response.ok) {
         toast({
           title: "Exercice créé",
           description: "L'exercice a été créé avec succès",
-        })
-        router.push("/admin/exercices")
+        });
+        router.push("/admin/exercices");
       } else {
-        const data = await response.json()
+        const data = await response.json();
         toast({
           title: "Erreur",
           description: data.error || "Une erreur est survenue lors de la création de l'exercice",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
-      console.error("Error creating exercise:", error)
+      console.error("Error creating exercise:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création de l'exercice",
+        description: error instanceof Error ? error.message : "Une erreur est survenue lors de la création de l'exercice",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
