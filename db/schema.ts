@@ -19,6 +19,7 @@ export const exercises = pgTable("exercises", {
   muscleGroup: varchar("muscle_group", { length: 100 }).notNull(),
   difficulty: varchar("difficulty", { length: 50 }).notNull(),
   videoUrl: varchar("video_url", { length: 255 }),
+  videoPublicId: varchar("video_public_id", { length: 255 }),
   instructions: text("instructions"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 })

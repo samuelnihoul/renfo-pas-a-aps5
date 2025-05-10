@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/db"
 import { exercises } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { deleteVideo } from "@/lib/cloudinary"
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -16,6 +17,16 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
     if (!existingExercise.length) {
       return NextResponse.json({ error: "Exercice non trouvé" }, { status: 404 })
+    }
+
+    // Si l'exercice a une vidéo sur Cloudinary, la supprimer
+    if (existingExercise[0].videoPublicId) {
+      try {
+        await deleteVideo(existingExercise[0].videoPublicId);
+      } catch (cloudinaryError) {
+        console.error("Erreur lors de la suppression de la vidéo sur Cloudinary:", cloudinaryError);
+        // Continuer malgré l'erreur de suppression de la vidéo
+      }
     }
 
     // Supprimer l'exercice
@@ -59,7 +70,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { name, description, muscleGroup, difficulty, instructions, videoUrl } = body
+    const { name, description, muscleGroup, difficulty, instructions, videoUrl, videoPublicId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom de l'exercice est requis" }, { status: 400 })
@@ -82,6 +93,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         difficulty,
         instructions: instructions || null,
         videoUrl: videoUrl || null,
+        videoPublicId: videoPublicId || null,
       })
       .where(eq(exercises.id, id))
       .returning()

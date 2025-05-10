@@ -45,6 +45,7 @@ const exerciseSchema = z.object({
     difficulty: z.string().min(1, "La difficulté est requise"),
     instructions: z.string().optional(),
     videoUrl: z.string().optional(),
+    videoPublicId: z.string().optional(),
 })
 
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
@@ -85,9 +86,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                     // Si l'exercice n'existe pas ou autre erreur
                     const data = await response.json()
                     throw new Error(data.error || "Erreur lors de la récupération de l'exercice")
-                }
-
-                const exercise = await response.json()
+                } const exercise = await response.json()
 
                 // Mise à jour des valeurs du formulaire
                 form.reset({
@@ -97,6 +96,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                     difficulty: exercise.difficulty,
                     instructions: exercise.instructions || "",
                     videoUrl: exercise.videoUrl || "",
+                    videoPublicId: exercise.videoPublicId || "",
                 })
 
                 setError(null)
@@ -170,10 +170,11 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                         setUploadStatus("error")
                         setUploadError(errorData.error || "Erreur lors du téléchargement de la vidéo")
                         throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
-                    }
-
-                    const uploadData = await uploadResponse.json();
+                    } const uploadData = await uploadResponse.json();
                     finalVideoUrl = uploadData.fileUrl;
+                    const videoPublicId = uploadData.publicId;
+                    // Mettre à jour le champ videoPublicId dans le formulaire
+                    form.setValue("videoPublicId", videoPublicId);
                     setUploadProgress(100)
                     setUploadStatus("success")
                 } catch (error) {
@@ -187,10 +188,10 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
+                }, body: JSON.stringify({
                     ...data,
                     videoUrl: finalVideoUrl,
+                    videoPublicId: form.getValues("videoPublicId"),
                 }),
             })
 

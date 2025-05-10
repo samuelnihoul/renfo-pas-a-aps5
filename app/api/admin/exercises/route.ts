@@ -5,7 +5,7 @@ import { exercises } from "@/db/schema"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, description, muscleGroup, difficulty, instructions, videoUrl } = body
+    const { name, description, muscleGroup, difficulty, instructions, videoUrl, videoPublicId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom de l'exercice est requis" }, { status: 400 })
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
         difficulty,
         instructions: instructions || null,
         videoUrl: videoUrl || null,
+        videoPublicId: videoPublicId || null,
         createdAt: now, // Use the Date object directly
       })
       .returning()

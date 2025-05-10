@@ -1,10 +1,7 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import { join } from "path";
-import { mkdir } from "fs/promises";
-import { v4 as uuidv4 } from "uuid";
+import { uploadVideo } from "@/lib/cloudinary";
 
 // Taille maximale de fichier (50MB)
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -36,33 +33,26 @@ export async function POST(request: NextRequest) {
                 { error: "Le fichier est trop volumineux. Taille maximale autorisée: 50MB." },
                 { status: 400 }
             );
-        }
-
-        // Générer un nom de fichier unique
-        const fileName = `${uuidv4()}.${fileType === "video/mp4" ? "mp4" : "webm"}`;
-
-        // Créer le répertoire de stockage s'il n'existe pas déjà
-        const uploadDir = join(process.cwd(), "public", "videos");
-        try {
-            await mkdir(uploadDir, { recursive: true });
-        } catch (error) {
-            console.error("Erreur lors de la création du répertoire:", error);
-        }
-
-        // Chemin du fichier
-        const filePath = join(uploadDir, fileName);
-
-        // Convertir le fichier en tableau d'octets
+        }        // Convertir le fichier en ArrayBuffer pour l'upload Cloudinary
         const bytes = await videoFile.arrayBuffer();
-        const buffer = Buffer.from(bytes);
 
-        // Écrire le fichier sur le disque
-        await writeFile(filePath, buffer);
+        try {
+            // Télécharger la vidéo sur Cloudinary
+            const result = await uploadVideo(bytes);
 
-        // URL publique du fichier
-        const fileUrl = `/videos/${fileName}`;
-
-        return NextResponse.json({ success: true, fileUrl });
+            // Retourner l'URL de la vidéo téléchargée
+            return NextResponse.json({
+                success: true,
+                fileUrl: result.url,
+                publicId: result.publicId
+            });
+        } catch (uploadError) {
+            console.error("Erreur lors du téléchargement sur Cloudinary:", uploadError);
+            return NextResponse.json(
+                { error: "Une erreur est survenue lors du téléchargement sur Cloudinary" },
+                { status: 500 }
+            );
+        }
     } catch (error) {
         console.error("Erreur lors du téléchargement du fichier:", error);
         return NextResponse.json(

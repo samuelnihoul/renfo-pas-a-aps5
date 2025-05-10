@@ -11,5 +11,5 @@ export default {
     url: process.env.DATABASE_URL!,
     connectionString: process.env.DATABASE_URL!,
   },
-  driver: "pg",
+  driver: "d1",
 } satisfies Config
