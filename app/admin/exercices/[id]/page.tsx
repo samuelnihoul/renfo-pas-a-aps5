@@ -50,13 +50,18 @@ const exerciseSchema = z.object({
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
 export default function EditExercisePage({ params }: { params: { id: string } }) {
-    const id = React.use(params.id as any) as string
+    const wrappedId = React.use(params as any) as { id: string }
+    const id = wrappedId.id
+
     const router = useRouter()
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [videoFile, setVideoFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const [uploadProgress, setUploadProgress] = useState(0)
+    const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle")
+    const [uploadError, setUploadError] = useState("")
 
     // Configuration du formulaire
     const form = useForm<ExerciseFormValues>({
@@ -104,41 +109,66 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         }
 
         fetchExercise()
-    }, [id, form])
-
-    // Gérer le téléchargement de fichier vidéo
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
+    }, [id, form])    // Gérer le téléchargement de fichier vidéo
+    const handleVideoChange = (file: File | null) => {
+        setVideoFile(file)
         if (file) {
-            setVideoFile(file)
-            const url = URL.createObjectURL(file)
-            setPreviewUrl(url)
-            // Nous ne mettons pas à jour le formulaire ici, car nous voulons uploader la vidéo lors de la soumission
+            setUploadStatus("idle")
         }
-    }    // Soumission du formulaire
+    }
+
+    const handleVideoUrlChange = (url: string) => {
+        form.setValue("videoUrl", url)
+    }
+
+    // Soumission du formulaire
     const onSubmit = async (data: ExerciseFormValues) => {
         setSubmitting(true)
 
         try {
-            let finalVideoUrl = data.videoUrl;
-
-            // Si un fichier vidéo a été sélectionné, on l'upload d'abord
+            let finalVideoUrl = data.videoUrl;            // Si un fichier vidéo a été sélectionné, on l'upload d'abord
             if (videoFile) {
-                const uploadFormData = new FormData();
-                uploadFormData.append("video", videoFile);
+                setUploadStatus("uploading")
+                setUploadProgress(0)
 
-                const uploadResponse = await fetch("/api/upload/video", {
-                    method: "POST",
-                    body: uploadFormData,
-                });
+                try {
+                    // Simuler la progression de l'upload
+                    const progressInterval = setInterval(() => {
+                        setUploadProgress((prev) => {
+                            if (prev >= 90) {
+                                clearInterval(progressInterval)
+                                return prev
+                            }
+                            return prev + 10
+                        })
+                    }, 300)
 
-                if (!uploadResponse.ok) {
-                    const errorData = await uploadResponse.json();
-                    throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
+                    const uploadFormData = new FormData();
+                    uploadFormData.append("video", videoFile);
+
+                    const uploadResponse = await fetch("/api/upload/video", {
+                        method: "POST",
+                        body: uploadFormData,
+                    });
+
+                    clearInterval(progressInterval)
+
+                    if (!uploadResponse.ok) {
+                        const errorData = await uploadResponse.json();
+                        setUploadStatus("error")
+                        setUploadError(errorData.error || "Erreur lors du téléchargement de la vidéo")
+                        throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
+                    }
+
+                    const uploadData = await uploadResponse.json();
+                    finalVideoUrl = uploadData.fileUrl;
+                    setUploadProgress(100)
+                    setUploadStatus("success")
+                } catch (error) {
+                    setUploadStatus("error")
+                    setUploadError(error instanceof Error ? error.message : "Erreur lors du téléchargement de la vidéo")
+                    throw error
                 }
-
-                const uploadData = await uploadResponse.json();
-                finalVideoUrl = uploadData.fileUrl;
             }
 
             const response = await fetch(`/api/admin/exercises/${id}`, {

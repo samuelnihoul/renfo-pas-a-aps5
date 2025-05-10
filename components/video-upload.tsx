@@ -2,14 +2,26 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 interface VideoUploadProps {
     videoUrl: string | null;
     onVideoChange: (file: File | null) => void;
     onVideoUrlChange: (url: string) => void;
+    uploadProgress?: number;
+    uploadStatus?: "idle" | "uploading" | "success" | "error";
+    uploadError?: string;
 }
 
-export default function VideoUpload({ videoUrl, onVideoChange, onVideoUrlChange }: VideoUploadProps) {
+export default function VideoUpload({
+    videoUrl,
+    onVideoChange,
+    onVideoUrlChange,
+    uploadProgress = 0,
+    uploadStatus = "idle",
+    uploadError = ""
+}: VideoUploadProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     // Set initial preview from videoUrl prop
@@ -42,11 +54,37 @@ export default function VideoUpload({ videoUrl, onVideoChange, onVideoUrlChange 
                 {previewUrl ? (
                     <div className="w-full">
                         <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
+
+                        {uploadStatus === "uploading" && (
+                            <div className="mt-2 mb-2">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                    <span className="text-sm">Téléchargement en cours...</span>
+                                </div>
+                                <Progress value={uploadProgress} className="h-2" />
+                            </div>
+                        )}
+
+                        {uploadStatus === "success" && (
+                            <div className="flex items-center gap-2 mt-2 mb-2 text-green-600">
+                                <CheckCircle className="h-4 w-4" />
+                                <span className="text-sm">Téléchargement réussi</span>
+                            </div>
+                        )}
+
+                        {uploadStatus === "error" && (
+                            <div className="flex items-center gap-2 mt-2 mb-2 text-red-600">
+                                <AlertCircle className="h-4 w-4" />
+                                <span className="text-sm">{uploadError || "Erreur lors du téléchargement"}</span>
+                            </div>
+                        )}
+
                         <Button
                             type="button"
                             variant="outline"
                             size="sm"
                             onClick={handleRemoveVideo}
+                            disabled={uploadStatus === "uploading"}
                         >
                             Supprimer la vidéo
                         </Button>
