@@ -9,5 +9,7 @@ export default {
   dialect: "postgresql",
   dbCredentials: {
     url: process.env.DATABASE_URL!,
+    connectionString: process.env.DATABASE_URL!,
   },
+  driver: "pg",
 } satisfies Config

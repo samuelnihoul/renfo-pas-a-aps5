@@ -121,7 +121,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
             setVideoFile(file);
-            
+
             // Create preview URL
             const fileURL = URL.createObjectURL(file);
             setPreviewUrl(fileURL);
