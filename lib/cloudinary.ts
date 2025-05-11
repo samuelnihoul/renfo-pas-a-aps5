@@ -1,12 +1,19 @@
 import { v2 as cloudinary } from 'cloudinary';
+import * as dotenv from "dotenv";
+
+// Charger les variables d'environnement
+dotenv.config();
 
 // Configuration de Cloudinary avec les variables d'environnement
+// L'URL de Cloudinary est automatiquement détectée à partir de CLOUDINARY_URL
 cloudinary.config({
     secure: true,
 });
 
 // La fonction principale pour télécharger une vidéo sur Cloudinary
 export async function uploadVideo(file: ArrayBuffer): Promise<{ url: string; publicId: string }> {
+    console.log("Configuration Cloudinary:", process.env.CLOUDINARY_URL ? "URL trouvée" : "URL manquante");
+
     return new Promise((resolve, reject) => {
         // Création d'un stream à partir du buffer
         const stream = cloudinary.uploader.upload_stream(
@@ -24,12 +31,14 @@ export async function uploadVideo(file: ArrayBuffer): Promise<{ url: string; pub
             },
             (error, result) => {
                 if (error) {
+                    console.error("Erreur Cloudinary détaillée:", JSON.stringify(error));
                     return reject(error);
                 }
                 if (!result) {
                     return reject(new Error('Echec du téléchargement: aucun résultat retourné'));
                 }
 
+                console.log("Résultat de l'upload Cloudinary:", result.secure_url);
                 return resolve({
                     url: result.secure_url,
                     publicId: result.public_id

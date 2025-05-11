@@ -15,9 +15,8 @@ import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
 import VideoUpload from "@/components/video-upload"
 
-export default function NewExercisePage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
+export default function NewExercisePage() {  const router = useRouter()
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -25,6 +24,7 @@ export default function NewExercisePage() {
     difficulty: "Débutant",
     instructions: "",
     videoUrl: "",
+    videoPublicId: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -60,12 +60,13 @@ export default function NewExercisePage() {
       })
     }
   }
-
-  const handleFileChange = (file: File | null) => {
-    if (file) {
-      setVideoFile(file)
-      // Ne pas définir videoUrl - nous attendrons de soumettre le formulaire
-      // pour obtenir l'URL réelle après upload
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setVideoFile(file);
+      // Créer une URL de prévisualisation
+      const fileURL = URL.createObjectURL(file);
+      setPreviewUrl(fileURL);
     }
   }
 
@@ -98,10 +99,14 @@ export default function NewExercisePage() {
     setLoading(true)
 
     try {
-      let finalVideoUrl = formData.videoUrl;
-
-      // Si un fichier vidéo a été sélectionné, on l'upload d'abord
+      let finalVideoUrl = formData.videoUrl;      // Si un fichier vidéo a été sélectionné, on l'upload d'abord
       if (videoFile) {
+        // Notification de début d'upload
+        toast({
+          title: "Téléchargement en cours",
+          description: `Envoi de '${videoFile.name}' vers le serveur...`,
+        });
+        
         const uploadFormData = new FormData();
         uploadFormData.append("video", videoFile);
 
@@ -112,14 +117,27 @@ export default function NewExercisePage() {
 
         if (!uploadResponse.ok) {
           const errorData = await uploadResponse.json();
+          toast({
+            title: "Échec du téléchargement",
+            description: errorData.error || "La vidéo n'a pas pu être téléchargée",
+            variant: "destructive"
+          });
           throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
         }
 
         const uploadData = await uploadResponse.json();
         finalVideoUrl = uploadData.fileUrl;
-      }
-
-      // Création de l'exercice avec l'URL de la vidéo
+        const videoPublicId = uploadData.publicId;
+        
+        // Notification de succès de l'upload
+        toast({
+          title: "Téléchargement réussi",
+          description: "La vidéo a été téléchargée avec succès",
+        });
+        
+        // Inclure videoPublicId dans les données soumises
+        formData.videoPublicId = videoPublicId;
+      }      // Création de l'exercice avec l'URL de la vidéo et l'identifiant public
       const response = await fetch("/api/admin/exercises", {
         method: "POST",
         headers: {
@@ -269,11 +287,15 @@ export default function NewExercisePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="video">Vidéo de démonstration</Label>
-              <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
+              <Label htmlFor="video">Vidéo de démonstration</Label>              <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
                 {previewUrl ? (
                   <div className="w-full">
-                    <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
+                    <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />                    <div className="flex items-center gap-2 my-2 text-sm">
+                      <Upload className="h-4 w-4 text-primary" />
+                      <span className="font-medium text-gray-700">
+                        {videoFile?.name} ({videoFile ? Math.round(videoFile.size / 1024) : 0}KB)
+                      </span>
+                    </div>
                     <Button
                       type="button"
                       variant="outline"
@@ -291,8 +313,7 @@ export default function NewExercisePage() {
                     </Button>
                   </div>
                 ) : (
-                  <>
-                    <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+                  <>                    <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-2">
                       Glissez-déposez ou cliquez pour sélectionner une vidéo
                     </p>

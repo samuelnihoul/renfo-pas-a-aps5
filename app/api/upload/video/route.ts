@@ -34,11 +34,11 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }        // Convertir le fichier en ArrayBuffer pour l'upload Cloudinary
-        const bytes = await videoFile.arrayBuffer();
-
-        try {
+        const bytes = await videoFile.arrayBuffer(); try {
             // Télécharger la vidéo sur Cloudinary
+            console.log("Début du téléchargement sur Cloudinary");
             const result = await uploadVideo(bytes);
+            console.log("Téléchargement Cloudinary réussi:", result);
 
             // Retourner l'URL de la vidéo téléchargée
             return NextResponse.json({
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
                 publicId: result.publicId
             });
         } catch (uploadError) {
-            console.error("Erreur lors du téléchargement sur Cloudinary:", uploadError);
+            console.error("Erreur détaillée lors du téléchargement sur Cloudinary:", uploadError);
             return NextResponse.json(
                 { error: "Une erreur est survenue lors du téléchargement sur Cloudinary" },
                 { status: 500 }
