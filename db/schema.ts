@@ -73,7 +73,11 @@ export const dayExercises = pgTable(
   },
   (table) => {
     return {
-      dayExerciseUnique: unique().on(table.dayId, table.exerciseId, table.orderIndex),
+      dayExerciseUnique: unique("day_exercise_unique_idx").on(
+        table.dayId,
+        table.exerciseId,
+        table.orderIndex
+      ),
     }
   },
 )
