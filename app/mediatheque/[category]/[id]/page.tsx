@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export default function ExercisePage({ params }: { params: { category: string; id: string } }) {
+export default async function ExercisePage({ params }: { params: { category: string; id: string } }) {
+  const awaitedParams = await params
   const id = params.id
   const category = params.category
   const { fetchExerciseDetails } = useData()
