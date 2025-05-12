@@ -19,10 +19,9 @@ export async function uploadVideo(file: ArrayBuffer): Promise<{ url: string; pub
         const stream = cloudinary.uploader.upload_stream(
             {
                 resource_type: 'video',
-                folder: 'exercise-videos',
-                // Options pour optimiser les vidéos
+                folder: 'exercise-videos',                // Options pour optimiser les vidéos
                 eager: [
-                    { streaming_profile: 'hd', format: 'mp4' },
+                    { format: 'mp4', quality: 'auto' },
                     { raw_transformation: 'q_auto:low', format: 'mp4' }
                 ],
                 eager_async: true,

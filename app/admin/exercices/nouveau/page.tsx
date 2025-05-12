@@ -15,7 +15,8 @@ import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
 import VideoUpload from "@/components/video-upload"
 
-export default function NewExercisePage() {  const router = useRouter()
+export default function NewExercisePage() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -106,7 +107,7 @@ export default function NewExercisePage() {  const router = useRouter()
           title: "Téléchargement en cours",
           description: `Envoi de '${videoFile.name}' vers le serveur...`,
         });
-        
+
         const uploadFormData = new FormData();
         uploadFormData.append("video", videoFile);
 
@@ -128,13 +129,13 @@ export default function NewExercisePage() {  const router = useRouter()
         const uploadData = await uploadResponse.json();
         finalVideoUrl = uploadData.fileUrl;
         const videoPublicId = uploadData.publicId;
-        
+
         // Notification de succès de l'upload
         toast({
           title: "Téléchargement réussi",
           description: "La vidéo a été téléchargée avec succès",
         });
-        
+
         // Inclure videoPublicId dans les données soumises
         formData.videoPublicId = videoPublicId;
       }      // Création de l'exercice avec l'URL de la vidéo et l'identifiant public
