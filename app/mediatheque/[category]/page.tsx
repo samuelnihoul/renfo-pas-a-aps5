@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function CategoryPage({ params }: { params: { category: string } }) {
-  const category = React.use(params.category as any) as string
+  const paramsUnwrapped = React.use(params as any) as { category: string }
+  const category = paramsUnwrapped.category
   const { fetchExercisesByMuscleGroup } = useData()
   const [exercises, setExercises] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
