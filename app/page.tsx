@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Video, MonitorIcon as Running } from "lucide-react"
+import { Video, BookHeart } from "lucide-react"
 import { useData } from "@/components/data-provider"
 
 import { Button } from "@/components/ui/button"
@@ -50,7 +50,7 @@ export default function Home() {
           <h1 className="text-2xl font-bold gradient-text">Renfo Pas à Pas</h1>
           <p className="text-sm text-muted-foreground">Renforcement pour la course à pied</p>
         </div>
-        <Running className="w-8 h-8 text-theme-light" />
+        <BookHeart className="w-8 h-8 text-theme-light" />
       </header>
 
       <Tabs defaultValue="programmes" className="w-full">
