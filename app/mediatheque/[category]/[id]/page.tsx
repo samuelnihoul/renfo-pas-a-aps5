@@ -99,8 +99,20 @@ export default function ExercisePage({ params }: { params: { category: string; i
                 <video
                   src={exercise.videoUrl}
                   controls
+                  preload="metadata"
                   className="w-full h-full object-cover"
                   poster="/placeholder.svg"
+                  onLoadedMetadata={(e) => {
+                    const video = e.target as HTMLVideoElement;
+                    // Accéder à la première frame
+                    video.currentTime = 0.1;
+                    // Désactiver cette action après la première exécution
+                    video.onloadeddata = () => {
+                      video.pause();
+                      // Réinitialiser pour la lecture normale
+                      video.currentTime = 0;
+                    };
+                  }}
                 />
               ) : (
                 <>

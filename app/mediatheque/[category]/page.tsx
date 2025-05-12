@@ -78,14 +78,38 @@ export default function CategoryPage({ params }: { params: { category: string } 
           <Link href={`/mediatheque/${category}/${exercise.id}`} key={exercise.id}>
             <Card>
               <div className="relative">
-                <img
-                  src={exercise.videoUrl || "/placeholder.svg"}
-                  alt={`Vidéo de ${exercise.name}`}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Play className="w-12 h-12 text-theme-light opacity-80" />
-                </div>
+                {exercise.videoUrl ? (
+                  <div className="w-full h-48 relative">
+                    <video
+                      src={exercise.videoUrl}
+                      className="w-full h-full object-cover"
+                      poster="/placeholder.svg"
+                      muted
+                      preload="metadata"
+                      onLoadedMetadata={(e) => {
+                        const video = e.target as HTMLVideoElement;
+                        video.currentTime = 0.1;
+                        video.onloadeddata = () => {
+                          video.pause();
+                        };
+                      }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Play className="w-12 h-12 text-theme-light opacity-80" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-48 relative">
+                    <img
+                      src="/placeholder.svg"
+                      alt={`Vidéo de ${exercise.name}`}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Play className="w-12 h-12 text-theme-light opacity-80" />
+                    </div>
+                  </div>
+                )}
               </div>
               <CardHeader className="pb-2">
                 <CardTitle>{exercise.name}</CardTitle>
