@@ -19,8 +19,6 @@ export default function ExercisePage({ params }: { params: { category: string; i
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Capitaliser la première lettre de la catégorie
-  const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
 
   useEffect(() => {
     const loadExercise = async () => {
@@ -96,13 +94,24 @@ export default function ExercisePage({ params }: { params: { category: string; i
           </TabsList>
 
           <TabsContent value="video" className="p-0">
-            <div className="aspect-video bg-muted flex items-center justify-center">
-              <img
-                src={exercise.videoUrl || "/placeholder.svg"}
-                alt={`Vidéo de ${exercise.name}`}
-                className="w-full h-full object-cover"
-              />
-              <Play className="absolute w-16 h-16 text-theme-light opacity-80" />
+            <div className="aspect-video bg-muted flex items-center justify-center relative">
+              {exercise.videoUrl ? (
+                <video
+                  src={exercise.videoUrl}
+                  controls
+                  className="w-full h-full object-cover"
+                  poster="/placeholder.svg"
+                />
+              ) : (
+                <>
+                  <img
+                    src="/placeholder.svg"
+                    alt={`Vidéo de ${exercise.name}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <Play className="absolute w-16 h-16 text-theme-light opacity-80" />
+                </>
+              )}
             </div>
           </TabsContent>
 
