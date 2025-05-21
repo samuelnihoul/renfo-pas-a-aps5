@@ -53,6 +53,25 @@ export default function AdminDashboard() {
         </Card>
 
 
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Dumbbell className="w-5 h-5" />
+              Blocks
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>Ajoutez et modifiez les blocs de renforcement musculaire.</p>
+            <div className="flex gap-2">
+              <Link href="/admin/blocs">
+                <Button variant="outline">Voir tous</Button>
+              </Link>
+              <Link href="/admin/exercices/nouveau">
+                <Button>Ajouter</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
