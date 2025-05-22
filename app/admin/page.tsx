@@ -8,7 +8,7 @@ export default function AdminDashboard() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Administration</h1>
       <p className="text-muted-foreground mb-6">
-        Bienvenue dans l'interface d'administration de Renfo Pas à Pas. Gérez vos programmes et exercices facilement.
+        Bienvenue dans l'interface d'administration de Renfo Pas à Pas. Gérez vos programmes, routines, exercices et blocs facilement.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
