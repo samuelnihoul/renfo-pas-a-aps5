@@ -1,6 +1,16 @@
 import { relations } from "drizzle-orm"
 import { pgTable, serial, varchar, text, timestamp, integer, date, decimal, unique } from "drizzle-orm/pg-core"
 
+// Table des programmes
+export const programs = pgTable("programs", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  difficulty: varchar("difficulty", { length: 50 }).notNull(),
+  duration: varchar("duration", { length: 50 }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+})
+
 // Table des utilisateurs
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -30,7 +40,8 @@ export const routines = pgTable(
   {
     id: serial("id").primaryKey(),
     programId: integer("program_id")
-      .notNull(),
+      .notNull()
+      .references(() => programs.id, { onDelete: "cascade" }),
     dayNumber: integer("day_number").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     focus: varchar("focus", { length: 255 }),
@@ -120,11 +131,15 @@ export const exercisesRelations = relations(exercises, ({ many }) => ({
   favorites: many(favorites),
 }))
 
-export const programsRelations = relations(routines, ({ many }) => ({
-  blocks: many(block),
+export const programsRelations = relations(programs, ({ many }) => ({
+  routines: many(routines),
 }))
 
 export const routinesRelations = relations(routines, ({ one, many }) => ({
+  program: one(programs, {
+    fields: [routines.programId],
+    references: [programs.id],
+  }),
   block: many(block),
   userProgress: many(userProgress),
 }))

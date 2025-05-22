@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dumbbell, Calendar, FileVideo } from "lucide-react"
+import { Dumbbell, Calendar, FileVideo, AlignJustify, FileText } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -11,7 +11,7 @@ export default function AdminDashboard() {
         Bienvenue dans l'interface d'administration de Renfo Pas à Pas. Gérez vos programmes et exercices facilement.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -26,6 +26,26 @@ export default function AdminDashboard() {
                 <Button variant="outline">Voir tous</Button>
               </Link>
               <Link href="/admin/programmes/nouveau">
+                <Button>Ajouter</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Routines
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>Gérez les jours d'entraînement dans vos programmes.</p>
+            <div className="flex gap-2">
+              <Link href="/admin/routines">
+                <Button variant="outline">Voir tous</Button>
+              </Link>
+              <Link href="/admin/routines/nouveau">
                 <Button>Ajouter</Button>
               </Link>
             </div>
@@ -56,7 +76,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Dumbbell className="w-5 h-5" />
+              <AlignJustify className="w-5 h-5" />
               Blocks
             </CardTitle>
           </CardHeader>

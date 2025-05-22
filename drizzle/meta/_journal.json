@@ -15,6 +15,13 @@
       "when": 1747940767351,
       "tag": "0001_sour_randall",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1747942247491,
+      "tag": "0002_nifty_mordo",
+      "breakpoints": true
     }
   ]
 }
