@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Dumbbell, Calendar, FileVideo, LogOut } from "lucide-react"
+import { LayoutDashboard, Dumbbell, Calendar, FileVideo, LogOut,AlignJustify,FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const menuItems = [
@@ -20,6 +20,16 @@ const menuItems = [
     title: "Exercices",
     href: "/admin/exercices",
     icon: Dumbbell,
+  },
+  {
+    title: "Routines",
+    href: "/admin/routines",
+    icon: FileText,
+  },
+  {
+    title: "Blocs",
+    href: "/admin/blocs",
+    icon: FileVideo,
   }
 ]
 
