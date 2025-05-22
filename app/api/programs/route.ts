@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { db } from "@/db"
-import { programs, programDays } from "@/db/schema"
+import { programs, routines } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function GET() {
@@ -11,7 +11,7 @@ export async function GET() {
     // Pour chaque programme, récupérer ses jours
     const programsWithDays = await Promise.all(
       programsList.map(async (program) => {
-        const days = await db.select().from(programDays).where(eq(programDays.programId, program.id))
+        const days = await db.select().from(routines).where(eq(routines.programId, program.id))
         return {
           ...program,
           days: days,

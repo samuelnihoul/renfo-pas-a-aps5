@@ -16,11 +16,10 @@ export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  muscleGroup: varchar("muscle_group", { length: 100 }).notNull(),
-  difficulty: varchar("difficulty", { length: 50 }).notNull(),
   videoUrl: varchar("video_url", { length: 255 }),
   videoPublicId: varchar("video_public_id", { length: 255 }),
   instructions: text("instructions"),
+  tempsReps: varchar('tempsReps'),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 })
 
@@ -34,8 +33,8 @@ export const programs = pgTable("programs", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 })
 
-// Table des jours de programme
-export const programDays = pgTable(
+// Table des routines du programme
+export const routines = pgTable(
   "program_days",
   {
     id: serial("id").primaryKey(),
@@ -54,14 +53,14 @@ export const programDays = pgTable(
   },
 )
 
-// Table associant les exercices aux jours
-export const dayExercises = pgTable(
-  "day_exercises",
+// Table associant les exercices aux blocks
+export const blockExercices = pgTable(
+  "block_exercices",
   {
     id: serial("id").primaryKey(),
     dayId: integer("day_id")
       .notNull()
-      .references(() => programDays.id, { onDelete: "cascade" }),
+      .references(() => routines.id, { onDelete: "cascade" }),
     exerciseId: integer("exercise_id")
       .notNull()
       .references(() => exercises.id, { onDelete: "cascade" }),
@@ -91,7 +90,7 @@ export const userProgress = pgTable("user_progress", {
   exerciseId: integer("exercise_id")
     .notNull()
     .references(() => exercises.id, { onDelete: "cascade" }),
-  programDayId: integer("program_day_id").references(() => programDays.id, { onDelete: "set null" }),
+  programDayId: integer("program_day_id").references(() => routines.id, { onDelete: "set null" }),
   date: date("date").notNull().defaultNow(),
   setsCompleted: integer("sets_completed").notNull(),
   repsCompleted: varchar("reps_completed", { length: 255 }).notNull(),
@@ -133,12 +132,12 @@ export const exercisesRelations = relations(exercises, ({ many }) => ({
 }))
 
 export const programsRelations = relations(programs, ({ many }) => ({
-  days: many(programDays),
+  days: many(routines),
 }))
 
-export const programDaysRelations = relations(programDays, ({ one, many }) => ({
+export const routinesRelations = relations(routines, ({ one, many }) => ({
   program: one(programs, {
-    fields: [programDays.programId],
+    fields: [routines.programId],
     references: [programs.id],
   }),
   exercises: many(dayExercises),
@@ -146,9 +145,9 @@ export const programDaysRelations = relations(programDays, ({ one, many }) => ({
 }))
 
 export const dayExercisesRelations = relations(dayExercises, ({ one }) => ({
-  day: one(programDays, {
+  day: one(routines, {
     fields: [dayExercises.dayId],
-    references: [programDays.id],
+    references: [routines.id],
   }),
   exercise: one(exercises, {
     fields: [dayExercises.exerciseId],
@@ -165,9 +164,9 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
     fields: [userProgress.exerciseId],
     references: [exercises.id],
   }),
-  programDay: one(programDays, {
+  programDay: one(routines, {
     fields: [userProgress.programDayId],
-    references: [programDays.id],
+    references: [routines.id],
   }),
 }))
 

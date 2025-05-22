@@ -17,8 +17,8 @@ export type NewExercise = typeof schema.exercises.$inferInsert
 export type Program = typeof schema.programs.$inferSelect
 export type NewProgram = typeof schema.programs.$inferInsert
 
-export type ProgramDay = typeof schema.programDays.$inferSelect
-export type NewProgramDay = typeof schema.programDays.$inferInsert
+export type ProgramDay = typeof schema.routines.$inferSelect
+export type NewProgramDay = typeof schema.routines.$inferInsert
 
 export type DayExercise = typeof schema.dayExercises.$inferSelect
 export type NewDayExercise = typeof schema.dayExercises.$inferInsert

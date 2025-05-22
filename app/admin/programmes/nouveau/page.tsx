@@ -76,7 +76,7 @@ export default function NewProgramPage() {
   const [currentTab, setCurrentTab] = useState("details")
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([])
   const [loadingExercises, setLoadingExercises] = useState(false)
-  const [programDays, setProgramDays] = useState<ProgramDay[]>([])
+  const [routines, setroutines] = useState<ProgramDay[]>([])
   const [newDayName, setNewDayName] = useState("")
   const [newDayFocus, setNewDayFocus] = useState("")
   const [dayError, setDayError] = useState("")
@@ -173,7 +173,7 @@ export default function NewProgramPage() {
       return
     }
 
-    setProgramDays((prev) => [
+    setroutines((prev) => [
       ...prev,
       {
         dayNumber: prev.length + 1,
@@ -190,7 +190,7 @@ export default function NewProgramPage() {
   }
 
   const removeDay = (dayNumber: number) => {
-    setProgramDays((prev) => {
+    setroutines((prev) => {
       const filtered = prev.filter(day => day.dayNumber !== dayNumber)
       // Réajuster les numéros de jour
       return filtered.map((day, index) => ({
@@ -225,7 +225,7 @@ export default function NewProgramPage() {
     const selectedExercise = availableExercises.find((ex) => ex.id === tempExercise.exerciseId)
     if (!selectedExercise) return
 
-    setProgramDays((prev) => {
+    setroutines((prev) => {
       const newDays = [...prev]
       const day = newDays[currentDayIndex]
 
@@ -268,7 +268,7 @@ export default function NewProgramPage() {
   }
 
   const removeExerciseFromDay = (dayIndex: number, exerciseIndex: number) => {
-    setProgramDays((prev) => {
+    setroutines((prev) => {
       const newDays = [...prev]
       newDays[dayIndex].exercises.splice(exerciseIndex, 1)
 
@@ -285,12 +285,12 @@ export default function NewProgramPage() {
   const moveExercise = (dayIndex: number, exerciseIndex: number, direction: 'up' | 'down') => {
     if (
       (direction === 'up' && exerciseIndex === 0) ||
-      (direction === 'down' && exerciseIndex === programDays[dayIndex].exercises.length - 1)
+      (direction === 'down' && exerciseIndex === routines[dayIndex].exercises.length - 1)
     ) {
       return // Déjà au début ou à la fin
     }
 
-    setProgramDays((prev) => {
+    setroutines((prev) => {
       const newDays = [...prev]
       const day = newDays[dayIndex]
       const newExercises = [...day.exercises]
@@ -320,7 +320,7 @@ export default function NewProgramPage() {
     }
 
     // Vérifier qu'il y a au moins un jour dans le programme
-    if (programDays.length === 0) {
+    if (routines.length === 0) {
       toast({
         title: "Erreur",
         description: "Vous devez ajouter au moins un jour d'entraînement",
@@ -335,7 +335,7 @@ export default function NewProgramPage() {
     try {
       const programData = {
         ...formData,
-        days: programDays
+        days: routines
       }
 
       const response = await fetch("/api/admin/programs", {
@@ -395,9 +395,9 @@ export default function NewProgramPage() {
           <TabsTrigger value="details">Détails</TabsTrigger>
           <TabsTrigger value="days">
             Jours d'entraînement
-            {programDays.length > 0 && (
+            {routines.length > 0 && (
               <Badge variant="secondary" className="ml-2">
-                {programDays.length}
+                {routines.length}
               </Badge>
             )}
           </TabsTrigger>
@@ -528,11 +528,11 @@ export default function NewProgramPage() {
             </CardFooter>
           </Card>
 
-          {programDays.length > 0 ? (
+          {routines.length > 0 ? (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Jours d'entraînement ({programDays.length})</h2>
+              <h2 className="text-xl font-semibold">Jours d'entraînement ({routines.length})</h2>
               <Accordion type="multiple" className="w-full">
-                {programDays.map((day, dayIndex) => (
+                {routines.map((day, dayIndex) => (
                   <AccordionItem key={dayIndex} value={`day-${dayIndex}`}>
                     <AccordionTrigger className="hover:bg-muted/50 px-4 rounded-md">
                       <div className="flex items-center gap-2">
@@ -657,7 +657,7 @@ export default function NewProgramPage() {
             <Button
               type="button"
               onClick={handleSubmit}
-              disabled={loading || programDays.length === 0}
+              disabled={loading || routines.length === 0}
             >
               {loading ? "Création..." : "Créer le programme"}
             </Button>

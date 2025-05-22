@@ -66,7 +66,7 @@ export default function AdminDashboard() {
               <Link href="/admin/blocs">
                 <Button variant="outline">Voir tous</Button>
               </Link>
-              <Link href="/admin/exercices/nouveau">
+              <Link href="/admin/blocs/nouveau">
                 <Button>Ajouter</Button>
               </Link>
             </div>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { db } from "@/db"
-import { programs, programDays, dayExercises } from "@/db/schema"
+import { programs, routines, dayExercises } from "@/db/schema"
 
 type ProgramDay = {
   dayNumber: number
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       for (const day of days as ProgramDay[]) {
         // Créer le jour
         const [newDay] = await db
-          .insert(programDays)
+          .insert(routines)
           .values({
             programId: newProgram.id,
             dayNumber: day.dayNumber,

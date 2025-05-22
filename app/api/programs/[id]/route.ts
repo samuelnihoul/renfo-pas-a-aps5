@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { db } from "@/db"
-import { programs, programDays } from "@/db/schema"
+import { programs, routines } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
@@ -20,7 +20,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 
     // Récupérer les jours du programme séparément
-    const days = await db.select().from(programDays).where(eq(programDays.programId, id))
+    const days = await db.select().from(routines).where(eq(routines.programId, id))
 
     // Combiner les résultats
     const result = {

@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/db"
-import { exercises, programs, programDays, dayExercises } from "@/db/schema"
+import { exercises, programs, routines, dayExercises } from "@/db/schema"
 
 export async function seedDatabase() {
   try {
@@ -106,7 +106,7 @@ export async function seedDatabase() {
     const insertedPrograms = await db.insert(programs).values(programsData).returning()
 
     // Créer des jours de programme
-    const programDaysData = [
+    const routinesData = [
       // Programme Complet
       {
         programId: insertedPrograms[0].id,
@@ -154,13 +154,13 @@ export async function seedDatabase() {
     ]
 
     // Insérer les jours de programme
-    const insertedProgramDays = await db.insert(programDays).values(programDaysData).returning()
+    const insertedroutines = await db.insert(routines).values(routinesData).returning()
 
     // Associer des exercices aux jours
     const dayExercisesData = [
       // Jour 1 - Programme Complet
       {
-        dayId: insertedProgramDays[0].id,
+        dayId: insertedroutines[0].id,
         exerciseId: insertedExercises[0].id, // Squat
         sets: 4,
         reps: "10-12",
@@ -168,7 +168,7 @@ export async function seedDatabase() {
         orderIndex: 1,
       },
       {
-        dayId: insertedProgramDays[0].id,
+        dayId: insertedroutines[0].id,
         exerciseId: insertedExercises[1].id, // Fentes
         sets: 3,
         reps: "12 (par jambe)",
@@ -176,7 +176,7 @@ export async function seedDatabase() {
         orderIndex: 2,
       },
       {
-        dayId: insertedProgramDays[0].id,
+        dayId: insertedroutines[0].id,
         exerciseId: insertedExercises[5].id, // Crunch
         sets: 3,
         reps: "15-20",
@@ -184,7 +184,7 @@ export async function seedDatabase() {
         orderIndex: 3,
       },
       {
-        dayId: insertedProgramDays[0].id,
+        dayId: insertedroutines[0].id,
         exerciseId: insertedExercises[6].id, // Planche
         sets: 3,
         reps: "30-45 sec",
@@ -194,7 +194,7 @@ export async function seedDatabase() {
 
       // Jour 2 - Programme Complet
       {
-        dayId: insertedProgramDays[1].id,
+        dayId: insertedroutines[1].id,
         exerciseId: insertedExercises[2].id, // Développé couché
         sets: 4,
         reps: "8-10",
@@ -202,7 +202,7 @@ export async function seedDatabase() {
         orderIndex: 1,
       },
       {
-        dayId: insertedProgramDays[1].id,
+        dayId: insertedroutines[1].id,
         exerciseId: insertedExercises[7].id, // Développé épaules
         sets: 3,
         reps: "10-12",
@@ -212,7 +212,7 @@ export async function seedDatabase() {
 
       // Jour 3 - Programme Complet
       {
-        dayId: insertedProgramDays[2].id,
+        dayId: insertedroutines[2].id,
         exerciseId: insertedExercises[3].id, // Tirage vertical
         sets: 4,
         reps: "8-10",
@@ -220,7 +220,7 @@ export async function seedDatabase() {
         orderIndex: 1,
       },
       {
-        dayId: insertedProgramDays[2].id,
+        dayId: insertedroutines[2].id,
         exerciseId: insertedExercises[4].id, // Curl biceps
         sets: 3,
         reps: "10-12",
@@ -230,7 +230,7 @@ export async function seedDatabase() {
 
       // Jour 4 - Programme Complet
       {
-        dayId: insertedProgramDays[3].id,
+        dayId: insertedroutines[3].id,
         exerciseId: insertedExercises[0].id, // Squat
         sets: 3,
         reps: "12-15",
@@ -238,7 +238,7 @@ export async function seedDatabase() {
         orderIndex: 1,
       },
       {
-        dayId: insertedProgramDays[3].id,
+        dayId: insertedroutines[3].id,
         exerciseId: insertedExercises[2].id, // Développé couché
         sets: 3,
         reps: "12-15",
@@ -246,7 +246,7 @@ export async function seedDatabase() {
         orderIndex: 2,
       },
       {
-        dayId: insertedProgramDays[3].id,
+        dayId: insertedroutines[3].id,
         exerciseId: insertedExercises[3].id, // Tirage vertical
         sets: 3,
         reps: "12-15",
@@ -256,7 +256,7 @@ export async function seedDatabase() {
 
       // Jour 1 - Débutant Total
       {
-        dayId: insertedProgramDays[4].id,
+        dayId: insertedroutines[4].id,
         exerciseId: insertedExercises[2].id, // Développé couché
         sets: 3,
         reps: "10-12",
@@ -264,7 +264,7 @@ export async function seedDatabase() {
         orderIndex: 1,
       },
       {
-        dayId: insertedProgramDays[4].id,
+        dayId: insertedroutines[4].id,
         exerciseId: insertedExercises[4].id, // Curl biceps
         sets: 3,
         reps: "12-15",
@@ -272,7 +272,7 @@ export async function seedDatabase() {
         orderIndex: 2,
       },
       {
-        dayId: insertedProgramDays[4].id,
+        dayId: insertedroutines[4].id,
         exerciseId: insertedExercises[7].id, // Développé épaules
         sets: 3,
         reps: "10-12",
@@ -282,7 +282,7 @@ export async function seedDatabase() {
 
       // Jour 2 - Débutant Total
       {
-        dayId: insertedProgramDays[5].id,
+        dayId: insertedroutines[5].id,
         exerciseId: insertedExercises[0].id, // Squat
         sets: 3,
         reps: "12-15",
@@ -290,7 +290,7 @@ export async function seedDatabase() {
         orderIndex: 1,
       },
       {
-        dayId: insertedProgramDays[5].id,
+        dayId: insertedroutines[5].id,
         exerciseId: insertedExercises[1].id, // Fentes
         sets: 2,
         reps: "10 (par jambe)",
@@ -300,7 +300,7 @@ export async function seedDatabase() {
 
       // Jour 3 - Débutant Total
       {
-        dayId: insertedProgramDays[6].id,
+        dayId: insertedroutines[6].id,
         exerciseId: insertedExercises[5].id, // Crunch
         sets: 3,
         reps: "15-20",
@@ -308,7 +308,7 @@ export async function seedDatabase() {
         orderIndex: 1,
       },
       {
-        dayId: insertedProgramDays[6].id,
+        dayId: insertedroutines[6].id,
         exerciseId: insertedExercises[6].id, // Planche
         sets: 3,
         reps: "20-30 sec",
@@ -316,7 +316,7 @@ export async function seedDatabase() {
         orderIndex: 2,
       },
       {
-        dayId: insertedProgramDays[6].id,
+        dayId: insertedroutines[6].id,
         exerciseId: insertedExercises[2].id, // Développé couché
         sets: 3,
         reps: "10-12",
