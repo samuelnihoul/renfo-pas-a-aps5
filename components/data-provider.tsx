@@ -46,7 +46,7 @@ type DataContextType = {
   loading: boolean
   error: string | null
   fetchProgramDetails: (id: number) => Promise<Program | null>
-  fetchDayExercises: (programId: number, dayId: number) => Promise<DayExercise[]>
+  fetchblock: (programId: number, dayId: number) => Promise<DayExercise[]>
   fetchExercisesByMuscleGroup: (muscleGroup: string) => Promise<Exercise[]>
   fetchExerciseDetails: (id: number) => Promise<Exercise | null>
 }
@@ -113,7 +113,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const fetchDayExercises = async (programId: number, dayId: number): Promise<DayExercise[]> => {
+  const fetchblock = async (programId: number, dayId: number): Promise<DayExercise[]> => {
     try {
       const response = await fetch(`/api/programs/${programId}/days/${dayId}/exercises`)
       if (!response.ok) {
@@ -158,7 +158,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     loading,
     error,
     fetchProgramDetails,
-    fetchDayExercises,
+    fetchblock,
     fetchExercisesByMuscleGroup,
     fetchExerciseDetails,
   }

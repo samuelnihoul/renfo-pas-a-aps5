@@ -20,8 +20,8 @@ export type NewProgram = typeof schema.programs.$inferInsert
 export type ProgramDay = typeof schema.routines.$inferSelect
 export type NewProgramDay = typeof schema.routines.$inferInsert
 
-export type DayExercise = typeof schema.dayExercises.$inferSelect
-export type NewDayExercise = typeof schema.dayExercises.$inferInsert
+export type DayExercise = typeof schema.block.$inferSelect
+export type NewDayExercise = typeof schema.block.$inferInsert
 
 export type UserProgress = typeof schema.userProgress.$inferSelect
 export type NewUserProgress = typeof schema.userProgress.$inferInsert

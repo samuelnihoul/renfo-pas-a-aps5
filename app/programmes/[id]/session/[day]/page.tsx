@@ -14,9 +14,9 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 export default function SessionPage({ params }: { params: { id: string; day: string } }) {
   const id = params.id
   const day = params.day
-  const { fetchDayExercises, fetchProgramDetails } = useData()
+  const { fetchblock, fetchProgramDetails } = useData()
   const [currentExercise, setCurrentExercise] = useState(0)
-  const [dayExercises, setDayExercises] = useState<any[]>([])
+  const [block, setblock] = useState<any[]>([])
   const [programDay, setProgramDay] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -43,13 +43,13 @@ export default function SessionPage({ params }: { params: { id: string; day: str
         setProgramDay(dayObj)
 
         // Charger les exercices du jour
-        const exercises = await fetchDayExercises(Number.parseInt(id), Number.parseInt(day))
+        const exercises = await fetchblock(Number.parseInt(id), Number.parseInt(day))
         if (exercises.length === 0) {
           setError("Aucun exercice trouvé pour ce jour")
           return
         }
 
-        setDayExercises(exercises)
+        setblock(exercises)
         setError(null)
       } catch (err) {
         setError("Erreur lors du chargement des données")
@@ -60,7 +60,7 @@ export default function SessionPage({ params }: { params: { id: string; day: str
     }
 
     loadData()
-  }, [id, day, fetchDayExercises, fetchProgramDetails])
+  }, [id, day, fetchblock, fetchProgramDetails])
 
   const handleExerciseChange = (index: number) => {
     setCurrentExercise(index)
@@ -80,7 +80,7 @@ export default function SessionPage({ params }: { params: { id: string; day: str
     )
   }
 
-  if (error || !programDay || dayExercises.length === 0) {
+  if (error || !programDay || block.length === 0) {
     return (
       <div className="container px-4 py-8 mx-auto">
         <Link href={`/programmes/${id}`}>
@@ -120,20 +120,20 @@ export default function SessionPage({ params }: { params: { id: string; day: str
           <Button
             variant="outline"
             size="icon"
-            onClick={() => handleExerciseChange(Math.min(dayExercises.length - 1, currentExercise + 1))}
-            disabled={currentExercise === dayExercises.length - 1}
+            onClick={() => handleExerciseChange(Math.min(block.length - 1, currentExercise + 1))}
+            disabled={currentExercise === block.length - 1}
           >
             <ChevronDown className="w-4 h-4" />
           </Button>
         </div>
         <div className="text-sm font-medium">
-          Exercice {currentExercise + 1}/{dayExercises.length}
+          Exercice {currentExercise + 1}/{block.length}
         </div>
       </div>
 
       <ScrollArea ref={scrollRef} className="flex-1 w-full">
         <div className="space-y-6 pb-6">
-          {dayExercises.map((dayExercise, index) => {
+          {block.map((dayExercise, index) => {
             const exercise = dayExercise.exercise
 
             return (

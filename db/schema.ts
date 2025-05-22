@@ -23,24 +23,14 @@ export const exercises = pgTable("exercises", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 })
 
-// Table des programmes
-export const programs = pgTable("programs", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description"),
-  difficulty: varchar("difficulty", { length: 50 }).notNull(),
-  duration: varchar("duration", { length: 50 }),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-})
 
-// Table des routines du programme
+// Table des routines 
 export const routines = pgTable(
-  "program_days",
+  "routines",
   {
     id: serial("id").primaryKey(),
     programId: integer("program_id")
-      .notNull()
-      .references(() => programs.id, { onDelete: "cascade" }),
+      .notNull(),
     dayNumber: integer("day_number").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     focus: varchar("focus", { length: 255 }),
@@ -53,9 +43,9 @@ export const routines = pgTable(
   },
 )
 
-// Table associant les exercices aux blocks
-export const blockExercices = pgTable(
-  "block_exercices",
+// Table des blocs
+export const block = pgTable(
+  "block",
   {
     id: serial("id").primaryKey(),
     dayId: integer("day_id")
@@ -126,33 +116,24 @@ export const usersRelations = relations(users, ({ many }) => ({
 }))
 
 export const exercisesRelations = relations(exercises, ({ many }) => ({
-  dayExercises: many(dayExercises),
   userProgress: many(userProgress),
   favorites: many(favorites),
 }))
 
-export const programsRelations = relations(programs, ({ many }) => ({
-  days: many(routines),
+export const programsRelations = relations(routines, ({ many }) => ({
+  blocks: many(block),
 }))
 
 export const routinesRelations = relations(routines, ({ one, many }) => ({
-  program: one(programs, {
-    fields: [routines.programId],
-    references: [programs.id],
-  }),
-  exercises: many(dayExercises),
+  block: many(block),
   userProgress: many(userProgress),
 }))
 
-export const dayExercisesRelations = relations(dayExercises, ({ one }) => ({
-  day: one(routines, {
-    fields: [dayExercises.dayId],
-    references: [routines.id],
-  }),
+export const blockRelations = relations(block, ({one}) => ({
   exercise: one(exercises, {
-    fields: [dayExercises.exerciseId],
+    fields: [block.exerciseId],
     references: [exercises.id],
-  }),
+  })
 }))
 
 export const userProgressRelations = relations(userProgress, ({ one }) => ({

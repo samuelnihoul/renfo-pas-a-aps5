@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/db"
-import { exercises, programs, routines, dayExercises } from "@/db/schema"
+import { exercises, programs, routines, block } from "@/db/schema"
 
 export async function seedDatabase() {
   try {
@@ -157,7 +157,7 @@ export async function seedDatabase() {
     const insertedroutines = await db.insert(routines).values(routinesData).returning()
 
     // Associer des exercices aux jours
-    const dayExercisesData = [
+    const blockData = [
       // Jour 1 - Programme Complet
       {
         dayId: insertedroutines[0].id,
@@ -326,7 +326,7 @@ export async function seedDatabase() {
     ]
 
     // Insérer les exercices des jours
-    await db.insert(dayExercises).values(dayExercisesData)
+    await db.insert(block).values(blockData)
 
     return { success: true, message: "Base de données initialisée avec succès!" }
   } catch (error) {

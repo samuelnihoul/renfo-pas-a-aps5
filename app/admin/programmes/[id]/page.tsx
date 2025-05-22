@@ -13,6 +13,17 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DataTable } from "@/components/ui/data-table"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -58,7 +69,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState("details")
   const [selectedDay, setSelectedDay] = useState<ProgramDay | null>(null)
-  const [dayExercises, setDayExercises] = useState<DayExercise[]>([])
+  const [block, setblock] = useState<DayExercise[]>([])
 
   useEffect(() => {
     const fetchProgram = async () => {
@@ -70,7 +81,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
           setProgram(data)
           if (data.days && data.days.length > 0) {
             setSelectedDay(data.days[0])
-            fetchDayExercises(data.days[0].id)
+            fetchblock(data.days[0].id)
           }
         } else {
           console.error("Failed to fetch program")
@@ -85,18 +96,46 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
     fetchProgram()
   }, [id])
 
-  const fetchDayExercises = async (dayId: number) => {
+  const fetchblock = async (dayId: number) => {
     try {
       const response = await fetch(`/api/programs/${id}/days/${dayId}/exercises`)
       if (response.ok) {
         const data = await response.json()
-        setDayExercises(data)
+        setblock(data)
       } else {
-        setDayExercises([])
+        setblock([])
       }
     } catch (error) {
       console.error("Error fetching day exercises:", error)
-      setDayExercises([])
+      setblock([])
+    }
+  }
+
+  /**
+   * Handles the deletion of a block (day exercise)
+   * 
+   * This function sends a DELETE request to the API endpoint to remove a block from the database.
+   * After successful deletion, it refreshes the blocks list to update the UI.
+   * This was added as part of the block feature audit to improve data management.
+   * 
+   * @param blockId - The ID of the block to delete
+   */
+  const handleDeleteBlock = async (blockId: number) => {
+    try {
+      const response = await fetch(`/api/admin/blocks/${blockId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete block")
+      }
+
+      // Refresh the blocks list after deletion
+      if (selectedDay) {
+        fetchblock(selectedDay.id)
+      }
+    } catch (error) {
+      console.error("Error deleting block:", error)
     }
   }
 
@@ -144,7 +183,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
 
   const handleDaySelect = (day: ProgramDay) => {
     setSelectedDay(day)
-    fetchDayExercises(day.id)
+    fetchblock(day.id)
   }
 
   const exerciseColumns: ColumnDef<DayExercise>[] = [
@@ -175,10 +214,33 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
     {
       id: "actions",
       cell: ({ row }) => {
+        const block = row.original
         return (
-          <Button variant="ghost" size="icon" className="text-destructive">
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Cette action ne peut pas être annulée. Cela supprimera définitivement cet exercice du jour d'entraînement.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleDeleteBlock(block.id)} className="bg-destructive text-destructive-foreground">
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )
       },
     },
@@ -354,7 +416,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
                             Ajouter un exercice
                           </Button>
                         </div>
-                        <DataTable columns={exerciseColumns} data={dayExercises} />
+                        <DataTable columns={exerciseColumns} data={block} />
                       </div>
                     </div>
                   </CardContent>
