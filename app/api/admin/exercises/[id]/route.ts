@@ -89,8 +89,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .set({
         name,
         description: description || null,
-        muscleGroup,
-        difficulty,
         instructions: instructions || null,
         videoUrl: videoUrl || null,
         videoPublicId: videoPublicId || null,

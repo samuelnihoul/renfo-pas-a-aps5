@@ -421,15 +421,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                     {previewUrl ? (
                                         <div className="w-full">                                            <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
 
-                                            {/* Affichage du nom du fichier */}
-                                            {videoFile && (
-                                                <div className="flex items-center gap-2 my-2 text-sm">
-                                                    <Upload className="h-4 w-4 text-primary" />
-                                                    <span className="font-medium text-gray-700">
-                                                        {videoFile.name} ({Math.round(videoFile.size / 1024)}KB)
-                                                    </span>
-                                                </div>
-                                            )}
+
 
                                             {/* Indicateurs d'état d'upload */}
                                             {uploadStatus === "uploading" && (
