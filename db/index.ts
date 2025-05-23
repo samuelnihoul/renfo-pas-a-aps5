@@ -1,11 +1,15 @@
-// Modifier l'import de drizzle pour inclure le support des relations
-import { drizzle } from "drizzle-orm/neon-http"
-import { neon } from "@neondatabase/serverless"
+// Import for regular PostgreSQL
+import { drizzle } from "drizzle-orm/node-postgres"
+import { Pool } from "pg"
 import * as schema from "./schema"
 
-// Utilisation de l'URL de connexion à partir des variables d'environnement
-const sql = neon(process.env.DATABASE_URL!)
-export const db = drizzle(sql, { schema })
+// Create a PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL!,
+})
+
+// Create the drizzle database instance
+export const db = drizzle(pool, { schema })
 
 // Types pour les requêtes
 export type User = typeof schema.users.$inferSelect
