@@ -2,6 +2,7 @@
   "name": "renfo-pas-a-aps5",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +10,8 @@
     "lint": "next lint",
     "studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate:pg",
-    "db:push": "drizzle-kit push:pg"
+    "db:push": "drizzle-kit push:pg",
+    "seed": "node --loader ts-node/esm seed-standalone.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -75,6 +77,7 @@
     "drizzle-kit": "^0.20.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

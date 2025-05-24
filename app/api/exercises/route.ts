@@ -10,13 +10,7 @@ export async function GET(request: Request) {
 
     let exercisesList
 
-    if (muscleGroup) {
-      exercisesList = await db.query.exercises.findMany({
-        where: eq(exercises.muscleGroup, muscleGroup),
-      })
-    } else {
       exercisesList = await db.query.exercises.findMany()
-    }
 
     return NextResponse.json(exercisesList)
   } catch (error) {
