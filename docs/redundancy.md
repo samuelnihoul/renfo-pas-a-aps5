@@ -206,7 +206,7 @@ To deploy the redundant system:
 
 2. **Start the Redundant System**:
    ```bash
-   docker-compose -f docker-compose.redundant.yml up -d
+   docker-compose -f container-compose.yml up -d
    ```
 
    Or on Windows:
@@ -216,7 +216,7 @@ To deploy the redundant system:
 
 3. **Verify the Deployment**:
    ```bash
-   docker-compose -f docker-compose.redundant.yml ps
+   docker-compose -f container-compose.yml ps
    ```
 
    Or on Windows:
