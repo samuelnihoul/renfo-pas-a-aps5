@@ -42,7 +42,8 @@ services:
     volumes:
       - postgres_primary_data:/var/lib/postgresql/data
       - ./db/postgresql.conf:/etc/postgresql/postgresql.conf
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+      - ./db/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf
     environment:
       - POSTGRES_USER=samuelnihoul
       - POSTGRES_PASSWORD=aoethns24teuTT!@
@@ -59,7 +60,8 @@ services:
     volumes:
       - postgres_replica_data:/var/lib/postgresql/data
       - ./db/postgresql.replica.conf:/etc/postgresql/postgresql.conf
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+      - ./db/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf
     environment:
       - POSTGRES_USER=samuelnihoul
       - POSTGRES_PASSWORD=aoethns24teuTT!@

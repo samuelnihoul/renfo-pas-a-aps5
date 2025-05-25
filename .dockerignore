@@ -1,0 +1,56 @@
+# Node.js dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js build output
+.next
+out
+build
+
+# Environment variables
+.env*
+!.env.example
+
+# Version control
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Development files
+README.md
+*.md
+.vscode
+.idea
+*.log
+
+# Testing
+__tests__
+test
+tests
+coverage
+
+# TypeScript cache
+*.tsbuildinfo
+next-env.d.ts
+
+# Project specific
+.github
+docs
+nginx
+scripts
+qodana.sarif.json
+qodana.yaml
+TODO.md
+seed-standalone.ts
+
+# Misc
+.DS_Store
+.vercel
+.venv
