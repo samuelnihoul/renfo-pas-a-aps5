@@ -5,13 +5,7 @@ import { eq } from "drizzle-orm"
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const muscleGroup = searchParams.get("muscleGroup")
-
-    let exercisesList
-
-      exercisesList = await db.query.exercises.findMany()
-
+    let exercisesList = await db.query.exercises.findMany()
     return NextResponse.json(exercisesList)
   } catch (error) {
     console.error("Error fetching exercises:", error)

@@ -32,7 +32,6 @@ type Program = {
   id: number
   name: string
   description: string | null
-  difficulty: string
   duration: string | null
   days: ProgramDay[]
 }
@@ -56,7 +55,6 @@ type DayExercise = {
   exercise: {
     id: number
     name: string
-    muscleGroup: string
   }
 }
 
@@ -190,10 +188,6 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
     {
       accessorKey: "exercise.name",
       header: "Exercice",
-    },
-    {
-      accessorKey: "exercise.muscleGroup",
-      header: "Groupe musculaire",
     },
     {
       accessorKey: "sets",

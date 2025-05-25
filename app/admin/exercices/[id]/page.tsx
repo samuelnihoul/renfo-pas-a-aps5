@@ -42,8 +42,6 @@ import * as z from "zod"
 const exerciseSchema = z.object({
     name: z.string().min(1, "Le nom est requis"),
     description: z.string().optional(),
-    muscleGroup: z.string().min(1, "Le groupe musculaire est requis"),
-    difficulty: z.string().min(1, "La difficulté est requise"),
     instructions: z.string().optional(),
     videoUrl: z.string().optional(),
     videoPublicId: z.string().optional(),
@@ -71,8 +69,6 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         defaultValues: {
             name: "",
             description: "",
-            muscleGroup: "",
-            difficulty: "",
             instructions: "",
             videoUrl: "",
         },
@@ -93,8 +89,6 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                 form.reset({
                     name: exercise.name,
                     description: exercise.description || "",
-                    muscleGroup: exercise.muscleGroup,
-                    difficulty: exercise.difficulty,
                     instructions: exercise.instructions || "",
                     videoUrl: exercise.videoUrl || "",
                     videoPublicId: exercise.videoPublicId || "",
@@ -302,61 +296,6 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="muscleGroup"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Groupe musculaire</FormLabel>
-                                        <FormControl>
-                                            <Select
-                                                value={field.value}
-                                                onValueChange={field.onChange}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Sélectionner un groupe musculaire" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Jambes">Jambes</SelectItem>
-                                                    <SelectItem value="Bras">Bras</SelectItem>
-                                                    <SelectItem value="Dos">Dos</SelectItem>
-                                                    <SelectItem value="Poitrine">Poitrine</SelectItem>
-                                                    <SelectItem value="Épaules">Épaules</SelectItem>
-                                                    <SelectItem value="Abdominaux">Abdominaux</SelectItem>
-                                                    <SelectItem value="Full Body">Full Body</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="difficulty"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Difficulté</FormLabel>
-                                        <FormControl>
-                                            <Select
-                                                value={field.value}
-                                                onValueChange={field.onChange}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Sélectionner une difficulté" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Débutant">Débutant</SelectItem>
-                                                    <SelectItem value="Intermédiaire">Intermédiaire</SelectItem>
-                                                    <SelectItem value="Avancé">Avancé</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
 
                             <FormField
                                 control={form.control}

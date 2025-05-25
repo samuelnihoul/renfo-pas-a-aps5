@@ -6,7 +6,6 @@ export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  difficulty: varchar("difficulty", { length: 50 }).notNull(),
   duration: varchar("duration", { length: 50 }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 })
@@ -26,8 +25,6 @@ export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  muscleGroup: varchar("muscle_group", { length: 50 }),
-  difficulty: varchar("difficulty", { length: 50 }),
   videoUrl: varchar("video_url", { length: 255 }),
   videoPublicId: varchar("video_public_id", { length: 255 }),
   instructions: text("instructions"),

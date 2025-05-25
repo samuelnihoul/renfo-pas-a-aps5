@@ -21,8 +21,6 @@ export default function NewExercisePage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    muscleGroup: "",
-    difficulty: "Débutant",
     instructions: "",
     videoUrl: "",
     videoPublicId: "",
@@ -76,14 +74,6 @@ export default function NewExercisePage() {
 
     if (!formData.name.trim()) {
       newErrors.name = "Le nom de l'exercice est requis"
-    }
-
-    if (!formData.muscleGroup) {
-      newErrors.muscleGroup = "Le groupe musculaire est requis"
-    }
-
-    if (!formData.difficulty) {
-      newErrors.difficulty = "La difficulté est requise"
     }
 
     setErrors(newErrors)
@@ -176,19 +166,6 @@ export default function NewExercisePage() {
     }
   }
 
-  const muscleGroups = [
-    "Jambes",
-    "Quadriceps",
-    "Ischio-jambiers",
-    "Mollets",
-    "Fessiers",
-    "Abdominaux",
-    "Dos",
-    "Poitrine",
-    "Épaules",
-    "Bras",
-    "Stabilisateurs",
-  ]
 
   return (
     <div>
@@ -234,46 +211,6 @@ export default function NewExercisePage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="muscleGroup" className={errors.muscleGroup ? "text-destructive" : ""}>
-                  Groupe musculaire*
-                </Label>
-                <Select
-                  value={formData.muscleGroup}
-                  onValueChange={(value) => handleSelectChange("muscleGroup", value)}
-                >
-                  <SelectTrigger className={errors.muscleGroup ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Sélectionner" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {muscleGroups.map((group) => (
-                      <SelectItem key={group} value={group}>
-                        {group}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.muscleGroup && <p className="text-destructive text-sm">{errors.muscleGroup}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="difficulty" className={errors.difficulty ? "text-destructive" : ""}>
-                  Difficulté*
-                </Label>
-                <Select value={formData.difficulty} onValueChange={(value) => handleSelectChange("difficulty", value)}>
-                  <SelectTrigger className={errors.difficulty ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Sélectionner" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Débutant">Débutant</SelectItem>
-                    <SelectItem value="Intermédiaire">Intermédiaire</SelectItem>
-                    <SelectItem value="Avancé">Avancé</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.difficulty && <p className="text-destructive text-sm">{errors.difficulty}</p>}
-              </div>
-            </div>
 
             <div className="space-y-2">
               <Label htmlFor="instructions">Instructions</Label>

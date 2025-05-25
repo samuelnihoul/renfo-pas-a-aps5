@@ -18,15 +18,10 @@ type ProgramDay = {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, description, difficulty, duration, days } = body
+    const { name, description, duration, days } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
-    }
-
-    // Validation supplémentaire
-    if (!difficulty) {
-      return NextResponse.json({ error: "La difficulté est requise" }, { status: 400 })
     }
 
     // Vérifier qu'il y a au moins un jour d'entraînement
@@ -43,7 +38,6 @@ export async function POST(request: Request) {
         .values({
           name,
           description: description || null,
-          difficulty,
           duration: duration || null,
           createdAt: new Date(),
         })

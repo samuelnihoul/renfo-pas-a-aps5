@@ -42,8 +42,6 @@ import {
 type Exercise = {
   id: number
   name: string
-  muscleGroup: string
-  difficulty: string
 }
 
 type DayExercise = {
@@ -53,7 +51,6 @@ type DayExercise = {
   reps: string
   restTime: string
   orderIndex: number
-  muscleGroup: string
 }
 
 type ProgramDay = {
@@ -69,7 +66,6 @@ export default function NewProgramPage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    difficulty: "Débutant",
     duration: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -159,10 +155,6 @@ export default function NewProgramPage() {
       newErrors.name = "Le nom du programme est requis"
     }
 
-    if (!formData.difficulty) {
-      newErrors.difficulty = "La difficulté est requise"
-    }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -249,8 +241,7 @@ export default function NewProgramPage() {
           sets: tempExercise.sets,
           reps: tempExercise.reps,
           restTime: tempExercise.restTime,
-          orderIndex: orderIndex,
-          muscleGroup: selectedExercise.muscleGroup
+          orderIndex: orderIndex
         }
       ]
 
@@ -374,8 +365,7 @@ export default function NewProgramPage() {
 
   // Filtrer les exercices pour la recherche
   const filteredExercises = availableExercises.filter(ex =>
-    ex.name.toLowerCase().includes(filterQuery.toLowerCase()) ||
-    ex.muscleGroup.toLowerCase().includes(filterQuery.toLowerCase())
+    ex.name.toLowerCase().includes(filterQuery.toLowerCase())
   )
 
   return (
@@ -437,22 +427,6 @@ export default function NewProgramPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="difficulty" className={errors.difficulty ? "text-destructive" : ""}>
-                      Difficulté*
-                    </Label>
-                    <Select value={formData.difficulty} onValueChange={(value) => handleSelectChange("difficulty", value)}>
-                      <SelectTrigger className={errors.difficulty ? "border-destructive" : ""}>
-                        <SelectValue placeholder="Sélectionner" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Débutant">Débutant</SelectItem>
-                        <SelectItem value="Intermédiaire">Intermédiaire</SelectItem>
-                        <SelectItem value="Avancé">Avancé</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {errors.difficulty && <p className="text-destructive text-sm">{errors.difficulty}</p>}
-                  </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="duration">Durée</Label>
@@ -570,7 +544,6 @@ export default function NewProgramPage() {
                             <TableRow>
                               <TableHead className="w-[50px]">#</TableHead>
                               <TableHead>Exercice</TableHead>
-                              <TableHead>Groupe</TableHead>
                               <TableHead className="w-[80px]">Séries</TableHead>
                               <TableHead className="w-[100px]">Répétitions</TableHead>
                               <TableHead className="w-[100px]">Repos</TableHead>
@@ -582,7 +555,6 @@ export default function NewProgramPage() {
                               <TableRow key={exIndex}>
                                 <TableCell>{exIndex + 1}</TableCell>
                                 <TableCell className="font-medium">{exercise.exerciseName}</TableCell>
-                                <TableCell>{exercise.muscleGroup}</TableCell>
                                 <TableCell>{exercise.sets}</TableCell>
                                 <TableCell>{exercise.reps}</TableCell>
                                 <TableCell>{exercise.restTime}</TableCell>
@@ -691,7 +663,7 @@ export default function NewProgramPage() {
                 <Label htmlFor="exercise-search">Rechercher un exercice</Label>
                 <Input
                   id="exercise-search"
-                  placeholder="Rechercher par nom ou groupe musculaire"
+                  placeholder="Rechercher par nom"
                   value={filterQuery}
                   onChange={(e) => setFilterQuery(e.target.value)}
                 />
@@ -702,20 +674,18 @@ export default function NewProgramPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Nom</TableHead>
-                      <TableHead>Groupe</TableHead>
-                      <TableHead>Difficulté</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {loadingExercises ? (
                       <TableRow>
-                        <TableCell colSpan={3} className="text-center py-8">
+                        <TableCell colSpan={1} className="text-center py-8">
                           Chargement des exercices...
                         </TableCell>
                       </TableRow>
                     ) : filteredExercises.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={3} className="text-center py-8">
+                        <TableCell colSpan={1} className="text-center py-8">
                           Aucun exercice trouvé
                         </TableCell>
                       </TableRow>
@@ -727,8 +697,6 @@ export default function NewProgramPage() {
                           onClick={() => handleExerciseSelection(exercise.id)}
                         >
                           <TableCell className="font-medium">{exercise.name}</TableCell>
-                          <TableCell>{exercise.muscleGroup}</TableCell>
-                          <TableCell>{exercise.difficulty}</TableCell>
                         </TableRow>
                       ))
                     )}

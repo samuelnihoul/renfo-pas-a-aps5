@@ -29,7 +29,7 @@ const menuItems = [
   {
     title: "Blocs",
     href: "/admin/blocs",
-    icon: FileVideo,
+    icon: AlignJustify,
   }
 ]
 

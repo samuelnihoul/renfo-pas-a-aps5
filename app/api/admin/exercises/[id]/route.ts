@@ -70,18 +70,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { name, description, muscleGroup, difficulty, instructions, videoUrl, videoPublicId } = body
+    const { name, description, instructions, videoUrl, videoPublicId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom de l'exercice est requis" }, { status: 400 })
-    }
-
-    if (!muscleGroup) {
-      return NextResponse.json({ error: "Le groupe musculaire est requis" }, { status: 400 })
-    }
-
-    if (!difficulty) {
-      return NextResponse.json({ error: "La difficulté est requise" }, { status: 400 })
     }
 
     const updatedExercise = await db
