@@ -41,5 +41,7 @@ COPY --from=builder /app/node_modules ./node_modules
 # Expose the port the app will run on
 EXPOSE 3000
 
+# Run push the database migration
+CMD ["pnpm","run","db:push"]
 # Start the application
 CMD ["pnpm", "start"]
