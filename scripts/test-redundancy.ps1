@@ -1,17 +1,10 @@
 # Test script for redundancy implementation
 Write-Host "Testing redundancy implementation..."
 
-# Start the redundant system
-Write-Host "Starting redundant system..."
-docker-compose -f docker-compose.redundant.yml up -d
-
-# Wait for the system to start
-Write-Host "Waiting for the system to start..."
-Start-Sleep -Seconds 30
 
 # Test 1: Verify all services are running
 Write-Host "Test 1: Verifying all services are running..."
-docker-compose -f docker-compose.redundant.yml ps
+podman-compose -f docker-compose.yml ps
 
 # Test 2: Test the application
 Write-Host "Test 2: Testing the application..."
