@@ -1,7 +1,7 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server";
-import { uploadVideo } from "@/lib/cloudinary";
+import { uploadVideo } from "@/lib/file-storage";
 
 // Taille maximale de fichier (50MB)
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -33,12 +33,12 @@ export async function POST(request: NextRequest) {
                 { error: "Le fichier est trop volumineux. Taille maximale autorisée: 50MB." },
                 { status: 400 }
             );
-        }        // Convertir le fichier en ArrayBuffer pour l'upload Cloudinary
+        }        // Convertir le fichier en ArrayBuffer pour l'upload
         const bytes = await videoFile.arrayBuffer(); try {
-            // Télécharger la vidéo sur Cloudinary
-            console.log("Début du téléchargement sur Cloudinary");
+            // Télécharger la vidéo sur le serveur local
+            console.log("Début du téléchargement sur le serveur local");
             const result = await uploadVideo(bytes);
-            console.log("Téléchargement Cloudinary réussi:", result);
+            console.log("Téléchargement réussi:", result);
 
             // Retourner l'URL de la vidéo téléchargée
             return NextResponse.json({
@@ -47,9 +47,9 @@ export async function POST(request: NextRequest) {
                 publicId: result.publicId
             });
         } catch (uploadError) {
-            console.error("Erreur détaillée lors du téléchargement sur Cloudinary:", uploadError);
+            console.error("Erreur détaillée lors du téléchargement de la vidéo:", uploadError);
             return NextResponse.json(
-                { error: "Une erreur est survenue lors du téléchargement sur Cloudinary" },
+                { error: "Une erreur est survenue lors du téléchargement de la vidéo" },
                 { status: 500 }
             );
         }

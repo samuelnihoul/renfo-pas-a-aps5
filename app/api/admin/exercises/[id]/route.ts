@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/db"
 import { exercises } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { deleteVideo } from "@/lib/cloudinary"
+import { deleteVideo } from "@/lib/file-storage"
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -19,12 +19,12 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       return NextResponse.json({ error: "Exercice non trouvé" }, { status: 404 })
     }
 
-    // Si l'exercice a une vidéo sur Cloudinary, la supprimer
+    // Si l'exercice a une vidéo, la supprimer
     if (existingExercise[0].videoPublicId) {
       try {
         await deleteVideo(existingExercise[0].videoPublicId);
-      } catch (cloudinaryError) {
-        console.error("Erreur lors de la suppression de la vidéo sur Cloudinary:", cloudinaryError);
+      } catch (deleteError) {
+        console.error("Erreur lors de la suppression de la vidéo:", deleteError);
         // Continuer malgré l'erreur de suppression de la vidéo
       }
     }
