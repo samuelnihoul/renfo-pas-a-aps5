@@ -69,7 +69,7 @@ services:
         condition: on-failure
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgres://user:password@db-primary:5432/renfo-pas-a-pas
+      - DATABASE_URL=postgres://user:password@db-primary:5432/renfo_pas_a_pas
       - VIDEO_STORAGE_PATH=/app/shared/videos
     volumes:
       - video_storage:/app/public/videos
@@ -90,7 +90,7 @@ services:
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=renfo-pas-a-pas
+      - POSTGRES_DB=renfo_pas_a_pas
     networks:
       - app-network
     restart: unless-stopped
@@ -107,7 +107,7 @@ services:
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=renfo-pas-a-pas
+      - POSTGRES_DB=renfo_pas_a_pas
     depends_on:
       - db-primary
     networks:

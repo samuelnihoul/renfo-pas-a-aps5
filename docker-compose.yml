@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+  # Database Migration Service
+  db-migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: /bin/sh -c "pnpm run db:push"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://samuelnihoul:aoethns24teuTT!@@db-primary:5432/renfo_pas_a_pas
+    depends_on:
+      - db-primary
+    networks:
+      - app-network
+    restart: "no"
+
   # Load Balancer
   nginx:
     image: nginx:latest
@@ -30,7 +45,7 @@ services:
     volumes:
       - video_storage:/app/public/videos
     depends_on:
-      - db-primary
+      - db-migration
     networks:
       - app-network
 

@@ -37,11 +37,12 @@ COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/drizzle.config.ts ./
+COPY --from=builder /app/db ./db
 
 # Expose the port the app will run on
 EXPOSE 3000
 
-# Run push the database migration
-CMD ["pnpm","run","db:push"]
 # Start the application
 CMD ["pnpm", "start"]

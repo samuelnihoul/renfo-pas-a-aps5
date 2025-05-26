@@ -45,7 +45,7 @@ The application uses a PostgreSQL database with the following main tables:
 Create a `.env` file in the root directory with the following variables:
 
 ```
-DATABASE_URL=postgres://username:password@localhost:5432/renfo-pas-a-pas
+DATABASE_URL=postgres://username:password@localhost:5432/renfo_pas_a_pas
 ```
 
 ### Installation and Setup
