@@ -18,6 +18,7 @@ COPY . .
 
 # Build the application
 RUN pnpm build
+RUN pnpm run db:push
 
 # Stage 2: Production
 FROM node:20-alpine AS runner

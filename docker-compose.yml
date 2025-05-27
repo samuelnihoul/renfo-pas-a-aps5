@@ -1,43 +1,13 @@
 version: '3.8'
 
 services:
-  # Database Migration Service
-  db-migration:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: /bin/sh -c "pnpm run db:push"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://samuelnihoul:aoethns24teuTT!@@db-primary:5432/renfo_pas_a_pas
-    depends_on:
-      - db-primary
-    networks:
-      - app-network
-    restart: "no"
 
-  # Load Balancer
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - app
-    networks:
-      - app-network
-    restart: unless-stopped
 
-  # Application (scaled to multiple instances)
+  # Application
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    deploy:
-      replicas: 3
-      restart_policy:
-        condition: on-failure
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgres://samuelnihoul:aoethns24teuTT!@@db-primary:5432/renfo_pas_a_pas
@@ -45,9 +15,12 @@ services:
     volumes:
       - video_storage:/app/public/videos
     depends_on:
-      - db-migration
+      - db-primary
     networks:
       - app-network
+    restart: unless-stopped
+    ports:
+      - 3000:3000
 
   # Primary Database
   db-primary:
@@ -67,25 +40,6 @@ services:
       - app-network
     restart: unless-stopped
 
-  # Replica Database
-  db-replica:
-    build:
-      context: ./db
-      dockerfile: Dockerfile
-    volumes:
-      - postgres_replica_data:/var/lib/postgresql/data
-      - ./db/postgresql.replica.conf:/etc/postgresql/postgresql.conf
-      - ./db/pg_hba.conf:/etc/postgresql/pg_hba.conf
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf
-    environment:
-      - POSTGRES_USER=samuelnihoul
-      - POSTGRES_PASSWORD=aoethns24teuTT!@
-      - POSTGRES_DB=renfo_pas_a_pas
-    depends_on:
-      - db-primary
-    networks:
-      - app-network
-    restart: unless-stopped
 
 networks:
   app-network:
@@ -93,6 +47,5 @@ networks:
 
 volumes:
   postgres_primary_data:
-  postgres_replica_data:
   video_storage:
     driver: local
