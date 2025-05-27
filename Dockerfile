@@ -18,7 +18,6 @@ COPY . .
 
 # Build the application
 RUN pnpm build
-RUN pnpm run db:push
 
 # Stage 2: Production
 FROM node:20-alpine AS runner
@@ -28,6 +27,7 @@ WORKDIR /app
 
 # Install pnpm
 RUN npm install -g pnpm
+RUN apk add --no-cache postgresql-client
 
 # Set environment variables
 ENV NODE_ENV=production
@@ -41,9 +41,10 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/drizzle.config.ts ./
 COPY --from=builder /app/db ./db
+COPY --from=builder /app/entrypoint.sh ./
 
 # Expose the port the app will run on
-EXPOSE 3000
+EXPOSE 3001
 
-# Start the application
-CMD ["pnpm", "start"]
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]

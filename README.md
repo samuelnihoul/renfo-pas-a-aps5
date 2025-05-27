@@ -7,7 +7,7 @@ A comprehensive fitness tracking application that helps users follow workout pro
 - **Frontend**: Next.js 15, React 19, Tailwind CSS
 - **Backend**: Next.js API routes
 - **Database**: PostgreSQL with Drizzle ORM
-- **Containerization**: Docker and Docker Compose
+- **Containerization**: Docker and Docker Compose (2 containers: app and database)
 - **UI Components**: Radix UI
 - **Form Handling**: React Hook Form with Zod validation
 
@@ -71,11 +71,15 @@ DATABASE_URL=postgres://username:password@localhost:5432/renfo_pas_a_pas
 #### With Docker
 
 1. Clone the repository
-2. Build and start the containers:
+2. Build and start the two containers (app and database):
    ```
    docker-compose up -d
    ```
 3. The application will be available at http://localhost:3000
+
+The Docker setup consists of two containers:
+- **app**: The Next.js application container
+- **db-primary**: The PostgreSQL database container
 
 ## Development Commands
 
@@ -95,33 +99,6 @@ DATABASE_URL=postgres://username:password@localhost:5432/renfo_pas_a_pas
 - `docker-compose logs`: View logs from all services
 - `docker-compose ps`: List running services
 
-## Redundancy and Fault-Resilience
-
-The application supports a redundant deployment configuration for high availability and fault tolerance:
-
-- **Multiple Application Instances**: Load balanced using NGINX
-- **Database Replication**: Primary-replica setup for PostgreSQL
-- **Shared Storage**: For video files and other static assets
-
-### Redundant Deployment
-
-To deploy the application with redundancy:
-
-```powershell
-docker-compose -f docker-compose.redundant.yml up -d
-```
-
-### Testing Redundancy
-
-A test script is provided to verify the redundancy implementation:
-
-```powershell
-scripts\test-redundancy.ps1
-```
-
-For detailed information about the redundancy implementation, refer to the documentation in the `docs` directory:
-- [Redundancy Documentation](docs/redundancy.md)
-- [Redundancy README](docs/README-redundancy.md)
 
 ## Project Structure
 
