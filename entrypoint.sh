@@ -15,4 +15,4 @@ pnpm run db:push
 
 # Start the application
 echo "Starting application..."
-exec pnpm next start
+exec pnpm run start
