@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Upload } from "lucide-react";
 import Link from "next/link";
 import { toast } from "@/components/ui/use-toast";
-import VideoUpload from "@/components/video-upload";
 
 export default function NewBlocPage() {
   const router = useRouter();
@@ -103,9 +102,6 @@ export default function NewBlocPage() {
       newErrors.type = "Le type de bloc est requis";
     }
 
-    if (!formData.difficulty) {
-      newErrors.difficulty = "La difficulté est requise";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -121,43 +117,6 @@ export default function NewBlocPage() {
     setLoading(true);
 
     try {
-      let finalVideoUrl = formData.videoUrl;
-      if (videoFile) {
-        toast({
-          title: "Téléchargement en cours",
-          description: `Envoi de '${videoFile.name}' vers le serveur...`,
-        });
-
-        const uploadFormData = new FormData();
-        uploadFormData.append("video", videoFile);
-
-        const uploadResponse = await fetch("/api/upload/video", {
-          method: "POST",
-          body: uploadFormData,
-        });
-
-        if (!uploadResponse.ok) {
-          const errorData = await uploadResponse.json();
-          toast({
-            title: "Échec du téléchargement",
-            description: errorData.error || "La vidéo n'a pas pu être téléchargée",
-            variant: "destructive",
-          });
-          throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
-        }
-
-        const uploadData = await uploadResponse.json();
-        finalVideoUrl = uploadData.fileUrl;
-        const videoPublicId = uploadData.publicId;
-
-        toast({
-          title: "Téléchargement réussi",
-          description: "La vidéo a été téléchargée avec succès",
-        });
-
-        formData.videoPublicId = videoPublicId;
-      }
-
       const response = await fetch("/api/admin/blocs", {
         method: "POST",
         headers: {
@@ -165,7 +124,6 @@ export default function NewBlocPage() {
         },
         body: JSON.stringify({
           ...formData,
-          videoUrl: finalVideoUrl,
         }),
       });
 

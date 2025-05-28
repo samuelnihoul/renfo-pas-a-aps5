@@ -29,3 +29,9 @@ next-env.d.ts
 
 #python
 .venv
+
+#data
+pulic/videos
+
+#JetBrains
+.idea

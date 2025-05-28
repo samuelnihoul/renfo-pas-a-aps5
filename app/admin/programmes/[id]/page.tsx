@@ -289,19 +289,6 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="difficulty">Difficulté</Label>
-                  <Select value={program.difficulty} onValueChange={(value) => handleSelectChange("difficulty", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Débutant">Débutant</SelectItem>
-                      <SelectItem value="Intermédiaire">Intermédiaire</SelectItem>
-                      <SelectItem value="Avancé">Avancé</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="duration">Durée</Label>

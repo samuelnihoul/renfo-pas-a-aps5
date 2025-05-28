@@ -24,11 +24,6 @@ export type NewProgram = typeof schema.programs.$inferInsert
 export type ProgramDay = typeof schema.routines.$inferSelect
 export type NewProgramDay = typeof schema.routines.$inferInsert
 
-export type DayExercise = typeof schema.block.$inferSelect
-export type NewDayExercise = typeof schema.block.$inferInsert
+export type DayExercise = typeof schema.blocks.$inferSelect
+export type NewDayExercise = typeof schema.blocks.$inferInsert
 
-export type UserProgress = typeof schema.userProgress.$inferSelect
-export type NewUserProgress = typeof schema.userProgress.$inferInsert
-
-export type Favorite = typeof schema.favorites.$inferSelect
-export type NewFavorite = typeof schema.favorites.$inferInsert

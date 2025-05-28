@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { block, exercises } from '@/db/schema';
+import { blocks, exercises } from '@/db/schema';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,8 +14,7 @@ export async function POST(request: NextRequest) {
     // Insert the exercise blocks into the database
     const insertedBlocks = await Promise.all(
       data.exercises.map(async (exercise: any, index: number) => {
-        const [newBlock] = await db.insert(block).values({
-          dayId: data.dayId,
+        const [newBlock] = await db.insert(blocks).values({
           exerciseId: exercise.exerciseId,
           sets: exercise.sets,
           reps: exercise.reps,

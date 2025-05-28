@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { db } from "@/db"
-import { programs, routines, block } from "@/db/schema"
+import { programs, routines, blocks } from "@/db/schema"
 
 type ProgramDay = {
   dayNumber: number
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
             createdAt: new Date(),
           }))
 
-          await db.insert(block).values(exercisesValues)
+          await db.insert(blocks).values(exercisesValues)
         }
       }
 

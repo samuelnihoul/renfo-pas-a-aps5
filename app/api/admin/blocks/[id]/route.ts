@@ -7,7 +7,7 @@
 
 import { NextResponse } from "next/server"
 import { db } from "@/db"
-import { block } from "@/db/schema"
+import { blocks } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function DELETE(
@@ -25,7 +25,7 @@ export async function DELETE(
     }
 
     // Delete the block
-    await db.delete(block).where(eq(block.id, id))
+    await db.delete(blocks).where(eq(blocks.id, id))
 
     return NextResponse.json({ success: true })
   } catch (error) {

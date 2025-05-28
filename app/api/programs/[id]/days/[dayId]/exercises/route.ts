@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { db } from "@/db"
-import { block, exercises } from "@/db/schema"
+import { blocks, exercises } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function GET(request: Request, { params }: { params: { id: string; dayId: string } }) {
@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: { params: { id: string; 
     }
 
     // Récupérer les exercices du jour
-    const blockList = await db.select().from(block).where(eq(block.dayId, dayId))
+    const blockList = await db.select().from(blocks).where(eq(blocks.exerciseId, dayId))
 
     // Récupérer les détails des exercices
     const result = await Promise.all(
