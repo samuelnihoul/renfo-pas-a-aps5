@@ -10,8 +10,7 @@
     "lint": "next lint",
     "studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate:pg",
-    "db:push": "drizzle-kit push:pg",
-    "seed": "node --loader ts-node/esm seed-standalone.ts"
+    "db:push": "drizzle-kit push:pg"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

@@ -1,40 +1,10 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
       "version": "5",
-      "when": 1746984529208,
-      "tag": "0000_tiny_captain_britain",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1747940767351,
-      "tag": "0001_sour_randall",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1747942247491,
-      "tag": "0002_nifty_mordo",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1748441712089,
-      "tag": "0003_new_blue_shield",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1748500478818,
-      "tag": "0004_dashing_lyja",
+      "when": 1748519900426,
+      "tag": "0000_high_jack_murdock",
       "breakpoints": true
     }
   ]

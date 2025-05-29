@@ -1,9 +1,12 @@
 import { relations } from "drizzle-orm"
-import { pgTable, serial, varchar, text, timestamp, integer, date, decimal, unique ,PgTableWithColumns,boolean} from "drizzle-orm/pg-core"
-const timestamps={
-  createdAt:timestamp('created_at',{withTimezone: true}).defaultNow(),
-  updatedAt:timestamp('updated_at',{withTimezone: true}).defaultNow(),
+import { pgTable, serial, varchar, text, timestamp, integer, unique, boolean } from "drizzle-orm/pg-core"
+
+// Timestamps helper for all tables
+const timestamps = {
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 }
+
 // Table des programmes
 export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
@@ -19,23 +22,11 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 255 }).notNull(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  ...timestamps,
-  isPremium:boolean('isPremium')
-})
-
-// Table des exercices
-export const exercises:PgTableWithColumns<any> = pgTable("exercises", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  videoUrl: varchar("video_url", { length: 255 }),
-  videoPublicId: varchar("video_public_id", { length: 255 }),
-  instructions: text("instructions"),
-  tempsReps: varchar('tempsReps'),
+  isPremium: boolean('isPremium'),
   ...timestamps
 })
 
-
-// Table des routines 
+// Table des routines (jours d'entraînement)
 export const routines = pgTable(
   "routines",
   {
@@ -46,7 +37,7 @@ export const routines = pgTable(
     dayNumber: integer("day_number").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     focus: varchar("focus", { length: 255 }),
-      ...timestamps
+    ...timestamps
   },
   (table) => {
     return {
@@ -55,7 +46,7 @@ export const routines = pgTable(
   },
 )
 
-// Table des blocs
+// Table des blocs d'exercices
 export const blocks = pgTable(
   "blocks",
   {
@@ -67,7 +58,7 @@ export const blocks = pgTable(
     reps: varchar("reps", { length: 50 }).notNull(),
     restTime: varchar("rest_time", { length: 50 }),
     orderIndex: integer("order_index").notNull(),
-      ...timestamps
+    ...timestamps
   },
   (table) => {
     return {
@@ -79,20 +70,42 @@ export const blocks = pgTable(
   },
 )
 
+// Table des exercices
+export const exercises = pgTable("exercises", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  videoUrl: varchar("video_url", { length: 255 }),
+  videoPublicId: varchar("video_public_id", { length: 255 }),
+  instructions: text("instructions"),
+  tempsReps: varchar('tempsReps'),
+  blockId: integer("block_id").notNull().references(() => blocks.id, { onDelete: 'cascade' }),
+  ...timestamps
+})
+
 // Relations
-
-export const exercisesRelations = relations(exercises, ({ many }) => ({
-  blocks:many(blocks)
+export const programsRelations = relations(programs, ({ many }) => ({
+  routines: many(routines)
 }))
-
-
 
 export const routinesRelations = relations(routines, ({ one, many }) => ({
-  programs:many(programs)
+  program: one(programs, {
+    fields: [routines.programId],
+    references: [programs.id]
+  }),
+  blocks: many(blocks)
 }))
 
-export const blocksRelations = relations(blocks, ({many}) => ({
-  routines:many(routines)
+export const blocksRelations = relations(blocks, ({ one, many }) => ({
+  routine: one(routines, {
+    fields: [blocks.routinesId],
+    references: [routines.id]
+  }),
+  exercises: many(exercises)
 }))
 
-
+export const exercisesRelations = relations(exercises, ({ one }) => ({
+  block: one(blocks, {
+    fields: [exercises.blockId],
+    references: [blocks.id]
+  })
+}))
