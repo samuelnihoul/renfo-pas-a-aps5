@@ -27,7 +27,7 @@ type Block = {
 }
 
 export default function ExercisesPage() {
-  const [exercises, setExercises] = useState<Exercise[]>([])
+  const [blocks, setBlocks] = useState<Block[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -40,7 +40,7 @@ export default function ExercisesPage() {
       const response = await fetch("/api/exercises")
       if (response.ok) {
         const data = await response.json()
-        setExercises(data)
+        setBlocks(data)
         setError(null)
       } else {
         const errorData = await response.json()
@@ -59,7 +59,7 @@ export default function ExercisesPage() {
   }, [])
 
   const confirmDeleteExercise = (id: number) => {
-    setExerciseToDelete(id)
+    setBlockToDelete(id)
     setDeleteDialogOpen(true)
   }
 
@@ -69,13 +69,13 @@ export default function ExercisesPage() {
     setIsDeleting(true)
 
     try {
-      const response = await fetch(`/api/admin/exercises/${exerciseToDelete}`, {
+      const response = await fetch(`/api/admin/blocs/${blockToDelete}`, {
         method: "DELETE",
       })
 
       if (response.ok) {
         toast({
-          title: "Exercice supprimé",
+          title: "Block supprimé",
           description: "L'bloc a été supprimé avec succès",
         })
         // Mettre à jour la liste des blocks
@@ -102,44 +102,18 @@ export default function ExercisesPage() {
     }
   }
 
-  const columns: ColumnDef<Exercise>[] = [
+  const columns: ColumnDef<Block>[] = [
     {
       accessorKey: "name",
       header: "Nom",
+    }
+   ,
+    {
+      accessorKey: "tempsReps",
+      header: "Temps et Répétitions",
     },
     {
-      accessorKey: "muscleGroup",
-      header: "Groupe musculaire",
-    },
-    {
-      accessorKey: "difficulty",
-      header: "Difficulté",
-      cell: ({ row }) => {
-        const difficulty = row.getValue("difficulty") as string
-        return (
-          <div
-            className={
-              difficulty === "Intermédiaire"
-                ? "text-orange-500"
-                : difficulty === "Avancé"
-                  ? "text-red-500"
-                  : "text-green-500"
-            }
-          >
-            {difficulty}
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: "videoUrl",
-      header: "Vidéo",
-      cell: ({ row }) => {
-        const videoUrl = row.getValue("videoUrl") as string | null
-        return videoUrl ? "Oui" : "Non"
-      },
-    },
-    {
+
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {

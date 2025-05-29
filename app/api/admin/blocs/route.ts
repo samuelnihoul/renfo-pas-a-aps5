@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { blocks, exercises } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,9 +12,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Insert the exercise blocks into the database and create associated exercises
+    // Insert the exercise blocks into the database and associate with existing exercises
     const insertedBlocksWithExercises = await Promise.all(
       data.exercises.map(async (exerciseData: any, index: number) => {
+        // Verify that the exercise exists
+        const exercise = await db.query.exercises.findFirst({
+          where: eq(exercises.id, exerciseData.exerciseId)
+        });
+
+        if (!exercise) {
+          throw new Error(`Exercise with ID ${exerciseData.exerciseId} not found`);
+        }
+
         // Create the block first
         const [newBlock] = await db.insert(blocks).values({
           routinesId: data.routinesId,
@@ -23,19 +33,18 @@ export async function POST(request: NextRequest) {
           orderIndex: index
         }).returning();
 
-        // Then create the associated exercise with reference to the block
-        const [newExercise] = await db.insert(exercises).values({
-          name: exerciseData.name,
-          videoUrl: exerciseData.videoUrl || null,
-          videoPublicId: exerciseData.videoPublicId || null,
-          instructions: exerciseData.instructions || null,
-          tempsReps: exerciseData.tempsReps || null,
-          blockId: newBlock.id
-        }).returning();
+        // Update the exercise with the block ID
+        await db
+          .update(exercises)
+          .set({
+            blockId: newBlock.id,
+            updatedAt: new Date(),
+          })
+          .where(eq(exercises.id, exerciseData.exerciseId));
 
         return {
           block: newBlock,
-          exercise: newExercise
+          exercise: exercise
         };
       })
     );
