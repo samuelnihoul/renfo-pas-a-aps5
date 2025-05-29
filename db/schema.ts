@@ -74,7 +74,7 @@ export const blocks = pgTable(
 export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  videoUrl: varchar("video_url", { length: 255 }),
+  videoPublicId: varchar("video_url", { length: 255 }),
   instructions: text("instructions"),
   tempsReps: varchar('tempsReps'),
   ...timestamps

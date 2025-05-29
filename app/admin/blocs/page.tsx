@@ -19,12 +19,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-type Exercise = {
+type Block = {
   id: number
   name: string
-  muscleGroup: string
-  difficulty: string
-  videoUrl: string | null
+  tempsReps:string
+  category: string
 }
 
 export default function ExercisesPage() {
@@ -45,11 +44,11 @@ export default function ExercisesPage() {
         setError(null)
       } else {
         const errorData = await response.json()
-        setError(errorData.error || "Erreur lors du chargement des exercices")
+        setError(errorData.error || "Erreur lors du chargement des blocks")
       }
     } catch (error) {
       console.error("Error fetching exercises:", error)
-      setError("Erreur lors du chargement des exercices")
+      setError("Erreur lors du chargement des blocks")
     } finally {
       setLoading(false)
     }
@@ -77,15 +76,15 @@ export default function ExercisesPage() {
       if (response.ok) {
         toast({
           title: "Exercice supprimé",
-          description: "L'exercice a été supprimé avec succès",
+          description: "L'bloc a été supprimé avec succès",
         })
-        // Mettre à jour la liste des exercices
+        // Mettre à jour la liste des blocks
         setExercises((prev) => prev.filter((exercise) => exercise.id !== exerciseToDelete))
       } else {
         const errorData = await response.json()
         toast({
           title: "Erreur",
-          description: errorData.error || "Erreur lors de la suppression de l'exercice",
+          description: errorData.error || "Erreur lors de la suppression de l'bloc",
           variant: "destructive",
         })
       }
@@ -93,7 +92,7 @@ export default function ExercisesPage() {
       console.error("Error deleting exercise:", error)
       toast({
         title: "Erreur",
-        description: "Erreur lors de la suppression de l'exercice",
+        description: "Erreur lors de la suppression de l'bloc",
         variant: "destructive",
       })
     } finally {
@@ -148,7 +147,7 @@ export default function ExercisesPage() {
 
         return (
           <div className="flex items-center gap-2">
-            <Link href={`/admin/exercices/${exercise.id}`}>
+            <Link href={`/admin/blocks/${exercise.id}`}>
               <Button variant="ghost" size="icon" title="Modifier">
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -172,7 +171,7 @@ export default function ExercisesPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <span className="ml-2">Chargement des exercices...</span>
+        <span className="ml-2">Chargement des blocks...</span>
       </div>
     )
   }
@@ -191,37 +190,37 @@ export default function ExercisesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Exercices</h1>
-        <Link href="/admin/exercices/nouveau">
+        <h1 className="text-2xl font-bold">Blocs</h1>
+        <Link href="/admin/blocs/nouveau">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Nouvel exercice
+            Nouvel bloc
           </Button>
         </Link>
       </div>
 
-      {exercises.length === 0 ? (
+      {blocs.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-10">
-            <p className="text-muted-foreground mb-4">Aucun exercice n'a été créé pour le moment.</p>
-            <Link href="/admin/exercices/nouveau">
+            <p className="text-muted-foreground mb-4">Aucun bloc n'a été créé pour le moment</p>
+            <Link href="/admin/blocs/nouveau">
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                Créer un exercice
+                Créer un bloc
               </Button>
             </Link>
           </CardContent>
         </Card>
       ) : (
-        <DataTable columns={columns} data={exercises} searchKey="name" searchPlaceholder="Rechercher un exercice..." />
+        <DataTable columns={columns} data={exercises} searchKey="name" searchPlaceholder="Rechercher un bloc..." />
       )}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cet exercice ?</AlertDialogTitle>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce bloc ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action est irréversible. L'exercice sera définitivement supprimé.
+              Cette action est irréversible. Le bloc sera définitivement supprimé.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

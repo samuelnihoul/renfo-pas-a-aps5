@@ -1,22 +1,11 @@
 import { NextResponse } from "next/server"
 import { db } from "@/db"
-import { programs, routines, blocks, exercises } from "@/db/schema"
+import { programs, routines } from "@/db/schema"
+import { eq } from "drizzle-orm"
 
 type ProgramDay = {
   dayNumber: number
-  name: string
-  focus: string
-  exercises: {
-    name: string
-    videoUrl?: string
-    videoPublicId?: string
-    instructions?: string
-    tempsReps?: string
-    sets: number
-    reps: string
-    restTime: string
-    orderIndex: number
-  }[]
+  routineId: number
 }
 
 export async function POST(request: Request) {
@@ -47,45 +36,26 @@ export async function POST(request: Request) {
         })
         .returning()
 
-      // Créer les jours de programme
+      // Associer les routines existantes au programme
       for (const day of days as ProgramDay[]) {
-        // Créer le jour
-        const [newDay] = await db
-          .insert(routines)
-          .values({
+        // Vérifier que la routine existe
+        const routine = await db.query.routines.findFirst({
+          where: eq(routines.id, day.routineId)
+        });
+
+        if (!routine) {
+          throw new Error(`Routine avec l'ID ${day.routineId} non trouvée`);
+        }
+
+        // Mettre à jour la routine avec l'ID du programme et le numéro du jour
+        await db
+          .update(routines)
+          .set({
             programId: newProgram.id,
             dayNumber: day.dayNumber,
-            name: day.name,
-            focus: day.focus || null,
-            createdAt: new Date(),
+            updatedAt: new Date(),
           })
-          .returning()
-
-        // Créer les blocs et exercices associés à ce jour
-        if (day.exercises && day.exercises.length > 0) {
-          for (const exercise of day.exercises) {
-            // Créer d'abord le bloc
-            const [newBlock] = await db.insert(blocks).values({
-              routinesId: newDay.id,
-              sets: exercise.sets,
-              reps: exercise.reps,
-              restTime: exercise.restTime || null,
-              orderIndex: exercise.orderIndex,
-              createdAt: new Date(),
-            }).returning();
-
-            // Puis créer l'exercice associé au bloc
-            await db.insert(exercises).values({
-              name: exercise.name,
-              videoUrl: exercise.videoUrl || null,
-              videoPublicId: exercise.videoPublicId || null,
-              instructions: exercise.instructions || null,
-              tempsReps: exercise.tempsReps || null,
-              blockId: newBlock.id,
-              createdAt: new Date(),
-            });
-          }
-        }
+          .where(eq(routines.id, day.routineId));
       }
 
       return NextResponse.json({
