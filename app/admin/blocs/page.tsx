@@ -26,79 +26,79 @@ type Block = {
   category: string
 }
 
-export default function ExercisesPage() {
-  const [blocks, setBlocks] = useState<Block[]>([])
+export default function BlocsPage() {
+  const [blocs, setBlocs] = useState<Block[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [exerciseToDelete, setExerciseToDelete] = useState<number | null>(null)
+  const [blocToDelete, setBlocToDelete] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const fetchExercises = async () => {
+  const fetchBlocs = async () => {
     try {
       setLoading(true)
-      const response = await fetch("/api/exercises")
+      const response = await fetch("/api/blocs")
       if (response.ok) {
         const data = await response.json()
-        setBlocks(data)
+        setBlocs(data)
         setError(null)
       } else {
         const errorData = await response.json()
-        setError(errorData.error || "Erreur lors du chargement des blocks")
+        setError(errorData.error || "Erreur lors du chargement des blocs")
       }
     } catch (error) {
-      console.error("Error fetching exercises:", error)
-      setError("Erreur lors du chargement des blocks")
+      console.error("Error fetching blocs:", error)
+      setError("Erreur lors du chargement des blocs")
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchExercises()
+    fetchBlocs()
   }, [])
 
-  const confirmDeleteExercise = (id: number) => {
-    setBlockToDelete(id)
+  const confirmDeleteBloc = (id: number) => {
+    setBlocToDelete(id)
     setDeleteDialogOpen(true)
   }
 
-  const handleDeleteExercise = async () => {
-    if (!exerciseToDelete) return
+  const handleDeleteBloc = async () => {
+    if (!blocToDelete) return
 
     setIsDeleting(true)
 
     try {
-      const response = await fetch(`/api/admin/blocs/${blockToDelete}`, {
+      const response = await fetch(`/api/admin/blocs/${blocToDelete}`, {
         method: "DELETE",
       })
 
       if (response.ok) {
         toast({
-          title: "Block supprimé",
-          description: "L'bloc a été supprimé avec succès",
+          title: "Bloc supprimé",
+          description: "Le bloc a été supprimé avec succès",
         })
-        // Mettre à jour la liste des blocks
-        setExercises((prev) => prev.filter((exercise) => exercise.id !== exerciseToDelete))
+        // Mettre à jour la liste des blocs
+        setBlocs((prev) => prev.filter((bloc) => bloc.id !== blocToDelete))
       } else {
         const errorData = await response.json()
         toast({
           title: "Erreur",
-          description: errorData.error || "Erreur lors de la suppression de l'bloc",
+          description: errorData.error || "Erreur lors de la suppression du bloc",
           variant: "destructive",
         })
       }
     } catch (error) {
-      console.error("Error deleting exercise:", error)
+      console.error("Error deleting bloc:", error)
       toast({
         title: "Erreur",
-        description: "Erreur lors de la suppression de l'bloc",
+        description: "Erreur lors de la suppression du bloc",
         variant: "destructive",
       })
     } finally {
       setIsDeleting(false)
       setDeleteDialogOpen(false)
-      setExerciseToDelete(null)
+      setBlocToDelete(null)
     }
   }
 
@@ -106,22 +106,20 @@ export default function ExercisesPage() {
     {
       accessorKey: "name",
       header: "Nom",
-    }
-   ,
+    },
     {
       accessorKey: "tempsReps",
       header: "Temps et Répétitions",
     },
     {
-
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const exercise = row.original
+        const bloc = row.original
 
         return (
           <div className="flex items-center gap-2">
-            <Link href={`/admin/blocks/${exercise.id}`}>
+            <Link href={`/admin/blocs/${bloc.id}`}>
               <Button variant="ghost" size="icon" title="Modifier">
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -131,7 +129,7 @@ export default function ExercisesPage() {
               size="icon"
               className="text-destructive"
               title="Supprimer"
-              onClick={() => confirmDeleteExercise(exercise.id)}
+              onClick={() => confirmDeleteBloc(bloc.id)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -145,7 +143,7 @@ export default function ExercisesPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <span className="ml-2">Chargement des blocks...</span>
+        <span className="ml-2">Chargement des blocs...</span>
       </div>
     )
   }
@@ -154,7 +152,7 @@ export default function ExercisesPage() {
     return (
       <div className="p-4 bg-destructive/10 text-destructive rounded-md">
         <p>{error}</p>
-        <Button variant="outline" className="mt-2" onClick={fetchExercises}>
+        <Button variant="outline" className="mt-2" onClick={fetchBlocs}>
           Réessayer
         </Button>
       </div>
@@ -168,7 +166,7 @@ export default function ExercisesPage() {
         <Link href="/admin/blocs/nouveau">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Nouvel bloc
+            Nouveau bloc
           </Button>
         </Link>
       </div>
@@ -186,7 +184,7 @@ export default function ExercisesPage() {
           </CardContent>
         </Card>
       ) : (
-        <DataTable columns={columns} data={exercises} searchKey="name" searchPlaceholder="Rechercher un bloc..." />
+        <DataTable columns={columns} data={blocs} searchKey="name" searchPlaceholder="Rechercher un bloc..." />
       )}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -200,7 +198,7 @@ export default function ExercisesPage() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteExercise}
+              onClick={handleDeleteBloc}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
