@@ -21,6 +21,7 @@ export default function NewBlocPage() {
     exercises: [] as number[],
   });
   const [exercises, setExercises] = useState<{ id: number; name: string }[]>([]);
+  const [errors,setErrors] = useState<Record<string, string>>({})
   useEffect(() => {
     // Fetch the list of exercises from the API
     const fetchExercises = async () => {
@@ -77,9 +78,7 @@ export default function NewBlocPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setVideoFile(file);
       const fileURL = URL.createObjectURL(file);
-      setPreviewUrl(fileURL);
     }
   };
 
@@ -185,17 +184,6 @@ export default function NewBlocPage() {
               {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={3}
-                placeholder="Description du bloc..."
-              />
-            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -224,16 +212,7 @@ export default function NewBlocPage() {
                 <Label htmlFor="difficulty" className={errors.difficulty ? "text-destructive" : ""}>
                   Difficulté*
                 </Label>
-                <Select value={formData.difficulty} onValueChange={(value) => handleSelectChange("difficulty", value)}>
-                  <SelectTrigger className={errors.difficulty ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Sélectionner" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Débutant">Débutant</SelectItem>
-                    <SelectItem value="Intermédiaire">Intermédiaire</SelectItem>
-                    <SelectItem value="Avancé">Avancé</SelectItem>
-                  </SelectContent>
-                </Select>
+
                 {errors.difficulty && <p className="text-destructive text-sm">{errors.difficulty}</p>}
               </div>
             </div>
@@ -252,69 +231,11 @@ export default function NewBlocPage() {
 
             <div className="space-y-2">
               <Label htmlFor="video">Vidéo de démonstration</Label>
-              <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
-                {previewUrl ? (
-                  <div className="w-full">
-                    <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
-                    <div className="flex items-center gap-2 my-2 text-sm">
-                      <Upload className="h-4 w-4 text-primary" />
-                      <span className="font-medium text-gray-700">
-                        {videoFile?.name} ({videoFile ? Math.round(videoFile.size / 1024) : 0}KB)
-                      </span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setVideoFile(null);
-                        setPreviewUrl(null);
-                        setFormData((prev) => ({
-                          ...prev,
-                          videoUrl: "",
-                        }));
-                      }}
-                    >
-                      Supprimer
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Glissez-déposez ou cliquez pour sélectionner une vidéo
-                    </p>
-                    <Input id="video" type="file" accept="video/*" onChange={handleFileChange} className="hidden" />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        document.getElementById("video")?.click();
-                      }}
-                    >
-                      Sélectionner un fichier
-                    </Button>
-                  </>
-                )}
-              </div>
+
               <p className="text-xs text-muted-foreground mt-2">Formats acceptés: MP4, WebM. Taille maximale: 50MB</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="videoUrl">URL de la vidéo (alternative)</Label>
-              <Input
-                id="videoUrl"
-                name="videoUrl"
-                value={formData.videoUrl}
-                onChange={handleChange}
-                placeholder="https://exemple.com/video.mp4"
-                disabled={!!previewUrl}
-              />
-              <p className="text-xs text-muted-foreground">
-                Si vous n'avez pas de fichier à télécharger, vous pouvez fournir une URL directe vers une vidéo.
-              </p>
-            </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="exercises">Exercices</Label>
