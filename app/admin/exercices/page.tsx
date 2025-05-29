@@ -109,28 +109,8 @@ export default function ExercisesPage() {
       header: "Nom",
     },
     {
-      accessorKey: "muscleGroup",
-      header: "Groupe musculaire",
-    },
-    {
-      accessorKey: "difficulty",
-      header: "Difficulté",
-      cell: ({ row }) => {
-        const difficulty = row.getValue("difficulty") as string
-        return (
-          <div
-            className={
-              difficulty === "Intermédiaire"
-                ? "text-orange-500"
-                : difficulty === "Avancé"
-                  ? "text-red-500"
-                  : "text-green-500"
-            }
-          >
-            {difficulty}
-          </div>
-        )
-      },
+      accessorKey: "tempsRep",
+      header: "Temps, et répétitions"
     },
     {
       accessorKey: "videoUrl",

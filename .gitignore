@@ -31,7 +31,7 @@ next-env.d.ts
 .venv
 
 #data
-pulic/videos
+public/videos
 
 #JetBrains
 .idea
