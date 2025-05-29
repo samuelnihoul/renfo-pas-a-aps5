@@ -75,10 +75,8 @@ export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   videoUrl: varchar("video_url", { length: 255 }),
-  videoPublicId: varchar("video_public_id", { length: 255 }),
   instructions: text("instructions"),
   tempsReps: varchar('tempsReps'),
-  blockId: integer("block_id").notNull().references(() => blocks.id, { onDelete: 'cascade' }),
   ...timestamps
 })
 

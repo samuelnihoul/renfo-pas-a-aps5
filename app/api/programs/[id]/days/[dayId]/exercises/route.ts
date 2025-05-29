@@ -12,20 +12,20 @@ export async function GET(request: Request, { params }: { params: { id: string; 
       return NextResponse.json({ error: "Invalid day ID" }, { status: 400 })
     }
 
-    // Récupérer les exercices du jour
-    const blockList = await db.select().from(blocks).where(eq(blocks.exerciseId, dayId))
+    // Récupérer les blocs du jour
+    const blockList = await db.select().from(blocks).where(eq(blocks.routinesId, dayId))
 
-    // Récupérer les détails des exercices
+    // Récupérer les détails des exercices associés à chaque bloc
     const result = await Promise.all(
-      blockList.map(async (dayExercise) => {
+      blockList.map(async (block) => {
         const exerciseDetails = await db
           .select()
           .from(exercises)
-          .where(eq(exercises.id, dayExercise.exerciseId))
+          .where(eq(exercises.blockId, block.id))
           .limit(1)
 
         return {
-          ...dayExercise,
+          ...block,
           exercise: exerciseDetails[0],
         }
       }),

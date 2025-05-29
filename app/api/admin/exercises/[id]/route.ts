@@ -80,7 +80,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .update(exercises)
       .set({
         name,
-        description: description || null,
         instructions: instructions || null,
         videoUrl: videoUrl || null,
         videoPublicId: videoPublicId || null,

@@ -7,25 +7,40 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
 
     // Validate the incoming data
-    if (!data.dayId || !data.exercises || !Array.isArray(data.exercises)) {
+    if (!data.routinesId || !data.exercises || !Array.isArray(data.exercises)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Insert the exercise blocks into the database
-    const insertedBlocks = await Promise.all(
-      data.exercises.map(async (exercise: any, index: number) => {
+    // Insert the exercise blocks into the database and create associated exercises
+    const insertedBlocksWithExercises = await Promise.all(
+      data.exercises.map(async (exerciseData: any, index: number) => {
+        // Create the block first
         const [newBlock] = await db.insert(blocks).values({
-          exerciseId: exercise.exerciseId,
-          sets: exercise.sets,
-          reps: exercise.reps,
-          restTime: exercise.restTime || null,
+          routinesId: data.routinesId,
+          sets: exerciseData.sets,
+          reps: exerciseData.reps,
+          restTime: exerciseData.restTime || null,
           orderIndex: index
         }).returning();
-        return newBlock;
+
+        // Then create the associated exercise with reference to the block
+        const [newExercise] = await db.insert(exercises).values({
+          name: exerciseData.name,
+          videoUrl: exerciseData.videoUrl || null,
+          videoPublicId: exerciseData.videoPublicId || null,
+          instructions: exerciseData.instructions || null,
+          tempsReps: exerciseData.tempsReps || null,
+          blockId: newBlock.id
+        }).returning();
+
+        return {
+          block: newBlock,
+          exercise: newExercise
+        };
       })
     );
 
-    return NextResponse.json(insertedBlocks, { status: 201 });
+    return NextResponse.json(insertedBlocksWithExercises, { status: 201 });
   } catch (error) {
     console.error('Error creating bloc:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

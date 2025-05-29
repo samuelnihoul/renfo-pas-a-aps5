@@ -260,20 +260,7 @@ export default function NewExercisePage() {
               <p className="text-xs text-muted-foreground mt-2">Formats acceptés: MP4, WebM. Taille maximale: 50MB</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="videoUrl">URL de la vidéo (alternative)</Label>
-              <Input
-                id="videoUrl"
-                name="videoUrl"
-                value={formData.videoUrl}
-                onChange={handleChange}
-                placeholder="https://exemple.com/video.mp4"
-                disabled={!!previewUrl}
-              />
-              <p className="text-xs text-muted-foreground">
-                Si vous n'avez pas de fichier à télécharger, vous pouvez fournir une URL directe vers une vidéo.
-              </p>
-            </div>
+
 
             <p className="text-sm text-muted-foreground">* Champs obligatoires</p>
           </CardContent>
