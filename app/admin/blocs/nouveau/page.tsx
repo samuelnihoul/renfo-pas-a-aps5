@@ -14,21 +14,13 @@ import { toast } from "@/components/ui/use-toast";
 export default function NewBlocPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{name:string,type:""|"mobilité"|"activation"|"force",instructions:string,exercises:number[]}>({
     name: "",
-    description: "",
     type: "",
-    difficulty: "Débutant",
     instructions: "",
-    videoUrl: "",
-    videoPublicId: "",
     exercises: [] as number[],
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [exercises, setExercises] = useState<{ id: number; name: string }[]>([]);
-
   useEffect(() => {
     // Fetch the list of exercises from the API
     const fetchExercises = async () => {

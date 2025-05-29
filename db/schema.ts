@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { pgTable, serial, varchar, text, timestamp, integer, date, decimal, unique ,PgTableWithColumns} from "drizzle-orm/pg-core"
+import { pgTable, serial, varchar, text, timestamp, integer, date, decimal, unique ,PgTableWithColumns,boolean} from "drizzle-orm/pg-core"
 const timestamps={
   createdAt:timestamp('created_at',{withTimezone: true}).defaultNow(),
   updatedAt:timestamp('updated_at',{withTimezone: true}).defaultNow(),
@@ -27,12 +27,10 @@ export const users = pgTable("users", {
 export const exercises:PgTableWithColumns<any> = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  description: text("description"),
   videoUrl: varchar("video_url", { length: 255 }),
   videoPublicId: varchar("video_public_id", { length: 255 }),
   instructions: text("instructions"),
   tempsReps: varchar('tempsReps'),
-    blockId:integer('block_id').notNull().references(()=>blocks.id,{onDelete:'cascade'}),
   ...timestamps
 })
 
@@ -48,7 +46,7 @@ export const routines = pgTable(
     dayNumber: integer("day_number").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     focus: varchar("focus", { length: 255 }),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+      ...timestamps
   },
   (table) => {
     return {
@@ -62,9 +60,9 @@ export const blocks = pgTable(
   "blocks",
   {
     id: serial("id").primaryKey(),
-    exerciseId: integer("exercise_id")
+    routinesId: integer("routines_id")
       .notNull()
-      .references(() => exercises.id, { onDelete: "cascade" }),
+      .references(() => routines.id, { onDelete: "cascade" }),
     sets: integer("sets").notNull(),
     reps: varchar("reps", { length: 50 }).notNull(),
     restTime: varchar("rest_time", { length: 50 }),
@@ -74,7 +72,7 @@ export const blocks = pgTable(
   (table) => {
     return {
       dayExerciseUnique: unique("day_exercise_unique_idx").on(
-        table.exerciseId,
+        table.routinesId,
         table.orderIndex
       ),
     }
@@ -87,16 +85,14 @@ export const exercisesRelations = relations(exercises, ({ many }) => ({
   blocks:many(blocks)
 }))
 
-export const programsRelations = relations(programs, ({ many }) => ({
-  routines: many(routines),
-}))
+
 
 export const routinesRelations = relations(routines, ({ one, many }) => ({
   programs:many(programs)
 }))
 
-export const blockRelations = relations(blocks, ({many}) => ({
-  exercises:many(exercises)
+export const blocksRelations = relations(blocks, ({many}) => ({
+  routines:many(routines)
 }))
 
 
