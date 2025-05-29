@@ -33,14 +33,7 @@ export async function POST(request: NextRequest) {
           orderIndex: index
         }).returning();
 
-        // Update the exercise with the block ID
-        await db
-          .update(exercises)
-          .set({
-            blockId: newBlock.id,
-            updatedAt: new Date(),
-          })
-          .where(eq(exercises.id, exerciseData.exerciseId));
+
 
         return {
           block: newBlock,
