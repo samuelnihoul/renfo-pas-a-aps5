@@ -11,7 +11,7 @@ out
 build
 
 # Environment variables
-.env.local
+.env
 !.env.example
 
 # Version control

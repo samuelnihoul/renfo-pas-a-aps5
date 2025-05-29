@@ -88,24 +88,11 @@ export const programsRelations = relations(programs, ({ many }) => ({
 }))
 
 export const routinesRelations = relations(routines, ({ one, many }) => ({
-  program: one(programs, {
-    fields: [routines.programId],
-    references: [programs.id]
-  }),
   blocks: many(blocks)
 }))
 
 export const blocksRelations = relations(blocks, ({ one, many }) => ({
-  routine: one(routines, {
-    fields: [blocks.routinesId],
-    references: [routines.id]
-  }),
+
   exercises: many(exercises)
 }))
 
-export const exercisesRelations = relations(exercises, ({ one }) => ({
-  block: one(blocks, {
-    fields: [exercises.blockId],
-    references: [blocks.id]
-  })
-}))
