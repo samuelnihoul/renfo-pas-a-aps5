@@ -20,7 +20,6 @@ export default function NewExercisePage() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
     instructions: "",
     videoUrl: "",
     videoPublicId: "",
@@ -199,17 +198,6 @@ export default function NewExercisePage() {
               {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={3}
-                placeholder="Description de l'exercice..."
-              />
-            </div>
 
 
             <div className="space-y-2">
