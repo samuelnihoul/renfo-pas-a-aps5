@@ -19,7 +19,6 @@ export async function POST(request: Request) {
       .values({
         name,
         instructions: instructions || null,
-        videoUrl: videoUrl || null,
         videoPublicId: videoPublicId || null,
         createdAt: now, // Use the Date object directly
       })

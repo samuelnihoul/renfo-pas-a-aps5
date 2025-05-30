@@ -81,7 +81,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .set({
         name,
         instructions: instructions || null,
-        videoUrl: videoUrl || null,
         videoPublicId: videoPublicId || null,
       })
       .where(eq(exercises.id, id))
