@@ -13,6 +13,9 @@ export const programs = pgTable("programs", {
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   duration: varchar("duration", { length: 50 }),
+    routineId:integer("routine_id").array().references(
+        ()=> routines.id,{onDelete:"cascade"}
+    ),
   ...timestamps
 })
 
@@ -31,18 +34,14 @@ export const routines = pgTable(
   "routines",
   {
     id: serial("id").primaryKey(),
-    programId: integer("program_id")
+    blockId: integer("program_id").array()
       .notNull()
-      .references(() => programs.id, { onDelete: "cascade" }),
+      .references(() => blocks.id, { onDelete: "cascade" }),
     dayNumber: integer("day_number").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     focus: varchar("focus", { length: 255 }),
+    orderIndex: integer("orderId").notNull().array(),
     ...timestamps
-  },
-  (table) => {
-    return {
-      programDayUnique: unique().on(table.programId, table.dayNumber),
-    }
   },
 )
 
@@ -51,22 +50,14 @@ export const blocks = pgTable(
   "blocks",
   {
     id: serial("id").primaryKey(),
-    routinesId: integer("routines_id")
+    exerciceId: integer("exerciceId").array()
       .notNull()
-      .references(() => routines.id, { onDelete: "cascade" }),
+      .references(() => exercises.id, { onDelete: "cascade" }),
     sets: integer("sets").notNull(),
     reps: varchar("reps", { length: 50 }).notNull(),
     restTime: varchar("rest_time", { length: 50 }),
     orderIndex: integer("order_index").notNull(),
     ...timestamps
-  },
-  (table) => {
-    return {
-      dayExerciseUnique: unique("day_exercise_unique_idx").on(
-        table.routinesId,
-        table.orderIndex
-      ),
-    }
   },
 )
 
