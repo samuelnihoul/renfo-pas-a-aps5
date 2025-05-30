@@ -12,10 +12,11 @@ export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  duration: varchar("duration", { length: 50 }),
     routineId:integer("routine_id").array().references(
         ()=> routines.id,{onDelete:"cascade"}
     ),
+    orderIndex:integer("order_index").notNull().array(),
+    material:text("material").notNull(),
   ...timestamps
 })
 
@@ -54,9 +55,9 @@ export const blocks = pgTable(
       .notNull()
       .references(() => exercises.id, { onDelete: "cascade" }),
     sets: integer("sets").notNull(),
-    reps: varchar("reps", { length: 50 }).notNull(),
     restTime: varchar("rest_time", { length: 50 }),
     orderIndex: integer("order_index").notNull(),
+      focus:varchar("focus").notNull(),
     ...timestamps
   },
 )
