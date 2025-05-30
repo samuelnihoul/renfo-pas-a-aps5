@@ -18,7 +18,6 @@ export async function POST(request: Request) {
       .insert(exercises)
       .values({
         name,
-        description: description || null,
         instructions: instructions || null,
         videoUrl: videoUrl || null,
         videoPublicId: videoPublicId || null,
