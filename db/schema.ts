@@ -38,9 +38,7 @@ export const routines = pgTable(
     blockId: integer("program_id").array()
       .notNull()
       .references(() => blocks.id, { onDelete: "cascade" }),
-    dayNumber: integer("day_number").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
-    focus: varchar("focus", { length: 255 }),
     orderIndex: integer("orderId").notNull().array(),
     ...timestamps
   },

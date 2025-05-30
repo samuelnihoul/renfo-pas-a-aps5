@@ -11,7 +11,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { name, description, duration } = body
+    const { name, description, orderIndex,routineId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
@@ -22,7 +22,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .set({
         name,
         description,
-        duration,
+        orderIndex,
+        routineId
       })
       .where(eq(programs.id, id))
       .returning()

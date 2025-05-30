@@ -4,28 +4,7 @@ import { routines } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import {notEqual} from "node:assert";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-  try {
-    const id = Number.parseInt(params.id)
-    if (isNaN(id)) {
-      return NextResponse.json({ error: "Invalid routine ID" }, { status: 400 })
-    }
 
-    // Récupérer la routine
-    const routine = await db.query.routines.findFirst({
-      where: eq(routines.id, id)
-    })
-
-    if (!routine) {
-      return NextResponse.json({ error: "Routine not found" }, { status: 404 })
-    }
-
-    return NextResponse.json(routine)
-  } catch (error) {
-    console.error("Error fetching routine:", error)
-    return NextResponse.json({ error: "Failed to fetch routine" }, { status: 500 })
-  }
-}
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -36,12 +15,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { programId, dayNumber, name, focus } = body
+    const { name, orderIndex ,blockId} = body
 
     // Validation
-    if (!programId || !dayNumber || !name) {
+    if (!blockId || !orderIndex || !name) {
       return NextResponse.json(
-        { error: "Missing required fields: programId, dayNumber, name" },
+        { error: "Missing required fields: blockId, orderIndex, name" },
         { status: 400 }
       )
     }
@@ -59,10 +38,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const result = await db
       .update(routines)
       .set({
-        programId,
-        dayNumber,
+        blockId,
         name,
-        focus: focus || null,
       })
       .where(eq(routines.id, id))
       .returning()

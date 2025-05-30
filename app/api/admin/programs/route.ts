@@ -3,15 +3,11 @@ import { db } from "@/db"
 import { programs, routines } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
-type ProgramDay = {
-  dayNumber: number
-  routineId: number
-}
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, routines ,orderIndex,description} = body
+    const { name, material,routines ,orderIndex,description} = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
@@ -26,10 +22,11 @@ export async function POST(request: Request) {
     }
     try {
       // Créer le programme
-      const [newProgram] = await db
+      const newProgram = await db
         .insert(programs)
         .values({
           name,
+          material,
           description: description || null,
           orderIndex,
           routineId:routines

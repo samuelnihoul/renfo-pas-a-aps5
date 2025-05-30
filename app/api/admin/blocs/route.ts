@@ -10,13 +10,12 @@ export async function POST(request: NextRequest) {
     if (!data.exerciceId || !data.orderIndex || !Array.isArray(data.exercises)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-
-
         const newBlock = await db.insert(blocks).values({
           exerciceId: data.exerciceId,
             sets:data.sets,
           restTime: data.restTime || null,
-          orderIndex: data.orderIndex
+          orderIndex: data.orderIndex,
+          focus:data.focus
         }).returning()
 
 
