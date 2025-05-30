@@ -8,18 +8,9 @@ export async function GET() {
     // Récupérer toutes les routines
     const routinesList = await db.select().from(routines)
 
-    // Pour chaque routine, récupérer les informations du programme associé
-    const routinesWithPrograms = await Promise.all(
-      routinesList.map(async (routine) => {
-        const program = await db.select().from(programs).where(eq(programs.id, routine.programId)).limit(1)
-        return {
-          ...routine,
-          program: program[0] || null,
-        }
-      }),
-    )
 
-    return NextResponse.json(routinesWithPrograms)
+
+    return NextResponse.json(routinesList)
   } catch (error) {
     console.error("Error fetching routines:", error)
     return NextResponse.json({ error: "Failed to fetch routines" }, { status: 500 })

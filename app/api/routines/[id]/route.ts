@@ -18,15 +18,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ error: "Routine not found" }, { status: 404 })
     }
 
-    // Récupérer les informations du programme associé
-    const program = await db.select().from(programs).where(eq(programs.id, routine[0].programId)).limit(1)
 
-    const routineWithProgram = {
-      ...routine[0],
-      program: program[0] || null,
-    }
 
-    return NextResponse.json(routineWithProgram)
+
+    return NextResponse.json(routine)
   } catch (error) {
     console.error("Error fetching routine:", error)
     return NextResponse.json({ error: "Failed to fetch routine" }, { status: 500 })
