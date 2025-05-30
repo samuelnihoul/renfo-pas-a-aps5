@@ -1,0 +1,1 @@
+ALTER TABLE "routines" RENAME COLUMN "program_id" TO "block_id";
