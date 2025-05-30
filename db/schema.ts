@@ -12,9 +12,7 @@ export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-    routineId:integer("routine_id").array().references(
-        ()=> routines.id,{onDelete:"cascade"}
-    ),
+    routineId:integer("routine_id").array(),
     orderIndex:integer("order_index").notNull().array(),
     material:text("material").notNull(),
   ...timestamps
@@ -35,9 +33,9 @@ export const routines = pgTable(
   "routines",
   {
     id: serial("id").primaryKey(),
-    blockId: integer("program_id").array()
-      .notNull()
-      .references(() => blocks.id, { onDelete: "cascade" }),
+    blockId: integer("block_id").array()
+      .notNull(),
+
     name: varchar("name", { length: 255 }).notNull(),
     orderIndex: integer("orderId").notNull().array(),
     ...timestamps
@@ -51,7 +49,7 @@ export const blocks = pgTable(
     id: serial("id").primaryKey(),
     exerciceId: integer("exerciceId").array()
       .notNull()
-      .references(() => exercises.id, { onDelete: "cascade" }),
+     ,
     sets: integer("sets").notNull(),
     restTime: varchar("rest_time", { length: 50 }),
     orderIndex: integer("order_index").notNull(),
@@ -69,18 +67,4 @@ export const exercises = pgTable("exercises", {
   tempsReps: varchar('tempsReps'),
   ...timestamps
 })
-
-// Relations
-export const programsRelations = relations(programs, ({ many }) => ({
-  routines: many(routines)
-}))
-
-export const routinesRelations = relations(routines, ({ one, many }) => ({
-  blocks: many(blocks)
-}))
-
-export const blocksRelations = relations(blocks, ({ one, many }) => ({
-
-  exercises: many(exercises)
-}))
 
