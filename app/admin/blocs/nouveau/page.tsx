@@ -11,6 +11,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
 import Selector from "@/components/admin/selector"
+import {BlockAdd,Exercise} from '@/db/schema'
 
 enum BlockTypes {
     Exercises = "Exercices",
@@ -21,11 +22,12 @@ enum BlockTypes {
 export default function NewProgram() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
-    const [formData, setFormData] = useState({
-        name: "",
-        type: BlockTypes.Exercises,
-        setsInfo: "",
-        repsInfo: "",
+    const [formData, setFormData] = useState<BlockAdd>({
+        focus: BlockTypes.Exercises as string,
+        exerciceId:[],
+        orderIndex:[],
+        sets:"",
+        restTime:""
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
@@ -69,7 +71,7 @@ export default function NewProgram() {
         setLoading(true)
 
         try {
-            const response = await fetch("/api/admin/blocks", {
+            const response = await fetch("/api/admin/blocs", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -82,7 +84,7 @@ export default function NewProgram() {
                     title: "Bloc créé",
                     description: "Le bloc a été créé avec succès",
                 })
-                router.push("/admin/blocks")
+                router.push("/admin/blocs")
             } else {
                 const data = await response.json()
                 toast({
@@ -106,7 +108,7 @@ export default function NewProgram() {
     return (
         <div>
             <div className="flex items-center mb-6">
-                <Link href="/admin/blocks">
+                <Link href="/admin/blocs">
                     <Button variant="ghost" size="sm" className="gap-1">
                         <ArrowLeft className="h-4 w-4" />
                         Retour

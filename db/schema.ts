@@ -50,9 +50,9 @@ export const blocks = pgTable(
     exerciceId: integer("exerciceId").array()
       .notNull()
      ,
-    sets: integer("sets").notNull(),
+    sets: varchar("sets").notNull(),
     restTime: varchar("rest_time", { length: 50 }),
-    orderIndex: integer("order_index").notNull(),
+    orderIndex: integer("order_index").notNull().array(),
       focus:varchar("focus").notNull(),
     ...timestamps
   },
@@ -67,4 +67,14 @@ export const exercises = pgTable("exercises", {
   tempsReps: varchar('tempsReps'),
   ...timestamps
 })
+export type Exercise= typeof exercises.$inferSelect
+export type ExerciseAdd= typeof exercises.$inferInsert
+export type Routine = typeof  routines.$inferSelect
+export type RoutineAdd = typeof routines.$inferInsert
+export type Block = typeof blocks.$inferSelect
+export type BlockAdd = typeof blocks.$inferInsert
+export type Program = typeof programs.$inferSelect
+export type ProgramAdd = typeof programs.$inferInsert
+export type User = typeof users.$inferSelect
+export type UserAdd = typeof users.$inferInsert
 
