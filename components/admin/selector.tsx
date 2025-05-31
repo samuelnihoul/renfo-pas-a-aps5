@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from "react";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, X, Save,ArrowLeft } from "lucide-react";
+import { Plus, X, Save, ArrowUp, ArrowDown, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { toast } from "@/components/ui/use-toast";
 import {
@@ -95,14 +96,6 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
         const selectedItem = availableItems.find((item) => item.id === tempItem.itemId);
         if (!selectedItem) return;
 
-        if (itemList.some((item) => item.itemId === tempItem.itemId)) {
-            toast({
-                title: "Erreur",
-                description: "Cet élément est déjà dans la liste",
-                variant: "destructive",
-            });
-            return;
-        }
 
         setItemList((prev) => [
             ...prev,
@@ -126,7 +119,58 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
         });
     };
 
+    const moveItem = (itemIndex: number, direction: "up" | "down") => {
+        if (
+            (direction === "up" && itemIndex === 0) ||
+            (direction === "down" && itemIndex === itemList.length - 1)
+        ) {
+            return;
+        }
 
+        const newIndex = direction === "up" ? itemIndex - 1 : itemIndex + 1;
+        const newList = [...itemList];
+        [newList[itemIndex], newList[newIndex]] = [newList[newIndex], newList[itemIndex]];
+
+        setItemList(newList);
+    };
+
+    const handleSubmit = async () => {
+        setLoading(true);
+
+        try {
+            const response = await fetch("/api/admin/lists", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ list: itemList }),
+            });
+
+            if (response.ok) {
+                toast({
+                    title: "Succès",
+                    description: "La liste a été créée avec succès",
+                });
+                router.push("/admin/lists");
+            } else {
+                const data = await response.json();
+                toast({
+                    title: "Erreur",
+                    description: data.error || "Une erreur est survenue lors de la création de la liste",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            console.error("Erreur lors de la création de la liste:", error);
+            toast({
+                title: "Erreur",
+                description: "Une erreur est survenue lors de la création de la liste",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const filteredItems = availableItems.filter((item) =>
         item.name.toLowerCase().includes(filterQuery.toLowerCase())
@@ -134,6 +178,15 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
 
     return (
         <div>
+            <div className="flex items-center mb-6">
+                <Link href={`/admin/${items}`}>
+                    <Button variant="ghost" size="sm" className="gap-1">
+                        <ArrowLeft className="h-4 w-4" />
+                        Retour
+                    </Button>
+                </Link>
+                <h1 className="text-2xl font-bold ml-2">Nouvelle Liste</h1>
+            </div>
 
             <Card className="mb-6">
                 <CardHeader>
@@ -162,14 +215,32 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
                                         <TableCell>{itemIndex + 1}</TableCell>
                                         <TableCell className="font-medium">{item.itemName}</TableCell>
                                         <TableCell>
-                                            <Button
-                                                size="icon"
-                                                variant="ghost"
-                                                className="text-destructive"
-                                                onClick={() => removeItemFromList(itemIndex)}
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </Button>
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    onClick={() => moveItem(itemIndex, "up")}
+                                                    disabled={itemIndex === 0}
+                                                >
+                                                    <ArrowUp className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    onClick={() => moveItem(itemIndex, "down")}
+                                                    disabled={itemIndex === itemList.length - 1}
+                                                >
+                                                    <ArrowDown className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="text-destructive"
+                                                    onClick={() => removeItemFromList(itemIndex)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -183,7 +254,15 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
                 </CardContent>
             </Card>
 
-
+            <div className="mt-6 flex justify-end">
+                <Button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={loading || itemList.length === 0}
+                >
+                    {loading ? "Création..." : "Créer la liste"}
+                </Button>
+            </div>
 
             <Dialog
                 open={addItemDialogOpen}
@@ -240,9 +319,8 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
                                             filteredItems.map((item) => (
                                                 <TableRow
                                                     key={item.id}
-                                                    className={`cursor-pointer ${
-                                                        tempItem.itemId === item.id ? 'bg-primary/10' : ''
-                                                    }`}
+                                                    className={`cursor-pointer ${tempItem.itemId === item.id ? 'bg-primary/10' : ''
+                                                        }`}
                                                     onClick={() => handleItemSelection(item.id)}
                                                 >
                                                     <TableCell className="font-medium">{item.name}</TableCell>
