@@ -178,15 +178,7 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
 
     return (
         <div>
-            <div className="flex items-center mb-6">
-                <Link href={`/admin/${items}`}>
-                    <Button variant="ghost" size="sm" className="gap-1">
-                        <ArrowLeft className="h-4 w-4" />
-                        Retour
-                    </Button>
-                </Link>
-                <h1 className="text-2xl font-bold ml-2">Nouvelle Liste</h1>
-            </div>
+
 
             <Card className="mb-6">
                 <CardHeader>
@@ -254,15 +246,7 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
                 </CardContent>
             </Card>
 
-            <div className="mt-6 flex justify-end">
-                <Button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={loading || itemList.length === 0}
-                >
-                    {loading ? "Création..." : "Créer la liste"}
-                </Button>
-            </div>
+
 
             <Dialog
                 open={addItemDialogOpen}
