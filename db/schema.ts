@@ -50,6 +50,7 @@ export const blocks = pgTable(
     exerciceId: integer("exerciceId").array()
       .notNull()
      ,
+      name:varchar("name").notNull(),
     sets: varchar("sets").notNull(),
     restTime: varchar("rest_time", { length: 50 }),
     orderIndex: integer("order_index").notNull().array(),

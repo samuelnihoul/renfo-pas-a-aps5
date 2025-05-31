@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from "react";
@@ -37,7 +36,12 @@ interface ItemDetail {
     itemName: string;
 }
 
-export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
+interface ItemSelectorAndOrganizerProps {
+    items: string;
+    onExerciseSelectAction: (selectedExerciseIds: number[], orderIndices: number[]) => void;
+}
+
+export default function ItemSelectorAndOrganizer({ items, onExerciseSelectAction }: ItemSelectorAndOrganizerProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [availableItems, setAvailableItems] = useState<Item[]>([]);
@@ -79,6 +83,13 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
         fetchItems();
     }, [items]);
 
+    useEffect(() => {
+        // Mettre à jour le parent chaque fois que itemList change
+        const selectedExerciseIds = itemList.map(item => item.itemId);
+        const orderIndices = itemList.map((_, index) => index);
+        onExerciseSelectAction(selectedExerciseIds, orderIndices);
+    }, [itemList ]);
+
     const openAddItemDialog = () => {
         setAddItemDialogOpen(true);
     };
@@ -95,7 +106,6 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
 
         const selectedItem = availableItems.find((item) => item.id === tempItem.itemId);
         if (!selectedItem) return;
-
 
         setItemList((prev) => [
             ...prev,
@@ -134,52 +144,12 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
         setItemList(newList);
     };
 
-    const handleSubmit = async () => {
-        setLoading(true);
-
-        try {
-            const response = await fetch("/api/admin/lists", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ list: itemList }),
-            });
-
-            if (response.ok) {
-                toast({
-                    title: "Succès",
-                    description: "La liste a été créée avec succès",
-                });
-                router.push("/admin/lists");
-            } else {
-                const data = await response.json();
-                toast({
-                    title: "Erreur",
-                    description: data.error || "Une erreur est survenue lors de la création de la liste",
-                    variant: "destructive",
-                });
-            }
-        } catch (error) {
-            console.error("Erreur lors de la création de la liste:", error);
-            toast({
-                title: "Erreur",
-                description: "Une erreur est survenue lors de la création de la liste",
-                variant: "destructive",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const filteredItems = availableItems.filter((item) =>
         item.name.toLowerCase().includes(filterQuery.toLowerCase())
     );
 
     return (
         <div>
-
-
             <Card className="mb-6">
                 <CardHeader>
                     <CardTitle>Ajouter des éléments à la liste</CardTitle>
@@ -246,8 +216,6 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
                 </CardContent>
             </Card>
 
-
-
             <Dialog
                 open={addItemDialogOpen}
                 onOpenChange={(open) => {
@@ -304,7 +272,7 @@ export default function ItemSelectorAndOrganizer({ items }: { items: string }) {
                                                 <TableRow
                                                     key={item.id}
                                                     className={`cursor-pointer ${tempItem.itemId === item.id ? 'bg-primary/10' : ''
-                                                        }`}
+                                                    }`}
                                                     onClick={() => handleItemSelection(item.id)}
                                                 >
                                                     <TableCell className="font-medium">{item.name}</TableCell>

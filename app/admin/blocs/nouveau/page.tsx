@@ -10,8 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
-import Selector from "@/components/admin/selector"
-import {BlockAdd,Exercise} from '@/db/schema'
+import ItemSelectorAndOrganizer from "@/components/admin/selector"
+import { BlockAdd } from '@/db/schema'
 
 enum BlockTypes {
     Exercises = "Exercices",
@@ -23,11 +23,12 @@ export default function NewProgram() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState<BlockAdd>({
-        focus: BlockTypes.Exercises as string,
-        exerciceId:[],
-        orderIndex:[],
-        sets:"",
-        restTime:""
+        focus: BlockTypes.Exercises,
+        orderIndex: [],
+        exerciceId: [],
+        name: "",
+        sets: "",
+        restTime: ""
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
@@ -50,7 +51,15 @@ export default function NewProgram() {
     const handleSelectChange = (value: string) => {
         setFormData(prev => ({
             ...prev,
-            type: value as BlockTypes,
+            focus: value as BlockTypes,
+        }))
+    }
+
+    const handleExerciseSelection = (selectedExerciseIds: number[], orderIndices: number[]) => {
+        setFormData(prev => ({
+            ...prev,
+            exerciceId: selectedExerciseIds,
+            orderIndex: orderIndices,
         }))
     }
 
@@ -138,8 +147,8 @@ export default function NewProgram() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="type">Type de bloc</Label>
-                            <Select onValueChange={handleSelectChange} defaultValue={formData.type}>
+                            <Label htmlFor="focus">Type de bloc</Label>
+                            <Select onValueChange={handleSelectChange} defaultValue={formData.focus}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sélectionnez un type de bloc" />
                                 </SelectTrigger>
@@ -151,27 +160,27 @@ export default function NewProgram() {
                             </Select>
                         </div>
 
-                        <Selector items={"blocs"} />
+                        <ItemSelectorAndOrganizer items={"blocs"} onExerciseSelectAction={handleExerciseSelection} />
 
                         <div className="space-y-2">
-                            <Label htmlFor="setsInfo">Information sur les sets</Label>
+                            <Label htmlFor="sets">Sets</Label>
                             <Input
-                                id="setsInfo"
-                                name="setsInfo"
-                                value={formData.setsInfo}
+                                id="sets"
+                                name="sets"
+                                value={formData.sets}
                                 onChange={handleChange}
-                                placeholder="Information sur les sets"
+                                placeholder="Sets"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="repsInfo">Information sur les reps</Label>
+                            <Label htmlFor="restTime">Temps de repos</Label>
                             <Input
-                                id="repsInfo"
-                                name="repsInfo"
-                                value={formData.repsInfo}
+                                id="restTime"
+                                name="restTime"
+                                value={formData.restTime as string}
                                 onChange={handleChange}
-                                placeholder="Information sur les reps"
+                                placeholder="Temps de repos"
                             />
                         </div>
 
