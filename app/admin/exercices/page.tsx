@@ -105,8 +105,12 @@ export default function ExercisesPage() {
       header: "Nom",
     },
     {
-      accessorKey: "tempsRep",
-      header: "Temps, et répétitions"
+      accessorKey: "tempsReps",
+      header: "Temps et répétitions"
+    },
+    {
+      accessorKey:"instructions",
+      header: "Instructions"
     },
     {
       accessorKey: "videoPublicId",

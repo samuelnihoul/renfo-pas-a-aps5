@@ -1,10 +1,8 @@
-//admin/exercices/[id]/page.tsx
 "use client"
 
-import React from "react"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import {Loader2, CheckCircle, AlertCircle, Upload} from "lucide-react"
+import { Loader2, CheckCircle, AlertCircle, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -20,21 +18,29 @@ import {
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-
 import { toast } from "@/components/ui/use-toast"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+
+// Define validation schema
+const exerciseSchema = z.object({
+    name: z.string().min(1, "Le nom est requis"),
+    instructions: z.string().optional(),
+    videoPublicId: z.string().optional(),
+    tempsRep: z.string().optional(),
+})
+
+type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
 export default function EditExercisePage({ params }: { params: { id: string } }) {
-    const wrappedId = React.use(params as any) as { id: string }
-    const id = wrappedId.id
-
+    const awaitedParams=React.use(params as any)
+    const { id } = awaitedParams
     const router = useRouter()
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
@@ -45,34 +51,31 @@ export default function EditExercisePage({ params }: { params: { id: string } })
     const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle")
     const [uploadError, setUploadError] = useState("")
 
-    // Configuration du formulaire
     const form = useForm<ExerciseFormValues>({
         resolver: zodResolver(exerciseSchema),
         defaultValues: {
             name: "",
-            description: "",
             instructions: "",
-            videoUrl: "",
+            tempsRep: "",
+            videoPublicId: "",
         },
-    })    // Récupérer les données de l'exercice au chargement
+    })
+
     useEffect(() => {
         const fetchExercise = async () => {
             try {
                 setLoading(true)
                 const response = await fetch(`/api/admin/exercises/${id}`)
-
                 if (!response.ok) {
-                    // Si l'exercice n'existe pas ou autre erreur
                     const data = await response.json()
                     throw new Error(data.error || "Erreur lors de la récupération de l'exercice")
-                } const exercise = await response.json()
+                }
 
-                // Mise à jour des valeurs du formulaire
+                const exercise = await response.json()
                 form.reset({
                     name: exercise.name,
-                    description: exercise.description || "",
+                    tempsRep: exercise.tempsRep || "",
                     instructions: exercise.instructions || "",
-                    videoUrl: exercise.videoUrl || "",
                     videoPublicId: exercise.videoPublicId || "",
                 })
 
@@ -86,96 +89,70 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         }
 
         fetchExercise()
-    }, [id, form])    // Gérer le téléchargement de fichier vidéo
-    const handleVideoChange = (file: File | null) => {
-        setVideoFile(file)
-        if (file) {
+    }, [id, form])
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0]
+            setVideoFile(file)
+            const fileURL = URL.createObjectURL(file)
+            setPreviewUrl(fileURL)
             setUploadStatus("idle")
         }
     }
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files.length > 0) {
-            const file = event.target.files[0];
-            setVideoFile(file);
-
-            // Create preview URL
-            const fileURL = URL.createObjectURL(file);
-            setPreviewUrl(fileURL);
-            setUploadStatus("idle");
-        }
-    }
-
-     // Soumission du formulaire
     const onSubmit = async (data: ExerciseFormValues) => {
-        setSubmitting(true);
+        setSubmitting(true)
 
         try {
-            let finalVideoUrl = data.videoUrl;            // Si un fichier vidéo a été sélectionné, on l'upload d'abord
+            let finalVideoPublicId = data.videoPublicId
+
             if (videoFile) {
-                setUploadStatus("uploading");
-                setUploadProgress(0);
+                setUploadStatus("uploading")
+                setUploadProgress(0)
 
                 try {
-                    // Simuler la progression de l'upload
-                    const progressInterval = setInterval(() => {
-                        setUploadProgress((prev) => {
-                            if (prev >= 90) {
-                                clearInterval(progressInterval);
-                                return prev;
-                            }
-                            return prev + 3; // Progression plus lente pour être plus réaliste
-                        });
-                    }, 200);
+                    const uploadFormData = new FormData()
+                    uploadFormData.append("video", videoFile)
 
-                    const uploadFormData = new FormData();
-                    uploadFormData.append("video", videoFile);
-
-                    console.log("Début du téléchargement de la vidéo...");
-
-                    // Notification de démarrage d'upload
                     toast({
                         title: "Téléchargement en cours",
                         description: "La vidéo est en cours d'envoi vers le serveur...",
-                    });
+                    })
 
                     const uploadResponse = await fetch("/api/upload/video", {
                         method: "POST",
                         body: uploadFormData,
-                    });
+                    })
 
-                    clearInterval(progressInterval); if (!uploadResponse.ok) {
-                        const errorData = await uploadResponse.json();
-                        setUploadStatus("error");
-                        setUploadError(errorData.error || "Erreur lors du téléchargement de la vidéo");
+                    if (!uploadResponse.ok) {
+                        const errorData = await uploadResponse.json()
+                        setUploadStatus("error")
+                        setUploadError(errorData.error || "Erreur lors du téléchargement de la vidéo")
 
-                        // Notification d'erreur
                         toast({
                             title: "Échec du téléchargement",
                             description: errorData.error || "La vidéo n'a pas pu être téléchargée",
-                            variant: "destructive"
-                        });
+                            variant: "destructive",
+                        })
 
-                        throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
+                        throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo")
                     }
 
-                    const uploadData = await uploadResponse.json();
-                    finalVideoUrl = uploadData.fileUrl;
-                    const videoPublicId = uploadData.publicId;
-                    // Mettre à jour le champ videoPublicId dans le formulaire
-                    form.setValue("videoPublicId", videoPublicId);
-                    setUploadProgress(100);
-                    setUploadStatus("success");
+                    const uploadData = await uploadResponse.json()
+                    finalVideoPublicId = uploadData.publicId
+                    form.setValue("videoPublicId", finalVideoPublicId)
+                    setUploadProgress(100)
+                    setUploadStatus("success")
 
-                    // Notification de succès
                     toast({
                         title: "Téléchargement réussi",
                         description: "La vidéo a été téléchargée avec succès et sera enregistrée lors de la sauvegarde du formulaire.",
-                    });
+                    })
                 } catch (error) {
-                    setUploadStatus("error");
-                    setUploadError(error instanceof Error ? error.message : "Erreur lors du téléchargement de la vidéo");
-                    throw error;
+                    setUploadStatus("error")
+                    setUploadError(error instanceof Error ? error.message : "Erreur lors du téléchargement de la vidéo")
+                    throw error
                 }
             }
 
@@ -186,10 +163,9 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                 },
                 body: JSON.stringify({
                     ...data,
-                    videoUrl: finalVideoUrl,
-                    videoPublicId: form.getValues("videoPublicId"),
+                    videoPublicId: finalVideoPublicId,
                 }),
-            });
+            })
 
             if (!response.ok) {
                 const errorData = await response.json()
@@ -201,7 +177,6 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                 description: "L'exercice a été mis à jour avec succès",
             })
 
-            // Redirection vers la liste des exercices
             router.push("/admin/exercices")
         } catch (err) {
             console.error("Error updating exercise:", err)
@@ -229,11 +204,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         return (
             <div className="p-4 bg-destructive/10 text-destructive rounded-md">
                 <p>{error}</p>
-                <Button
-                    variant="outline"
-                    className="mt-2"
-                    onClick={() => router.push("/admin/exercices")}
-                >
+                <Button variant="outline" className="mt-2" onClick={() => router.push("/admin/exercices")}>
                     Retour aux exercices
                 </Button>
             </div>
@@ -244,10 +215,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         <div>
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold">Modifier l'exercice</h1>
-                <Button
-                    variant="outline"
-                    onClick={() => router.push("/admin/exercices")}
-                >
+                <Button variant="outline" onClick={() => router.push("/admin/exercices")}>
                     Retour
                 </Button>
             </div>
@@ -255,9 +223,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
             <Card>
                 <CardHeader>
                     <CardTitle>Informations de l'exercice</CardTitle>
-                    <CardDescription>
-                        Modifiez les détails de l'exercice ci-dessous.
-                    </CardDescription>
+                    <CardDescription>Modifiez les détails de l'exercice ci-dessous.</CardDescription>
                 </CardHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -278,30 +244,12 @@ export default function EditExercisePage({ params }: { params: { id: string } })
 
                             <FormField
                                 control={form.control}
-                                name="tempsReps"
+                                name="tempsRep"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Temps / Répétitions</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Temps / Répétitions" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="description"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Description</FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                placeholder="Décrivez brièvement l'exercice"
-                                                className="resize-none"
-                                                rows={3}
-                                                {...field}
-                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -327,22 +275,20 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                 )}
                             />
 
-                                  <div className="space-y-2">
-                                <FormLabel htmlFor="video-upload">Télécharger une vidéo</FormLabel>                                <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
+                            <div className="space-y-2">
+                                <FormLabel htmlFor="video-upload">Télécharger une vidéo</FormLabel>
+                                <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
                                     {previewUrl ? (
-                                        <div className="w-full">                                            <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
-
-                                            {/* Affichage du nom du fichier */}
+                                        <div className="w-full">
+                                            <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
                                             {videoFile && (
                                                 <div className="flex items-center gap-2 my-2 text-sm">
                                                     <Upload className="h-4 w-4 text-primary" />
                                                     <span className="font-medium text-gray-700">
-                                                        {videoFile.name} ({Math.round(videoFile.size / 1024)}KB)
-                                                    </span>
+                            {videoFile.name} ({Math.round(videoFile.size / 1024)}KB)
+                          </span>
                                                 </div>
                                             )}
-
-                                            {/* Indicateurs d'état d'upload */}
                                             {uploadStatus === "uploading" && (
                                                 <div className="mt-2 mb-2">
                                                     <div className="flex items-center gap-2 mb-1">
@@ -352,71 +298,64 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                                     <Progress value={uploadProgress} className="h-2" />
                                                 </div>
                                             )}
-
                                             {uploadStatus === "success" && (
                                                 <div className="flex items-center gap-2 mt-2 mb-2 text-green-600 bg-green-50 p-2 rounded-md">
                                                     <CheckCircle className="h-5 w-5" />
                                                     <span className="text-sm font-medium">Téléchargement réussi! La vidéo sera enregistrée quand vous sauvegarderez.</span>
                                                 </div>
                                             )}
-
                                             {uploadStatus === "error" && (
                                                 <div className="flex items-center gap-2 mt-2 mb-2 text-red-600 bg-red-50 p-2 rounded-md">
                                                     <AlertCircle className="h-5 w-5" />
                                                     <span className="text-sm font-medium">{uploadError || "Erreur lors du téléchargement"}</span>
                                                 </div>
                                             )}
-
                                             <Button
                                                 type="button"
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => {
-                                                    setVideoFile(null);
-                                                    setPreviewUrl(null);
-                                                    setUploadStatus("idle");
+                                                    setVideoFile(null)
+                                                    setPreviewUrl(null)
+                                                    setUploadStatus("idle")
                                                 }}
                                                 disabled={uploadStatus === "uploading"}
                                             >
                                                 Supprimer
                                             </Button>
                                         </div>
-                                    ) : form.watch("videoUrl") ? (
+                                    ) : form.watch("videoPublicId") ? (
                                         <div className="w-full">
-                                            <video src={form.watch("videoUrl")} controls className="w-full h-48 object-cover rounded-md mb-2" />
+                                            <video src={form.watch("videoPublicId")} controls className="w-full h-48 object-cover rounded-md mb-2" />
                                             <Button
                                                 type="button"
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => {
-                                                    form.setValue("videoUrl", "");
+                                                    form.setValue("videoPublicId", "")
                                                 }}
                                             >
                                                 Supprimer la vidéo existante
                                             </Button>
                                         </div>
                                     ) : (
-                                        <>
-                                            <div className="flex flex-col items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-muted-foreground mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                                </svg>
-                                                <p className="text-sm text-muted-foreground mb-2">
-                                                    Glissez-déposez ou cliquez pour sélectionner une vidéo
-                                                </p>
-                                                <Input id="video-upload" type="file" accept="video/*" onChange={handleFileChange} className="hidden" />
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        document.getElementById("video-upload")?.click();
-                                                    }}
-                                                >
-                                                    Sélectionner un fichier
-                                                </Button>
-                                            </div>
-                                        </>
+                                        <div className="flex flex-col items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-muted-foreground mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                            </svg>
+                                            <p className="text-sm text-muted-foreground mb-2">Glissez-déposez ou cliquez pour sélectionner une vidéo</p>
+                                            <Input id="video-upload" type="file" accept="video/*" onChange={handleFileChange} className="hidden" />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    document.getElementById("video-upload")?.click()
+                                                }}
+                                            >
+                                                Sélectionner un fichier
+                                            </Button>
+                                        </div>
                                     )}
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-2">Formats acceptés: MP4, WebM. Taille maximale: 50MB</p>
@@ -424,11 +363,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                         </CardContent>
 
                         <CardFooter className="flex justify-between">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => router.push("/admin/exercices")}
-                            >
+                            <Button type="button" variant="outline" onClick={() => router.push("/admin/exercices")}>
                                 Annuler
                             </Button>
                             <Button type="submit" disabled={submitting}>
