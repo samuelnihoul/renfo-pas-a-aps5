@@ -41,7 +41,7 @@ interface ItemSelectorAndOrganizerProps {
     onItemSelectAction: (selectedExerciseIds: number[], orderIndices: number[]) => void;
 }
 
-export default function ItemSelectorAndOrganizer({ items, onItemSelectAction }: ItemSelectorAndOrganizerProps) {
+export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: ItemSelectorAndOrganizerProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [availableItems, setAvailableItems] = useState<Item[]>([]);

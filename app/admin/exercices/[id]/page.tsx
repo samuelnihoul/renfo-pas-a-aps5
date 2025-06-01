@@ -1,3 +1,4 @@
+//admin/exercices/[id]/page.tsx
 "use client"
 
 import React from "react"
@@ -8,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
-import VideoUpload from "@/components/video-upload"
 import {
     Card,
     CardContent,
@@ -26,28 +26,10 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+
 import { toast } from "@/components/ui/use-toast"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-
-// Définition du schéma de validation
-const exerciseSchema = z.object({
-    name: z.string().min(1, "Le nom est requis"),
-    description: z.string().optional(),
-    instructions: z.string().optional(),
-    videoUrl: z.string().optional(),
-    videoPublicId: z.string().optional(),
-})
-
-type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
 export default function EditExercisePage({ params }: { params: { id: string } }) {
     const wrappedId = React.use(params as any) as { id: string }
@@ -124,9 +106,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         }
     }
 
-    const handleVideoUrlChange = (url: string) => {
-        form.setValue("videoUrl", url)
-    }    // Soumission du formulaire
+     // Soumission du formulaire
     const onSubmit = async (data: ExerciseFormValues) => {
         setSubmitting(true);
 
@@ -296,7 +276,19 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                 )}
                             />
 
-
+                            <FormField
+                                control={form.control}
+                                name="tempsReps"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Temps / Répétitions</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Temps / Répétitions" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <FormField
                                 control={form.control}
                                 name="description"
@@ -335,27 +327,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="videoUrl"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>URL de la vidéo</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="https://example.com/video.mp4"
-                                                {...field}
-                                                value={field.value || ""}
-                                                disabled={!!previewUrl}
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            Lien vers une vidéo démontrant l'exercice (facultatif)
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />                            <div className="space-y-2">
+                                  <div className="space-y-2">
                                 <FormLabel htmlFor="video-upload">Télécharger une vidéo</FormLabel>                                <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
                                     {previewUrl ? (
                                         <div className="w-full">                                            <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />

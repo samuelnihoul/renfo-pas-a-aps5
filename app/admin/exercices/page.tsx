@@ -1,3 +1,4 @@
+//admin/exercices/page.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -18,14 +19,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {Exercise} from "@/db/schema"
 
-type Exercise = {
-  id: number
-  name: string
-  muscleGroup: string
-  difficulty: string
-  videoUrl: string | null
-}
+
 
 export default function ExercisesPage() {
   const [exercises, setExercises] = useState<Exercise[]>([])
@@ -113,10 +109,10 @@ export default function ExercisesPage() {
       header: "Temps, et répétitions"
     },
     {
-      accessorKey: "videoUrl",
+      accessorKey: "videoPublicId",
       header: "Vidéo",
       cell: ({ row }) => {
-        const videoUrl = row.getValue("videoUrl") as string | null
+        const videoUrl = row.getValue("videoPublicId") as string | null
         return videoUrl ? "Oui" : "Non"
       },
     },
