@@ -1,3 +1,4 @@
+//admin/exercices/[id]/page
 "use client"
 
 import React, { useState, useEffect } from "react"
@@ -39,7 +40,7 @@ const exerciseSchema = z.object({
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
 export default function EditExercisePage({ params }: { params: { id: string } }) {
-    const awaitedParams=React.use(params as any)
+    const awaitedParams=React.use(params ) as {id:string}
     const { id } = awaitedParams
     const router = useRouter()
     const [loading, setLoading] = useState(true)
@@ -56,7 +57,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         defaultValues: {
             name: "",
             instructions: "",
-            tempsRep: "",
+            tempsReps: "",
             videoPublicId: "",
         },
     })
