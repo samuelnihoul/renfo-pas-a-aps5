@@ -42,7 +42,8 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 // Ajoutons aussi la route GET pour récupérer un exercice spécifique
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const id = Number.parseInt(params.id)
+    const awaitedParams = await params
+    const id =  Number.parseInt(awaitedParams.id)
 
     if (isNaN(id)) {
       return NextResponse.json({ error: "ID invalide" }, { status: 400 })

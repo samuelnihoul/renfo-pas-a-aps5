@@ -38,10 +38,10 @@ interface ItemDetail {
 
 interface ItemSelectorAndOrganizerProps {
     items: string;
-    onExerciseSelectAction: (selectedExerciseIds: number[], orderIndices: number[]) => void;
+    onItemSelectAction: (selectedExerciseIds: number[], orderIndices: number[]) => void;
 }
 
-export default function ItemSelectorAndOrganizer({ items, onExerciseSelectAction }: ItemSelectorAndOrganizerProps) {
+export default function ItemSelectorAndOrganizer({ items, onItemSelectAction }: ItemSelectorAndOrganizerProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [availableItems, setAvailableItems] = useState<Item[]>([]);
@@ -87,7 +87,7 @@ export default function ItemSelectorAndOrganizer({ items, onExerciseSelectAction
         // Mettre à jour le parent chaque fois que itemList change
         const selectedExerciseIds = itemList.map(item => item.itemId);
         const orderIndices = itemList.map((_, index) => index);
-        onExerciseSelectAction(selectedExerciseIds, orderIndices);
+        onItemSelectAction(selectedExerciseIds, orderIndices);
     }, [itemList ]);
 
     const openAddItemDialog = () => {

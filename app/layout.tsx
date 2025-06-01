@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Renfo Pas à Pas - Application de renforcement musculaire",
   description: "Application de programme de renforcement musculaire avec médiathèque d'exercices",
-  generator: 'nihoul.dev'
+  generator: 'harmonia.dev'
 }
 
 export default function RootLayout({

@@ -160,7 +160,7 @@ export default function NewProgram() {
                             </Select>
                         </div>
 
-                        <ItemSelectorAndOrganizer items={"blocs"} onExerciseSelectAction={handleExerciseSelection} />
+                        <ItemSelectorAndOrganizer items={"blocs"} onItemSelectAction={handleExerciseSelection} />
 
                         <div className="space-y-2">
                             <Label htmlFor="sets">Sets</Label>
