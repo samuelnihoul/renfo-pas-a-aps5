@@ -1,3 +1,4 @@
+//admin/exercices/[id]/route
 import { NextResponse } from "next/server"
 import { db } from "@/db"
 import { exercises } from "@/db/schema"
@@ -39,39 +40,19 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 }
 
-// Ajoutons aussi la route GET pour récupérer un exercice spécifique
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  try {
-    const awaitedParams = await params
-    const id =  Number.parseInt(awaitedParams.id)
 
-    if (isNaN(id)) {
-      return NextResponse.json({ error: "ID invalide" }, { status: 400 })
-    }
-
-    const exercise = await db.select().from(exercises).where(eq(exercises.id, id)).limit(1)
-
-    if (!exercise.length) {
-      return NextResponse.json({ error: "Exercice non trouvé" }, { status: 404 })
-    }
-
-    return NextResponse.json(exercise[0])
-  } catch (error) {
-    console.error("Erreur lors de la récupération de l'exercice:", error)
-    return NextResponse.json({ error: "Erreur lors de la récupération de l'exercice" }, { status: 500 })
-  }
-}
 
 // Et la route PUT pour mettre à jour un exercice
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  const awaitedParams = await params
   try {
-    const id = Number.parseInt(params.id)
+    const id = Number.parseInt(awaitedParams.id)
     if (isNaN(id)) {
       return NextResponse.json({ error: "ID invalide" }, { status: 400 })
     }
 
     const body = await request.json()
-    const { name, description, instructions, videoUrl, videoPublicId } = body
+    const { name, tempsReps, instructions,  videoPublicId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom de l'exercice est requis" }, { status: 400 })
@@ -83,6 +64,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         name,
         instructions: instructions || null,
         videoPublicId: videoPublicId || null,
+        tempsReps
       })
       .where(eq(exercises.id, id))
       .returning()

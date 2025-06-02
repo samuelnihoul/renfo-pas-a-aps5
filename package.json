@@ -59,7 +59,7 @@
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.25.46"
+    "zod": "^3.25.47"
   },
   "devDependencies": {
     "@types/node": "^22",

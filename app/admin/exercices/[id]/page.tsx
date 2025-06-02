@@ -31,16 +31,16 @@ import * as z from "zod"
 
 // Define validation schema
 const exerciseSchema = z.object({
-    name: z.string().min(1, "Le nom est requis"),
-    instructions: z.string().optional(),
-    videoPublicId: z.string().optional(),
-    tempsRep: z.string().optional(),
+    name: z.string(),
+    instructions: z.string(),
+    videoPublicId: z.string(),
+    tempsReps: z.string(),
 })
 
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
 export default function EditExercisePage({ params }: { params: { id: string } }) {
-    const awaitedParams=React.use(params ) as {id:string}
+    const awaitedParams = React.use(params as any) as { id: string }
     const { id } = awaitedParams
     const router = useRouter()
     const [loading, setLoading] = useState(true)
@@ -53,7 +53,6 @@ export default function EditExercisePage({ params }: { params: { id: string } })
     const [uploadError, setUploadError] = useState("")
 
     const form = useForm<ExerciseFormValues>({
-        resolver: zodResolver(exerciseSchema),
         defaultValues: {
             name: "",
             instructions: "",
@@ -66,7 +65,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
         const fetchExercise = async () => {
             try {
                 setLoading(true)
-                const response = await fetch(`/api/admin/exercises/${id}`)
+                const response = await fetch(`/api/exercises/${id}`)
                 if (!response.ok) {
                     const data = await response.json()
                     throw new Error(data.error || "Erreur lors de la récupération de l'exercice")
@@ -75,7 +74,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                 const exercise = await response.json()
                 form.reset({
                     name: exercise.name,
-                    tempsRep: exercise.tempsRep || "",
+                    tempsReps: exercise.tempsReps || "",
                     instructions: exercise.instructions || "",
                     videoPublicId: exercise.videoPublicId || "",
                 })
@@ -104,7 +103,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
 
     const onSubmit = async (data: ExerciseFormValues) => {
         setSubmitting(true)
-
+        console.log(data)
         try {
             let finalVideoPublicId = data.videoPublicId
 
@@ -245,7 +244,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
 
                             <FormField
                                 control={form.control}
-                                name="tempsRep"
+                                name="tempsReps"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Temps / Répétitions</FormLabel>
@@ -286,8 +285,8 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                                 <div className="flex items-center gap-2 my-2 text-sm">
                                                     <Upload className="h-4 w-4 text-primary" />
                                                     <span className="font-medium text-gray-700">
-                            {videoFile.name} ({Math.round(videoFile.size / 1024)}KB)
-                          </span>
+                                                        {videoFile.name} ({Math.round(videoFile.size / 1024)}KB)
+                                                    </span>
                                                 </div>
                                             )}
                                             {uploadStatus === "uploading" && (
