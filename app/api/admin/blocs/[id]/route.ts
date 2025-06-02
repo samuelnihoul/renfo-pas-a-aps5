@@ -37,7 +37,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         // Validate the incoming data
-        if (!data.exerciceId || !data.orderIndex || !Array.isArray(data.exerciceId)) {
+        if (!data.exerciceId  || !Array.isArray(data.exerciceId)) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
@@ -46,7 +46,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             exerciceId: data.exerciceId,
             sets: data.sets,
             restTime: data.restTime || null,
-            orderIndex: data.orderIndex,
             focus: data.focus,
             name: data.name
         }).where(eq(blocks.id, Number(id))).returning();
