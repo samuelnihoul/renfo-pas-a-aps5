@@ -1,3 +1,4 @@
+//admin/blocs/nouveau/page
 "use client"
 
 import { useState } from "react"

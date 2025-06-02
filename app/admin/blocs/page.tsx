@@ -1,3 +1,4 @@
+//admin/blocs/page
 "use client"
 
 import { useState, useEffect } from "react"
@@ -18,13 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-
-type Block = {
-  id: number
-  name: string
-  tempsReps:string
-  category: string
-}
+import {Block} from "@/db/schema"
 
 export default function BlocsPage() {
   const [blocs, setBlocs] = useState<Block[]>([])
@@ -108,8 +103,12 @@ export default function BlocsPage() {
       header: "Nom",
     },
     {
-      accessorKey: "tempsReps",
-      header: "Temps et Répétitions",
+      accessorKey: "restTime",
+      header: "Temps de repos",
+    },
+    {
+      accessorKey: "sets",
+      header: "Sets",
     },
     {
       id: "actions",

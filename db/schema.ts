@@ -12,9 +12,8 @@ export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-    routineId:integer("routine_id").array(),
-    orderIndex:integer("order_index").notNull().array(),
-    material:text("material").notNull(),
+  routineId: integer("routine_id").array(),
+  material: text("material").notNull(),
   ...timestamps
 })
 
@@ -37,7 +36,6 @@ export const routines = pgTable(
       .notNull(),
 
     name: varchar("name", { length: 255 }).notNull(),
-    orderIndex: integer("orderId").notNull().array(),
     ...timestamps
   },
 )
@@ -49,12 +47,11 @@ export const blocks = pgTable(
     id: serial("id").primaryKey(),
     exerciceId: integer("exerciceId").array()
       .notNull()
-     ,
-      name:varchar("name").notNull(),
+    ,
+    name: varchar("name").notNull(),
     sets: varchar("sets").notNull(),
     restTime: varchar("rest_time", { length: 50 }),
-    orderIndex: integer("order_index").notNull().array(),
-      focus:varchar("focus").notNull(),
+    focus: varchar("focus").notNull(),
     ...timestamps
   },
 )
@@ -68,9 +65,9 @@ export const exercises = pgTable("exercises", {
   tempsReps: varchar('tempsReps'),
   ...timestamps
 })
-export type Exercise= typeof exercises.$inferSelect
-export type ExerciseAdd= typeof exercises.$inferInsert
-export type Routine = typeof  routines.$inferSelect
+export type Exercise = typeof exercises.$inferSelect
+export type ExerciseAdd = typeof exercises.$inferInsert
+export type Routine = typeof routines.$inferSelect
 export type RoutineAdd = typeof routines.$inferInsert
 export type Block = typeof blocks.$inferSelect
 export type BlockAdd = typeof blocks.$inferInsert
