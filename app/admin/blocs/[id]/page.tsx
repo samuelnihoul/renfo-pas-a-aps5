@@ -259,9 +259,9 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                 <Button
                     variant="outline"
                     className="mt-2"
-                    onClick={() => router.push("/admin/exercices")}
+                    onClick={() => router.push("/admin/blocs")}
                 >
-                    Retour aux exercices
+                    Retour aux blocs
                 </Button>
             </div>
         )
@@ -270,10 +270,10 @@ export default function EditExercisePage({ params }: { params: { id: string } })
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold">Modifier l'exercice</h1>
+                <h1 className="text-2xl font-bold">Modifier le bloc</h1>
                 <Button
                     variant="outline"
-                    onClick={() => router.push("/admin/exercices")}
+                    onClick={() => router.push("/admin/blocs")}
                 >
                     Retour
                 </Button>
@@ -281,9 +281,10 @@ export default function EditExercisePage({ params }: { params: { id: string } })
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Informations de l'exercice</CardTitle>
+                    <CardTitle>Informations du bloc
+                    </CardTitle>
                     <CardDescription>
-                        Modifiez les détails de l'exercice ci-dessous.
+                        Modifiez les détails du bloc ci-dessous.
                     </CardDescription>
                 </CardHeader>
                 <Form {...form}>
@@ -296,7 +297,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                     <FormItem>
                                         <FormLabel>Nom</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Nom de l'exercice" {...field} />
+                                            <Input placeholder="Nom du bloc" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -367,7 +368,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                         <FormLabel>Description</FormLabel>
                                         <FormControl>
                                             <Textarea
-                                                placeholder="Décrivez brièvement l'exercice"
+                                                placeholder="Décrivez brièvement le block"
                                                 className="resize-none"
                                                 rows={3}
                                                 {...field}
@@ -386,7 +387,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                         <FormLabel>Instructions</FormLabel>
                                         <FormControl>
                                             <Textarea
-                                                placeholder="Détaillez les étapes pour réaliser l'exercice"
+                                                placeholder="Détaillez les étapes pour réaliser le bloc"
                                                 className="resize-none"
                                                 rows={5}
                                                 {...field}
@@ -412,7 +413,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            Lien vers une vidéo démontrant l'exercice (facultatif)
+                                            Lien vers une vidéo démontrant le bloc (facultatif)
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -509,7 +510,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => router.push("/admin/exercices")}
+                                onClick={() => router.push("/admin/blocs")}
                             >
                                 Annuler
                             </Button>

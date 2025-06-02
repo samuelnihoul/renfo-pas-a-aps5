@@ -1,4 +1,4 @@
-//admin/blocs/nouveau/page
+// admin/blocs/nouveau/page.tsx
 "use client"
 
 import { useState } from "react"
@@ -15,17 +15,16 @@ import ItemSelectorAndOrganizer from "@/components/admin/selector"
 import { BlockAdd } from '@/db/schema'
 
 enum BlockTypes {
-    Exercises = "Exercices",
-    Routines = "Routines",
-    Programmes = "Programmes",
+    Activation = "Activation",
+    Développement = "Développement",
+    Mobilité = "Mobilité",
 }
 
 export default function NewProgram() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState<BlockAdd>({
-        focus: BlockTypes.Exercises,
-        orderIndex: [],
+        focus: BlockTypes.Activation,
         exerciceId: [],
         name: "",
         sets: "",
@@ -56,11 +55,10 @@ export default function NewProgram() {
         }))
     }
 
-    const handleExerciseSelection = (selectedExerciseIds: number[], orderIndices: number[]) => {
+    const handleExerciseSelection = (selectedExerciseIds: number[]) => {
         setFormData(prev => ({
             ...prev,
             exerciceId: selectedExerciseIds,
-            orderIndex: orderIndices,
         }))
     }
 
