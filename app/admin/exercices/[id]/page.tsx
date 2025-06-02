@@ -326,7 +326,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
                                         </div>
                                     ) : form.watch("videoPublicId") ? (
                                         <div className="w-full">
-                                            <video src={form.watch("videoPublicId")} controls className="w-full h-48 object-cover rounded-md mb-2" />
+                                            <video src={`/videos/${form.watch("videoPublicId")}`} controls className="w-full h-48 object-cover rounded-md mb-2" />
                                             <Button
                                                 type="button"
                                                 variant="outline"
