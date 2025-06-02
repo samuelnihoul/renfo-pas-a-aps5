@@ -41,7 +41,7 @@ interface ItemSelectorAndOrganizerProps {
     onItemSelectAction: (selectedExerciseIds: number[], orderIndices: number[]) => void;
 }
 
-export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: ItemSelectorAndOrganizerProps) {
+export default function ItemSelectorAndOrganizer({ items, onItemSelectAction }: ItemSelectorAndOrganizerProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [availableItems, setAvailableItems] = useState<Item[]>([]);
@@ -88,7 +88,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: I
         const selectedExerciseIds = itemList.map(item => item.itemId);
         const orderIndices = itemList.map((_, index) => index);
         onItemSelectAction(selectedExerciseIds, orderIndices);
-    }, [itemList ]);
+    }, [itemList]);
 
     const openAddItemDialog = () => {
         setAddItemDialogOpen(true);
@@ -156,7 +156,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: I
                 </CardHeader>
                 <CardContent>
                     <div className="flex justify-end mb-4">
-                        <Button size="sm" onClick={openAddItemDialog}>
+                        <Button type="button" size="sm" onClick={openAddItemDialog}>
                             <Plus className="mr-2 h-4 w-4" />
                             Ajouter un élément
                         </Button>
@@ -179,6 +179,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: I
                                         <TableCell>
                                             <div className="flex gap-1">
                                                 <Button
+                                                    type="button"
                                                     size="icon"
                                                     variant="ghost"
                                                     onClick={() => moveItem(itemIndex, "up")}
@@ -187,6 +188,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: I
                                                     <ArrowUp className="h-4 w-4" />
                                                 </Button>
                                                 <Button
+                                                    type="button"
                                                     size="icon"
                                                     variant="ghost"
                                                     onClick={() => moveItem(itemIndex, "down")}
@@ -195,6 +197,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: I
                                                     <ArrowDown className="h-4 w-4" />
                                                 </Button>
                                                 <Button
+                                                    type="button"
                                                     size="icon"
                                                     variant="ghost"
                                                     className="text-destructive"
@@ -272,7 +275,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: I
                                                 <TableRow
                                                     key={item.id}
                                                     className={`cursor-pointer ${tempItem.itemId === item.id ? 'bg-primary/10' : ''
-                                                    }`}
+                                                        }`}
                                                     onClick={() => handleItemSelection(item.id)}
                                                 >
                                                     <TableCell className="font-medium">{item.name}</TableCell>
@@ -286,10 +289,11 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction}: I
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setAddItemDialogOpen(false)}>
+                        <Button type="button" variant="outline" onClick={() => setAddItemDialogOpen(false)}>
                             Annuler
                         </Button>
                         <Button
+                            type="button"
                             onClick={addItemToList}
                             disabled={tempItem.itemId === 0}
                         >
