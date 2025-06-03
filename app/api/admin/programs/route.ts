@@ -28,7 +28,6 @@ export async function POST(request: Request) {
           name,
           material,
           description: description || null,
-          orderIndex,
           routineId:routines
         })
         .returning()

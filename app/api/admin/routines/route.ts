@@ -19,7 +19,6 @@ export async function POST(request: Request) {
     // Create the routine
     const result = await db.insert(routines).values({
       blockId,
-      orderIndex,
       name,
     }).returning()
 

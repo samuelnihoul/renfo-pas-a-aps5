@@ -189,7 +189,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                             </Select>
                         </div>
 
-                        <ItemSelectorAndOrganizer items={"exercises"} onItemSelectAction={handleExerciseSelection} selectedItems={formData.exerciceId} />
+                        <ItemSelectorAndOrganizer items={"exercises"} onItemSelectAction={handleExerciseSelection}  />
 
                         <div className="space-y-2">
                             <Label htmlFor="sets">Sets</Label>
