@@ -1,3 +1,4 @@
+//app/admin/blocs/[id]/page.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -12,6 +13,7 @@ import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
 import ItemSelectorAndOrganizer from "@/components/admin/selector"
 import { BlockAdd } from '@/db/schema'
+import React from "react"
 
 enum BlockTypes {
     Activation = "Activation",
@@ -20,6 +22,7 @@ enum BlockTypes {
 }
 
 export default function EditBlockPage({ params }: { params: { id: string } }) {
+    const awaitedParams = React.use(params as any) as { id: string }
     const router = useRouter()
     const [loading, setLoading] = useState(true)
     const [formData, setFormData] = useState<BlockAdd>({
@@ -35,7 +38,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
     useEffect(() => {
         const fetchBlock = async () => {
             try {
-                const response = await fetch(`/api/blocs/${params.id}`)
+                const response = await fetch(`/api/blocs/${awaitedParams.id}`)
                 if (!response.ok) {
                     throw new Error("Erreur lors de la récupération du bloc")
                 }
@@ -54,7 +57,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
         }
 
         fetchBlock()
-    }, [params.id])
+    }, [awaitedParams.id])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -102,7 +105,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
         setLoading(true)
 
         try {
-            const response = await fetch(`/api/admin/blocs/${params.id}`, {
+            const response = await fetch(`/api/admin/blocs/${awaitedParams.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -165,7 +168,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                             <Input
                                 id="name"
                                 name="name"
-                                value={formData.name}
+                                value={formData.name||""}
                                 onChange={handleChange}
                                 className={errors.name ? "border-destructive" : ""}
                             />
@@ -193,7 +196,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                             <Input
                                 id="sets"
                                 name="sets"
-                                value={formData.sets}
+                                value={formData.sets||""}
                                 onChange={handleChange}
                                 placeholder="Sets"
                             />
@@ -204,7 +207,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                             <Input
                                 id="restTime"
                                 name="restTime"
-                                value={formData.restTime as string}
+                                value={formData.restTime ||""}
                                 onChange={handleChange}
                                 placeholder="Temps de repos"
                             />

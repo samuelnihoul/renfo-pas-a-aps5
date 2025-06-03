@@ -1,3 +1,4 @@
+//app/api/admin/blocs/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { blocks, BlockAdd } from '@/db/schema';
@@ -5,8 +6,9 @@ import { eq } from 'drizzle-orm';
 
 // DELETE route
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    const awaitedParams = await params;
     try {
-        const { id } = params;
+        const { id } = awaitedParams;
 
         if (!id) {
             return NextResponse.json({ error: 'Missing block ID' }, { status: 400 });
@@ -28,8 +30,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
 // PUT route
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+    const awaitedParams = await params;
     try {
-        const { id } = params;
+        const { id } = awaitedParams;
         const data: BlockAdd = await request.json();
 
         if (!id) {
