@@ -112,26 +112,7 @@ export default function RoutinesPage() {
       accessorKey: "name",
       header: "Nom",
     },
-    {
-      accessorKey: "program.name",
-      header: "Programme",
-      cell: ({ row }) => {
-        const program = row.original.program
-        return program?.name || "Non spécifié"
-      },
-    },
-    {
-      accessorKey: "dayNumber",
-      header: "Jour",
-    },
-    {
-      accessorKey: "focus",
-      header: "Focus",
-      cell: ({ row }) => {
-        const focus = row.getValue("focus") as string | null
-        return focus || "Non spécifié"
-      },
-    },
+
     {
       id: "actions",
       header: "Actions",

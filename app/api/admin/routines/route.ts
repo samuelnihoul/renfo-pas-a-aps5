@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const { blockId, orderIndex, name  } = body
 
     // Validation
-    if (!blockId || !orderIndex || !name) {
+    if (!blockId || !name) {
       return NextResponse.json(
         { error: "Missing required fields: blockId, orderIndex, name" },
         { status: 400 }

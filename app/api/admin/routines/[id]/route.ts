@@ -15,10 +15,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { name, orderIndex ,blockId} = body
+    const { name,blockId} = body
 
     // Validation
-    if (!blockId || !orderIndex || !name) {
+    if (!blockId || !name) {
       return NextResponse.json(
         { error: "Missing required fields: blockId, orderIndex, name" },
         { status: 400 }
