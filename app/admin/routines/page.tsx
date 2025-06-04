@@ -1,3 +1,4 @@
+//admin/routines/page
 "use client"
 
 import { useState, useEffect } from "react"

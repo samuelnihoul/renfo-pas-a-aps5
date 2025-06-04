@@ -47,10 +47,12 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
     const fetchRoutine = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`/api/admin/routines/${id}`)
+        const response = await fetch(`/api/routines/${id}`)
         if (response.ok) {
           const data = await response.json()
           setFormData(data)
+	  toast({
+		  description:JSON.stringify(data)})
         } else {
           toast({
             title: "Erreur",
@@ -220,7 +222,7 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
                 <Input
                     id="name"
                     name="name"
-                    value={formData.name}
+                    value={formData[0].name || ""}
                     onChange={handleInputChange}
                     className={errors.name ? "border-destructive" : ""}
                 />

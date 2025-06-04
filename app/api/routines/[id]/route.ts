@@ -4,8 +4,9 @@ import { routines, programs } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
+	const awaitedParams=await params
   try {
-    const id = Number.parseInt(params.id)
+    const id = Number.parseInt(awaitedParams.id)
 
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid routine ID" }, { status: 400 })

@@ -7,14 +7,14 @@ import { eq } from "drizzle-orm"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, material,routines ,orderIndex,description} = body
+    const { name, requiredEquipment,routineIds } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
     }
 
     // Vérifier qu'il y a au moins un jour d'entraînement
-    if (!routines || !Array.isArray(routines) || routines.length === 0) {
+    if (!routineIds || !Array.isArray(routineIds) || routineIds.length === 0) {
       return NextResponse.json(
         { error: "Au moins un jour d'entraînement est requis" },
         { status: 400 }
@@ -26,9 +26,8 @@ export async function POST(request: Request) {
         .insert(programs)
         .values({
           name,
-          material,
-          description: description || null,
-          routineId:routines
+          material:requiredEquipment,
+          routineId:routineIds
         })
         .returning()
 
