@@ -19,9 +19,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ error: "Routine not found" }, { status: 404 })
     }
 
-
-
-
     return NextResponse.json(routine)
   } catch (error) {
     console.error("Error fetching routine:", error)
