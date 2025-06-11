@@ -38,3 +38,4 @@ public/videos
 
 #drizzle
 drizzle/meta
+.env*.local
