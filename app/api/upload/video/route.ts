@@ -1,63 +1,52 @@
-"use server"
-
-import { NextRequest, NextResponse } from "next/server";
-import { uploadVideo } from "@/lib/file-storage";
-
-// Taille maximale de fichier (50MB)
-const MAX_FILE_SIZE = 50 * 1024 * 1024;
-
-export async function POST(request: NextRequest) {
-    try {
-        const formData = await request.formData();
-        const videoFile = formData.get("video") as File | null;
-
-        if (!videoFile) {
-            return NextResponse.json(
-                { error: "Aucun fichier vidéo fourni" },
-                { status: 400 }
-            );
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
+import { NextResponse } from 'next/server';
+ 
+export async function POST(request: Request): Promise<NextResponse> {
+  const body = (await request.json()) as HandleUploadBody;
+ 
+  try {
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (
+        pathname,
+        /* clientPayload */
+      ) => {
+        // Generate a client token for the browser to upload the file
+        // ⚠️ Authenticate and authorize users before generating the token.
+        // Otherwise, you're allowing anonymous uploads.
+ 
+        return {
+          allowedContentTypes: ['image/jpeg', 'image/png', 'image/webp'],
+          addRandomSuffix: true,
+          tokenPayload: JSON.stringify({
+            // optional, sent to your server on upload completion
+            // you could pass a user id from auth, or a value from clientPayload
+          }),
+        };
+      },
+      onUploadCompleted: async ({ blob, tokenPayload }) => {
+        // Get notified of client upload completion
+        // ⚠️ This will not work on `localhost` websites,
+        // Use ngrok or similar to get the full upload flow
+ 
+        console.log('blob upload completed', blob, tokenPayload);
+ 
+        try {
+          // Run any logic after the file upload completed
+          // const { userId } = JSON.parse(tokenPayload);
+          // await db.update({ avatar: blob.url, userId });
+        } catch (error) {
+          throw new Error('Could not update user');
         }
-
-        // Vérifier le type de fichier (accepter uniquement mp4 et webm)
-        const fileType = videoFile.type;
-        if (!["video/mp4", "video/webm"].includes(fileType)) {
-            return NextResponse.json(
-                { error: "Type de fichier non pris en charge. Veuillez télécharger un fichier MP4 ou WebM." },
-                { status: 400 }
-            );
-        }
-
-        // Vérifier la taille du fichier
-        if (videoFile.size > MAX_FILE_SIZE) {
-            return NextResponse.json(
-                { error: "Le fichier est trop volumineux. Taille maximale autorisée: 50MB." },
-                { status: 400 }
-            );
-        }        // Convertir le fichier en ArrayBuffer pour l'upload
-        const bytes = await videoFile.arrayBuffer(); try {
-            // Télécharger la vidéo sur le serveur local
-            console.log("Début du téléchargement sur le serveur local");
-            const result = await uploadVideo(bytes);
-            console.log("Téléchargement réussi:", result);
-
-            // Retourner l'URL de la vidéo téléchargée
-            return NextResponse.json({
-                success: true,
-                fileUrl: result.url,
-                publicId: result.publicId
-            });
-        } catch (uploadError) {
-            console.error("Erreur détaillée lors du téléchargement de la vidéo:", uploadError);
-            return NextResponse.json(
-                { error: "Une erreur est survenue lors du téléchargement de la vidéo" },
-                { status: 500 }
-            );
-        }
-    } catch (error) {
-        console.error("Erreur lors du téléchargement du fichier:", error);
-        return NextResponse.json(
-            { error: "Une erreur est survenue lors du téléchargement du fichier" },
-            { status: 500 }
-        );
-    }
+      },
+    });
+ 
+    return NextResponse.json(jsonResponse);
+  } catch (error) {
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 400 }, // The webhook will retry 5 times waiting for a 200
+    );
+  }
 }
