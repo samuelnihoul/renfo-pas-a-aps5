@@ -1,3 +1,4 @@
+//routines/nouvau/page
 "use client"
 
 import { useState } from "react"
@@ -59,7 +60,6 @@ export default function NewRoutine() {
       return
     }
     setLoading(true)
-
     try {
       const response = await fetch("/api/admin/routines", {
         method: "POST",

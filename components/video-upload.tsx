@@ -26,7 +26,6 @@ export default function VideoUpload({
     uploadError = ""
 }: VideoUploadProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
     // Set initial preview from videoUrl prop
     useEffect(() => {
         if (videoUrl) {
