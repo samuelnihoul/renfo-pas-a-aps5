@@ -1,9 +1,9 @@
+//novueau
 "use client"
 
 import type React from "react"
-import { type PutBlobResult } from "@vercel/blob"
-import { upload } from "@vercel/blob/client"
-import { useState, useRef } from "react"
+
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,17 +26,16 @@ export default function NewExercisePage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [blob, setBlob] = useState<PutBlobResult | null>(null)
-  const inputFileRef = useRef<HTMLInputElement>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
+    // Effacer l'erreur lorsque l'utilisateur modifie le champ
     if (errors[name]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev }
         delete newErrors[name]
         return newErrors
@@ -45,12 +44,13 @@ export default function NewExercisePage() {
   }
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
+    // Effacer l'erreur lorsque l'utilisateur modifie le champ
     if (errors[name]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev }
         delete newErrors[name]
         return newErrors
@@ -59,16 +59,18 @@ export default function NewExercisePage() {
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-      setVideoFile(file)
-      const fileURL = URL.createObjectURL(file)
-      setPreviewUrl(fileURL)
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      setVideoFile(file);
+      // Create a preview URL for the video
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
     }
-  }
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
+
     if (!formData.name.trim()) {
       newErrors.name = "Le nom de l'exercice est requis"
     }
@@ -78,29 +80,36 @@ export default function NewExercisePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
     if (!validateForm()) {
       return
     }
+
     setLoading(true)
+
     try {
-      let finalVideoUrl = formData.videoUrl
+      let finalVideoUrl = formData.videoUrl;
+
+      // Si un fichier vidéo a été sélectionné, on l'upload d'abord
       if (videoFile) {
-        toast({
-          title: "Téléchargement en cours",
-          description: `Envoi de '${videoFile.name}' vers le serveur...`,
-        })
-        const file = videoFile
-        const newBlob = await upload(file.name, file, {
-          access: 'public',
-          handleUploadUrl: "/api/upload/video",
-        })
-        setBlob(newBlob)
-        finalVideoUrl = newBlob.url
-        toast({
-          title: "Téléchargement réussi",
-          description: "La vidéo a été téléchargée avec succès",
-        })
+        const uploadFormData = new FormData();
+        uploadFormData.append("video", videoFile);
+
+        const uploadResponse = await fetch("/api/upload/video", {
+          method: "POST",
+          body: uploadFormData,
+        });
+
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json();
+          throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo");
+        }
+
+        const uploadData = await uploadResponse.json();
+        finalVideoUrl = uploadData.fileUrl;
       }
+
+      // Création de l'exercice avec l'URL de la vidéo
       const response = await fetch("/api/admin/exercises", {
         method: "POST",
         headers: {
@@ -110,142 +119,141 @@ export default function NewExercisePage() {
           ...formData,
           videoUrl: finalVideoUrl,
         }),
-      })
+      });
+
       if (response.ok) {
         toast({
           title: "Exercice créé",
           description: "L'exercice a été créé avec succès",
-        })
-        router.push("/admin/exercices")
+        });
+        router.push("/admin/exercices");
       } else {
-        const data = await response.json()
+        const data = await response.json();
         toast({
           title: "Erreur",
           description: data.error || "Une erreur est survenue lors de la création de l'exercice",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
-      console.error("Error creating exercise:", error)
+      console.error("Error creating exercise:", error);
       toast({
         title: "Erreur",
         description: error instanceof Error ? error.message : "Une erreur est survenue lors de la création de l'exercice",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-      <div>
-        <div className="flex items-center mb-6">
-          <Link href="/admin/exercices">
-            <Button variant="ghost" size="sm" className="gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Retour
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold ml-2">Nouvel exercice</h1>
-        </div>
-
-        <Card className="max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit}>
-            <CardHeader>
-              <CardTitle>Informations de l'exercice</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className={errors.name ? "text-destructive" : ""}>
-                  Nom de l'exercice*
-                </Label>
-                <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={errors.name ? "border-destructive" : ""}
-                />
-                {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="instructions">Instructions</Label>
-                <Textarea
-                    id="instructions"
-                    name="instructions"
-                    value={formData.instructions}
-                    onChange={handleChange}
-                    rows={4}
-                    placeholder="Instructions détaillées pour réaliser l'exercice..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="video">Vidéo de démonstration</Label>
-                <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
-                  {previewUrl ? (
-                      <div className="w-full">
-                        <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
-                        <div className="flex items-center gap-2 my-2 text-sm">
-                          <Upload className="h-4 w-4 text-primary" />
-                          <span className="font-medium text-gray-700">
-                        {videoFile?.name} ({videoFile ? Math.round(videoFile.size / 1024) : 0}KB)
-                      </span>
-                        </div>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setVideoFile(null)
-                              setPreviewUrl(null)
-                              setFormData(prev => ({
-                                ...prev,
-                                videoUrl: "",
-                              }))
-                            }}
-                        >
-                          Supprimer
-                        </Button>
-                      </div>
-                  ) : (
-                      <>
-                        <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Glissez-déposez ou cliquez pour sélectionner une vidéo
-                        </p>
-                        <Input id="video" type="file" accept="video/*" onChange={handleFileChange} className="hidden" />
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              document.getElementById("video")?.click()
-                            }}
-                        >
-                          Sélectionner un fichier
-                        </Button>
-                      </>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">Formats acceptés: MP4, WebM. Taille maximale: 50MB</p>
-              </div>
-
-              <p className="text-sm text-muted-foreground">* Champs obligatoires</p>
-            </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-              <Link href="/admin/exercices">
-                <Button variant="outline" type="button">
-                  Annuler
-                </Button>
-              </Link>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Création..." : "Créer l'exercice"}
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
+    <div>
+      <div className="flex items-center mb-6">
+        <Link href="/admin/exercices">
+          <Button variant="ghost" size="sm" className="gap-1">
+            <ArrowLeft className="h-4 w-4" />
+            Retour
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold ml-2">Nouvel exercice</h1>
       </div>
+
+      <Card className="max-w-2xl mx-auto">
+        <form onSubmit={handleSubmit}>
+          <CardHeader>
+            <CardTitle>Informations de l'exercice</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className={errors.name ? "text-destructive" : ""}>
+                Nom de l'exercice*
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={errors.name ? "border-destructive" : ""}
+              />
+              {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
+            </div>
+
+
+
+            <div className="space-y-2">
+              <Label htmlFor="instructions">Instructions</Label>
+              <Textarea
+                id="instructions"
+                name="instructions"
+                value={formData.instructions}
+                onChange={handleChange}
+                rows={4}
+                placeholder="Instructions détaillées pour réaliser l'exercice..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="video">Vidéo de démonstration</Label>
+              <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
+                {previewUrl ? (
+                  <div className="w-full">
+                    <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setVideoFile(null)
+                        setPreviewUrl(null)
+                        setFormData((prev) => ({
+                          ...prev,
+                          videoUrl: "",
+                        }))
+                      }}
+                    >
+                      Supprimer
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Glissez-déposez ou cliquez pour sélectionner une vidéo
+                    </p>
+                    <Input id="video" type="file" accept="video/*" onChange={handleFileChange}className="hidden" />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        document.getElementById("video")?.click()
+                      }}
+                    >
+                      Sélectionner un fichier
+                    </Button>
+                  </>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">Formats acceptés: MP4, WebM. Taille maximale: 50MB</p>
+            </div>
+
+
+            <p className="text-sm text-muted-foreground">* Champs obligatoires</p>
+          </CardContent>
+          <CardFooter className="flex justify-end gap-2">
+            <Link href="/admin/exercices">
+              <Button variant="outline" type="button">
+                Annuler
+              </Button>
+            </Link>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Création..." : "Créer l'exercice"}
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   )
 }
+

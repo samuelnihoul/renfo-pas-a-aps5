@@ -1,7 +1,5 @@
+// video-upload
 import React from "react";
-import { type PutBlobResult } from '@vercel/blob';
-import { upload } from '@vercel/blob/client';
-import { useState, useRef } from 'react';
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +24,7 @@ export default function VideoUpload({
     uploadError = ""
 }: VideoUploadProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
     // Set initial preview from videoUrl prop
     useEffect(() => {
         if (videoUrl) {

@@ -16,7 +16,6 @@ export async function uploadVideo(file: ArrayBuffer): Promise<{ url: string; pub
                 folder: 'exercise-videos',
                 // Options pour optimiser les vidéos
                 eager: [
-                    { streaming_profile: 'hd', format: 'mp4' },
                     { raw_transformation: 'q_auto:low', format: 'mp4' }
                 ],
                 eager_async: true,
