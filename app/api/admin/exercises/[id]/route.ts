@@ -6,8 +6,9 @@ import { eq } from "drizzle-orm"
 import { deleteVideo } from "@/lib/file-storage"
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const awaitedParams= await params
   try {
-    const id = Number.parseInt(params.id)
+    const id = Number.parseInt(awaitedParams.id)
 
     if (isNaN(id)) {
       return NextResponse.json({ error: "ID invalide" }, { status: 400 })
