@@ -88,7 +88,7 @@ export default function NewExercisePage() {
         }
 
         const uploadData = await uploadResponse.json()
-        finalVideoPublicId = uploadData.publicId // Assuming the server returns the publicId
+        finalVideoPublicId = uploadData.fileUrl // Assuming the server returns the publicId
       }
 
       const response = await fetch("/api/admin/exercises", {
@@ -162,7 +162,7 @@ export default function NewExercisePage() {
               <label htmlFor="tempsReps">
                 Temps/Répétitions
               </label>
-              <Input
+              <Textarea
                 id="tempsReps"
                 name="tempsReps"
                 value={formData.tempsReps}

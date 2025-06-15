@@ -76,7 +76,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
 
         // Set preview URL if there is an existing video
         if (exercise.videoPublicId) {
-          setPreviewUrl(`/videos/${exercise.videoPublicId}`)
+          setPreviewUrl(exercise.videoPublicId)
         }
       } catch (err) {
         console.error("Error fetching exercise:", err)
