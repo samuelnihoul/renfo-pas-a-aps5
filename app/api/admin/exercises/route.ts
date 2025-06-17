@@ -21,6 +21,7 @@ export async function POST(request: Request) {
         instructions: instructions || null,
         videoPublicId: videoPublicId || null,
         createdAt: now, // Use the Date object directly
+	tempsReps:tempsReps||null
       })
       .returning()
 

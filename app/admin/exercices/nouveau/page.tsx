@@ -91,6 +91,7 @@ export default function NewExercisePage() {
         finalVideoPublicId = uploadData.fileUrl // Assuming the server returns the publicId
       }
 
+      console.log(formData)
       const response = await fetch("/api/admin/exercises", {
         method: "POST",
         headers: {
