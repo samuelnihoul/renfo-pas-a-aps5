@@ -144,7 +144,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nom du programme</Label>
-              <Input id="name" name="name" value={program.name || ""} onChange={handleProgramChange} required />
+              <Input id="name" name="name" value={program.name}  onChange={handleProgramChange} required />
             </div>
 
             <div className="space-y-2">
@@ -153,7 +153,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
                   id="requiredEquipment"
                   name="requiredEquipment"
 		  
-                  value={program.material || ""}
+                  value={program.material }
                   onChange={handleProgramChange}
               />
             </div>
