@@ -16,7 +16,7 @@ type Program = {
   id: number
   name: string
   requiredEquipment: string
-  routineIds: number[]
+  routineId: number[]
 }
 
 export default function EditProgramPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
@@ -28,13 +28,16 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
+	  console.log("useEffect")
     const fetchProgram = async () => {
       try {
         setLoading(true)
         const response = await fetch(`/api/programs/${id}`)
         if (response.ok) {
           const data = await response.json()
-          setProgram(data)
+	  console.log(data)
+          setProgram(data[0])
+	  console.log(program)
         } else {
           console.error("Failed to fetch program")
           toast({
@@ -72,7 +75,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
     if (program) {
       setProgram({
         ...program,
-        routineIds: selectedRoutineIds,
+        routineId: selectedRoutineIds,
       })
     }
   }
@@ -141,7 +144,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nom du programme</Label>
-              <Input id="name" name="name" value={program[0].name || ""} onChange={handleProgramChange} required />
+              <Input id="name" name="name" value={program.name || ""} onChange={handleProgramChange} required />
             </div>
 
             <div className="space-y-2">
@@ -150,7 +153,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
                   id="requiredEquipment"
                   name="requiredEquipment"
 		  
-                  value={program[0].material || ""}
+                  value={program.material || ""}
                   onChange={handleProgramChange}
               />
             </div>

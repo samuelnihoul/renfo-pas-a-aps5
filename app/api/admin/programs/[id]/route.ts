@@ -4,13 +4,16 @@ import { programs } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
+	const awaitedParams=await params
+	console.log(awaitedParams)
   try {
-    const id = Number.parseInt(params.id)
+    const id = Number.parseInt(awaitedParams.id)
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 })
     }
 
     const body = await request.json()
+    console.log(body)
     const { name, description, orderIndex,routineId } = body
 
     if (!name) {
@@ -39,8 +42,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+	const awaitedParams=await params
   try {
-    const id = Number.parseInt(params.id)
+    const id = Number.parseInt(awaitedParams.id)
 
     if (isNaN(id)) {
       return NextResponse.json({ error: "ID invalide" }, { status: 400 })
