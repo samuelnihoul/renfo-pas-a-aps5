@@ -1,3 +1,4 @@
+//components/admin/selector.tsx
 "use client"
 
 import React, { useState, useEffect } from "react";
@@ -36,90 +37,106 @@ interface ItemDetail {
     itemName: string;
 }
 
+
 interface ItemSelectorAndOrganizerProps {
-    items: string;
-    onItemSelectAction: (selectedExerciseIds: number[], orderIndices: number[]) => void;
+	items: string;
+	onItemSelectAction: (selectedExerciseIds: number[], orderIndices: number[]) => void;
+	selectedItemIds?: number[]; // Ajoutez cette ligne
 }
+export default function ItemSelectorAndOrganizer({ items, onItemSelectAction,selectedItemIds }: ItemSelectorAndOrganizerProps) {
+	const router = useRouter();
+	const [loading, setLoading] = useState(false);
+	const [availableItems, setAvailableItems] = useState<Item[]>([]);
+	const [loadingItems, setLoadingItems] = useState(false);
+	const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
+	const [filterQuery, setFilterQuery] = useState("");
+	const [itemList, setItemList] = useState<ItemDetail[]>([]);
+	const [tempItem, setTempItem] = useState({
+		itemId: 0,
+	});
 
-export default function ItemSelectorAndOrganizer({ items, onItemSelectAction }: ItemSelectorAndOrganizerProps) {
-    const router = useRouter();
-    const [loading, setLoading] = useState(false);
-    const [availableItems, setAvailableItems] = useState<Item[]>([]);
-    const [loadingItems, setLoadingItems] = useState(false);
-    const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
-    const [filterQuery, setFilterQuery] = useState("");
-    const [itemList, setItemList] = useState<ItemDetail[]>([]);
-    const [tempItem, setTempItem] = useState({
-        itemId: 0,
-    });
+	useEffect(() => {
+		const fetchItems = async () => {
+			console.log("selectedItemsIds",selectedItemIds)
+			setLoadingItems(true);
+			try {
+				const response = await fetch(`/api/${items}`);
+				if (response.ok) {
+					const data = await response.json();
+					console.log("item data",data)
+					setAvailableItems(data);
+				} else {
+					toast({
+						title: "Erreur",
+						description: "Impossible de charger les éléments",
+						variant: "destructive",
+					});
+				}
+			} catch (error) {
+				console.error("Erreur lors du chargement des éléments:", error);
+				toast({
+					title: "Erreur",
+					description: "Impossible de charger les éléments",
+					variant: "destructive",
+				});
+			} finally {
+				setLoadingItems(false);
+			}
+		};
 
-    useEffect(() => {
-        const fetchItems = async () => {
-            setLoadingItems(true);
-            try {
-                const response = await fetch(`/api/${items}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setAvailableItems(data);
-                } else {
-                    toast({
-                        title: "Erreur",
-                        description: "Impossible de charger les éléments",
-                        variant: "destructive",
-                    });
-                }
-            } catch (error) {
-                console.error("Erreur lors du chargement des éléments:", error);
-                toast({
-                    title: "Erreur",
-                    description: "Impossible de charger les éléments",
-                    variant: "destructive",
-                });
-            } finally {
-                setLoadingItems(false);
-            }
-        };
+		fetchItems();
+	}, [items]);
 
-        fetchItems();
-    }, [items]);
+	useEffect(() => {
+		if (selectedItemIds && selectedItemIds.length > 0) {
+			console.log("avaoilable items",availableItems)
+			const selectedItems = availableItems.filter(item =>
+								    selectedItemIds.includes(item.id)
+								   ).map(item => ({
+									   itemId: item.id,
+									   itemName: item.name,
+								   }));
+								   setItemList(selectedItems);
+								   console.log("selectedItems",selectedItems)
+		}
+	}, [selectedItemIds, availableItems]);
+	useEffect(() => {
+		// Mettre à jour le parent chaque fois que itemList change
+		const selectedExerciseIds = itemList.map(item => item.itemId);
+		const orderIndices = itemList.map((_, index) => index);
+		onItemSelectAction(selectedExerciseIds, orderIndices);
+	}, [itemList]);
 
-    useEffect(() => {
-        // Mettre à jour le parent chaque fois que itemList change
-        const selectedExerciseIds = itemList.map(item => item.itemId);
-        const orderIndices = itemList.map((_, index) => index);
-        onItemSelectAction(selectedExerciseIds, orderIndices);
-    }, [itemList]);
+	const openAddItemDialog = () => {
+		setAddItemDialogOpen(true);
+	};
 
-    const openAddItemDialog = () => {
-        setAddItemDialogOpen(true);
-    };
+	const handleItemSelection = (id: number) => {
+		setTempItem((prev) => ({
+			...prev,
+			itemId: id,
+		}));
+	};
 
-    const handleItemSelection = (id: number) => {
-        setTempItem((prev) => ({
-            ...prev,
-            itemId: id,
-        }));
-    };
+	const addItemToList = () => {
+		if (tempItem.itemId === 0) return;
 
-    const addItemToList = () => {
-        if (tempItem.itemId === 0) return;
+		const selectedItem = availableItems.find((item) => item.id === tempItem.itemId);
+		if (!selectedItem) return;
 
-        const selectedItem = availableItems.find((item) => item.id === tempItem.itemId);
-        if (!selectedItem) return;
+		setItemList((prev) => [
+			...prev,
+			{
+				itemId: tempItem.itemId,
+				itemName: selectedItem.name,
+			},
+		]);
 
-        setItemList((prev) => [
-            ...prev,
-            {
-                itemId: tempItem.itemId,
-                itemName: selectedItem.name,
-            },
-        ]);
-
-        setTempItem({
-            itemId: 0,
-        });
-        setAddItemDialogOpen(false);
-    };
+		setTempItem({
+			itemId: 0,
+		});
+		setAddItemDialogOpen(false);
+	};
 
     const removeItemFromList = (itemIndex: number) => {
         setItemList((prev) => {

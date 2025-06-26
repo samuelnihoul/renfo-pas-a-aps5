@@ -1,3 +1,4 @@
+//app/admin/programmes/[id]/page.tsx
 "use client"
 import React from 'react'
 import { useState, useEffect } from "react"
@@ -28,16 +29,13 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-	  console.log("useEffect")
     const fetchProgram = async () => {
       try {
         setLoading(true)
         const response = await fetch(`/api/programs/${id}`)
         if (response.ok) {
           const data = await response.json()
-	  console.log(data)
           setProgram(data[0])
-	  console.log(program)
         } else {
           console.error("Failed to fetch program")
           toast({
@@ -158,7 +156,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
               />
             </div>
 
-            <Selector items={"routines"} onItemSelectAction={handleRoutineSelection}  />
+            <Selector items={"routines"} onItemSelectAction={handleRoutineSelection}  selectedItemIds={program.routineId}/>
           </CardContent>
           <CardFooter className="flex justify-end">
             <Button onClick={handleSaveProgram} disabled={saving}>

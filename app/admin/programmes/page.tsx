@@ -23,7 +23,7 @@ import {
 type Program = {
   id: number
   name: string
-  requiredEquipment: string
+  matearial: string
 }
 
 export default function ProgramsPage() {
@@ -107,7 +107,7 @@ export default function ProgramsPage() {
       header: "Nom",
     },
     {
-      accessorKey: "requiredEquipment",
+      accessorKey: "material",
       header: "Matériel nécessaire",
     },
     {
