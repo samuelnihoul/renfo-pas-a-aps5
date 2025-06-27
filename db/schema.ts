@@ -23,6 +23,7 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 255 }).notNull(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   isPremium: boolean('isPremium'),
+  isAdmin:boolean("isAdmin"),
   ...timestamps
 })
 
@@ -33,7 +34,6 @@ export const routines = pgTable(
     id: serial("id").primaryKey(),
     blockId: integer("block_id").array()
       .notNull(),
-
     name: varchar("name", { length: 255 }).notNull(),
     ...timestamps
   },
