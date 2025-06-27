@@ -310,9 +310,10 @@ export default function Home() {
                                     <h4 className="font-medium">{exercise.name}</h4>
                                     <div className="aspect-w-16 aspect-h-9">
                                       <video 
-                                        src={`https://res.cloudinary.com/demo/video/upload/${exercise.videoPublicId}.mp4`}
+                                        src={exercise.videoPublicId}
                                         controls 
                                         className="w-full rounded-lg"
+                                        preload="metadata"
                                       />
                                     </div>
                                   </div>
