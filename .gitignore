@@ -39,3 +39,6 @@ public/videos
 #drizzle
 drizzle/meta
 .env*.local
+
+#macintosh
+.DS_Store

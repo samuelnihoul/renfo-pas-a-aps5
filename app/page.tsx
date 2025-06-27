@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ChevronRight, ChevronDown, Dumbbell, ListChecks, Calendar, BookHeart } from "lucide-react"
+import { ChevronRight, ChevronDown, Dumbbell, ListChecks, Calendar } from "lucide-react"
+import Image from "next/image"
 import { useData } from "@/components/data-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -201,13 +202,22 @@ export default function Home() {
           <h1 className="text-2xl font-bold gradient-text">Renfo Pas à Pas</h1>
           <p className="text-sm text-muted-foreground">Renforcement pour la course à pied</p>
         </div>
-        <BookHeart className="w-8 h-8 text-theme-light" />
+        <div className="w-8 h-8 relative">
+          <Image 
+            src="/favicon.ico" 
+            alt="Company Logo" 
+            fill 
+            className="object-contain"
+            priority
+            className="rounded-xl "
+          />
+        </div>
       </header>
 
       <Tabs defaultValue="programs" className="w-full">
         <TabsList>
           <TabsTrigger value="programs">Programmes</TabsTrigger>
-          <TabsTrigger value="exercises">Exercices</TabsTrigger>
+          <TabsTrigger value="exercises">Médiathèque d'exercices</TabsTrigger>
         </TabsList>
 
         <TabsContent value="programs" className="mt-6">
