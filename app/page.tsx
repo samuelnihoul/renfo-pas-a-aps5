@@ -60,6 +60,9 @@ function ExerciseItem({ exercise }: { exercise: Exercise }) {
       {exercise.instructions && (
         <p className="text-sm text-gray-600 mt-1">{exercise.instructions}</p>
       )}
+      {exercise.tempsReps && (
+        <p className="text-sm text-gray-600 mt-1">{exercise.tempsReps}</p>
+      )}
     </div>
   )
 }
@@ -82,7 +85,7 @@ function BlockItem({ block, exercises }: { block: Block, exercises: Exercise[] }
         }
         <ListChecks className="w-4 h-4 text-blue-500" />
         <span className="font-medium">{block.name}</span>
-        <span className="text-sm text-gray-500 ml-2">({block.sets} séries)</span>
+        <span className="text-sm text-gray-500 ml-2">({block.sets})</span>
       </div>
       
       {isExpanded && blockExercises.map((ex: any) => (
@@ -364,6 +367,12 @@ export default function Home() {
                       <div className="mt-3">
                         <h4 className="text-sm font-medium text-gray-700">Instructions :</h4>
                         <p className="text-sm text-gray-600 mt-1">{exercise.instructions}</p>
+                      </div>
+                    )}
+                    {exercise.tempsReps && (
+                      <div className="mt-3">
+                        <h4 className="text-sm font-medium text-gray-700">Temps par répétion :</h4>
+                        <p className="text-sm text-gray-600 mt-1">{exercise.tempsReps}</p>
                       </div>
                     )}
                   </div>
