@@ -5,56 +5,63 @@ import { createContext, useContext, type ReactNode, useState, useEffect } from "
 type Program = {
   id: number
   name: string
-  description: string | null
-  difficulty: string
-  duration: string | null
-  days: ProgramDay[]
+  material: string
+  routineId: number[]
+  createdAt: string
+  updatedAt: string
 }
 
-type ProgramDay = {
+type Routine = {
   id: number
-  programId: number
-  dayNumber: number
+  blockId: number[]
   name: string
-  focus: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+type Block = {
+  id: number
+  exerciceId: number[]
+  name: string
+  sets: string
+  restTime: string | null
+  focus: string
+  createdAt: string
+  updatedAt: string
 }
 
 type Exercise = {
   id: number
   name: string
-  description: string | null
-  muscleGroup: string
-  difficulty: string
-  videoUrl: string | null
+  videoPublicId: string | null
   instructions: string | null
-}
-
-type DayExercise = {
-  id: number
-  dayId: number
-  exerciseId: number
-  sets: number
-  reps: string
-  restTime: string | null
-  orderIndex: number
-  exercise: Exercise
+  tempsReps: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 type DataContextType = {
   programs: Program[]
+  routines: Routine[]
+  blocks: Block[]
   exercises: Exercise[]
   loading: boolean
   error: string | null
   fetchProgramDetails: (id: number) => Promise<Program | null>
-  fetchblock: (programId: number, dayId: number) => Promise<DayExercise[]>
-  fetchExercisesByMuscleGroup: (muscleGroup: string) => Promise<Exercise[]>
+  fetchRoutineDetails: (id: number) => Promise<Routine | null>
+  fetchBlockDetails: (id: number) => Promise<Block | null>
   fetchExerciseDetails: (id: number) => Promise<Exercise | null>
+  fetchRoutinesByProgram: (programId: number) => Promise<Routine[]>
+  fetchBlocksByRoutine: (routineId: number) => Promise<Block[]>
+  fetchExercisesByBlock: (blockId: number) => Promise<Exercise[]>
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined)
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [programs, setPrograms] = useState<Program[]>([])
+  const [routines, setRoutines] = useState<Routine[]>([])
+  const [blocks, setBlocks] = useState<Block[]>([])
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -71,6 +78,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         const programsData = await programsResponse.json()
         setPrograms(programsData || [])
+
+        // Fetch routines
+        const routinesResponse = await fetch("/api/routines")
+        if (!routinesResponse.ok) {
+          throw new Error("Failed to fetch routines")
+        }
+        const routinesData = await routinesResponse.json()
+        setRoutines(routinesData || [])
+
+        // Fetch blocks
+        const blocksResponse = await fetch("/api/blocs")
+        if (!blocksResponse.ok) {
+          throw new Error("Failed to fetch blocks")
+        }
+        const blocksData = await blocksResponse.json()
+        setBlocks(blocksData || [])
 
         // Fetch exercises
         const exercisesResponse = await fetch("/api/exercises")
@@ -98,44 +121,36 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (!response.ok) {
         throw new Error("Failed to fetch program details")
       }
-      const data = await response.json()
-
-      // Vérifier si les données sont au format attendu
-      if (!data || !data.id) {
-        console.error("Invalid program data format:", data)
-        return null
-      }
-
-      return data
+      return await response.json()
     } catch (err) {
       console.error("Error fetching program details:", err)
       return null
     }
   }
 
-  const fetchblock = async (programId: number, dayId: number): Promise<DayExercise[]> => {
+  const fetchRoutineDetails = async (id: number): Promise<Routine | null> => {
     try {
-      const response = await fetch(`/api/programs/${programId}/days/${dayId}/exercises`)
+      const response = await fetch(`/api/routines/${id}`)
       if (!response.ok) {
-        throw new Error("Failed to fetch day exercises")
+        throw new Error("Failed to fetch routine details")
       }
       return await response.json()
     } catch (err) {
-      console.error("Error fetching day exercises:", err)
-      return []
+      console.error("Error fetching routine details:", err)
+      return null
     }
   }
 
-  const fetchExercisesByMuscleGroup = async (muscleGroup: string): Promise<Exercise[]> => {
+  const fetchBlockDetails = async (id: number): Promise<Block | null> => {
     try {
-      const response = await fetch(`/api/exercises?muscleGroup=${encodeURIComponent(muscleGroup)}`)
+      const response = await fetch(`/api/blocs/${id}`)
       if (!response.ok) {
-        throw new Error("Failed to fetch exercises by muscle group")
+        throw new Error("Failed to fetch block details")
       }
       return await response.json()
     } catch (err) {
-      console.error("Error fetching exercises by muscle group:", err)
-      return []
+      console.error("Error fetching block details:", err)
+      return null
     }
   }
 
@@ -152,15 +167,71 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const fetchRoutinesByProgram = async (programId: number): Promise<Routine[]> => {
+    try {
+      const program = programs.find(p => p.id === programId)
+      if (!program) return []
+      
+      const routinesResponse = await fetch(`/api/routines`)
+      if (!routinesResponse.ok) {
+        throw new Error("Failed to fetch routines")
+      }
+      const allRoutines = await routinesResponse.json()
+      return allRoutines.filter((r: Routine) => program.routineId.includes(r.id))
+    } catch (err) {
+      console.error("Error fetching routines by program:", err)
+      return []
+    }
+  }
+
+  const fetchBlocksByRoutine = async (routineId: number): Promise<Block[]> => {
+    try {
+      const routine = routines.find(r => r.id === routineId)
+      if (!routine) return []
+      
+      const blocksResponse = await fetch(`/api/blocs`)
+      if (!blocksResponse.ok) {
+        throw new Error("Failed to fetch blocks")
+      }
+      const allBlocks = await blocksResponse.json()
+      return allBlocks.filter((b: Block) => routine.blockId.includes(b.id))
+    } catch (err) {
+      console.error("Error fetching blocks by routine:", err)
+      return []
+    }
+  }
+
+  const fetchExercisesByBlock = async (blockId: number): Promise<Exercise[]> => {
+    try {
+      const block = blocks.find(b => b.id === blockId)
+      if (!block) return []
+      
+      const exercisesResponse = await fetch(`/api/exercises`)
+      if (!exercisesResponse.ok) {
+        throw new Error("Failed to fetch exercises")
+      }
+      const allExercises = await exercisesResponse.json()
+      return allExercises.filter((e: Exercise) => block.exerciceId.includes(e.id))
+    } catch (err) {
+      console.error("Error fetching exercises by block:", err)
+      return []
+    }
+  }
+
   const value = {
     programs,
+    routines,
+    blocks,
     exercises,
     loading,
     error,
     fetchProgramDetails,
-    fetchblock,
-    fetchExercisesByMuscleGroup,
+    fetchRoutineDetails,
+    fetchBlockDetails,
     fetchExerciseDetails,
+    fetchRoutinesByProgram,
+    fetchBlocksByRoutine,
+    fetchExercisesByBlock
   }
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>

@@ -1,18 +1,177 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Video, BookHeart } from "lucide-react"
+import { ChevronRight, ChevronDown, Dumbbell, ListChecks, Calendar, BookHeart } from "lucide-react"
 import { useData } from "@/components/data-provider"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminLink } from "@/components/admin-link"
 
-export default function Home() {
-  const { programs, exercises, loading, error } = useData()
+// Types pour les composants
+type Exercise = {
+  id: number
+  name: string
+  instructions: string | null
+  tempsReps: string | null
+  videoPublicId: string | null
+  createdAt: string
+  updatedAt: string
+}
 
-  if (loading) {
+type Block = {
+  id: number
+  name: string
+  sets: string
+  restTime: string | null
+  focus: string
+  exerciceId: number[]
+  createdAt: string
+  updatedAt: string
+}
+
+type Routine = {
+  id: number
+  name: string
+  blockId: number[]
+  createdAt: string
+  updatedAt: string
+}
+
+type Program = {
+  id: number
+  name: string
+  material: string
+  routineId: number[]
+  createdAt: string
+  updatedAt: string
+}
+
+// Composant pour afficher un exercice
+function ExerciseItem({ exercise }: { exercise: Exercise }) {
+  return (
+    <div className="ml-8 p-2 border-l-2 border-gray-200 pl-4">
+      <div className="flex items-center gap-2">
+        <Dumbbell className="w-4 h-4 text-gray-500" />
+        <span className="font-medium">{exercise.name}</span>
+      </div>
+      {exercise.instructions && (
+        <p className="text-sm text-gray-600 mt-1">{exercise.instructions}</p>
+      )}
+    </div>
+  )
+}
+
+// Composant pour afficher un bloc d'exercices
+function BlockItem({ block, exercises }: { block: Block, exercises: Exercise[] }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  
+  const blockExercises = exercises.filter(ex => block.exerciceId.includes(ex.id))
+  
+  return (
+    <div className="ml-6 border-l-2 border-gray-200 pl-4">
+      <div 
+        className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? 
+          <ChevronDown className="w-4 h-4" /> : 
+          <ChevronRight className="w-4 h-4" />
+        }
+        <ListChecks className="w-4 h-4 text-blue-500" />
+        <span className="font-medium">{block.name}</span>
+        <span className="text-sm text-gray-500 ml-2">({block.sets} séries)</span>
+      </div>
+      
+      {isExpanded && blockExercises.map((ex: any) => (
+        <ExerciseItem key={ex.id} exercise={ex} />
+      ))}
+    </div>
+  )
+}
+
+// Composant pour afficher une routine
+function RoutineItem({ routine, blocks, exercises }: { routine: Routine, blocks: Block[], exercises: Exercise[] }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  
+  const routineBlocks = blocks.filter(block => routine.blockId.includes(block.id))
+  
+  return (
+    <div className="ml-4 border-l-2 border-blue-200 pl-4">
+      <div 
+        className="flex items-center gap-2 cursor-pointer hover:bg-blue-50 p-2 rounded"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? 
+          <ChevronDown className="w-4 h-4" /> : 
+          <ChevronRight className="w-4 h-4" />
+        }
+        <Calendar className="w-4 h-4 text-blue-500" />
+        <span className="font-medium">{routine.name}</span>
+      </div>
+      
+      {isExpanded && routineBlocks.map((block: any) => (
+        <BlockItem 
+          key={block.id} 
+          block={block} 
+          exercises={exercises.filter(ex => block.exerciceId.includes(ex.id))} 
+        />
+      ))}
+    </div>
+  )
+}
+
+export default function Home() {
+  const { 
+    programs, 
+    routines, 
+    blocks, 
+    exercises, 
+    loading, 
+    error,
+    fetchRoutinesByProgram,
+    fetchBlocksByRoutine,
+    fetchExercisesByBlock
+  } = useData()
+  
+  const [expandedPrograms, setExpandedPrograms] = useState<Record<number, boolean>>({})
+  const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({})
+  const [loadingStates, setLoadingStates] = useState({
+    programs: true,
+    routines: true,
+    blocks: true,
+    exercises: true
+  })
+
+  // Charger les données initiales
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        // Charger les routines pour chaque programme
+        if (programs.length > 0) {
+          setLoadingStates(prev => ({ ...prev, routines: true }))
+          const routinesMap: Record<number, Routine[]> = {}
+          
+          await Promise.all(programs.map(async (program) => {
+            const programRoutines = await fetchRoutinesByProgram(program.id)
+            routinesMap[program.id] = programRoutines
+          }))
+          
+          setProgramRoutines(routinesMap)
+        }
+      } catch (error) {
+        console.error("Error loading initial data:", error)
+      } finally {
+        setLoadingStates(prev => ({ ...prev, routines: false }))
+      }
+    }
+    
+    loadInitialData()
+  }, [programs, fetchRoutinesByProgram])
+
+  // Afficher un indicateur de chargement global si nécessaire
+  if (loading || loadingStates.routines) {
     return (
       <div className="container px-4 py-8 mx-auto flex items-center justify-center min-h-screen">
         <p>Chargement des données...</p>
@@ -28,20 +187,12 @@ export default function Home() {
     )
   }
 
-  // Regrouper les exercices par groupe musculaire de manière sécurisée
-  const exercisesByMuscle = exercises.reduce(
-    (acc, exercise) => {
-      const group = exercise.muscleGroup || "Autre"
-      if (!acc[group]) {
-        acc[group] = []
-      }
-      acc[group].push(exercise)
-      return acc
-    },
-    {} as Record<string, typeof exercises>,
-  )
-
-  const muscleGroups = Object.keys(exercisesByMuscle)
+  const toggleProgram = (programId: number) => {
+    setExpandedPrograms(prev => ({
+      ...prev,
+      [programId]: !prev[programId]
+    }))
+  }
 
   return (
     <div className="container px-4 py-8 mx-auto">
@@ -53,76 +204,128 @@ export default function Home() {
         <BookHeart className="w-8 h-8 text-theme-light" />
       </header>
 
-      <Tabs defaultValue="programmes" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-8 gradient-bg text-white">
-          <TabsTrigger value="programmes">Programmes</TabsTrigger>
-          <TabsTrigger value="mediatheque">Médiathèque</TabsTrigger>
+      <Tabs defaultValue="programs" className="w-full">
+        <TabsList>
+          <TabsTrigger value="programs">Programmes</TabsTrigger>
+          <TabsTrigger value="exercises">Exercices</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="programmes" className="space-y-4">
-          <h2 className="text-xl font-semibold mb-4">Mes Programmes</h2>
-
-          {programs && programs.length > 0 ? (
-            programs.map((program) => (
-              <Link href={`/programmes/${program.id}`} key={program.id} className="block">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle>{program.name}</CardTitle>
-                    <CardDescription>Programme d'entraînement</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="font-medium">Difficulté:</span>
-                      <span className={program.difficulty === "Intermédiaire" ? "text-orange-500" : "text-green-500"}>
-                        {program.difficulty}
-                      </span>
+        <TabsContent value="programs" className="mt-6">
+          <div className="space-y-6">
+            {programs.map((program) => {
+              const isLoading = !programRoutines[program.id]
+              
+              return (
+              <Card key={program.id} className="overflow-hidden">
+                <div 
+                  className="p-4 bg-gray-50 border-b cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-between"
+                  onClick={() => toggleProgram(program.id)}
+                >
+                  <div className="flex items-center gap-3">
+                    {expandedPrograms[program.id] ? 
+                      <ChevronDown className="w-5 h-5 text-gray-500" /> : 
+                      <ChevronRight className="w-5 h-5 text-gray-500" />
+                    }
+                    <h2 className="text-xl font-semibold">{program.name}</h2>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {programRoutines[program.id]?.length || 0} routines
+                  </div>
+                </div>
+                
+                {expandedPrograms[program.id] && (
+                  <div className="p-4 pt-2">
+                    <div className="mb-4">
+                      <h3 className="font-medium text-gray-700 mb-2">Matériel nécessaire :</h3>
+                      <p className="text-gray-600">{program.material || "Aucun matériel spécifié"}</p>
                     </div>
-                    <div className="flex items-center gap-2 text-sm mt-1">
-                      <span className="font-medium">Durée:</span>
-                      <span>{program.duration}</span>
+                    
+                    <div>
+                      <h3 className="font-medium text-gray-700 mb-2">Routines :</h3>
+                      <div className="space-y-4">
+                        {isLoading ? (
+                          <div className="flex justify-center py-4">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                          </div>
+                        ) : programRoutines[program.id]?.length > 0 ? (
+                          programRoutines[program.id].map(routine => {
+                            const routineBlocks = blocks.filter(b => routine.blockId.includes(b.id))
+                            return (
+                              <RoutineItem 
+                                key={routine.id}
+                                routine={routine}
+                                blocks={routineBlocks}
+                                exercises={exercises}
+                              />
+                            )
+                          })
+                        ) : (
+                          <p className="text-gray-500 text-sm">Aucune routine disponible pour ce programme.</p>
+                        )}
+                      </div>
                     </div>
-                  </CardContent>
-                  <CardFooter className="pt-2 border-t">
-                    <Button variant="ghost" size="sm" className="ml-auto hover:text-theme-light">
-                      Voir le programme
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))
-          ) : (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-10">
-                <p className="text-muted-foreground mb-4">Aucun programme disponible pour le moment.</p>
-              </CardContent>
-            </Card>
-          )}
+                  </div>
+                )}
+              </Card>
+              )
+            })}
+            
+            {programs.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">Aucun programme disponible pour le moment.</p>
+                <Button className="mt-4" asChild>
+                  <Link href="/admin/programmes/nouveau">Créer un programme</Link>
+                </Button>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
-        <TabsContent value="mediatheque" className="space-y-4">
-          <h2 className="text-xl font-semibold mb-4">Médiathèque d'Exercices</h2>
-
-          <div className="grid grid-cols-2 gap-4">
-            {muscleGroups.map((category) => (
-              <Link href={`/mediatheque/${category.toLowerCase()}`} key={category}>
-                <Card>
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-base">{category}</CardTitle>
-                  </CardHeader>
-                  <CardFooter className="p-4 pt-0">
-                    <Video className="w-5 h-5 text-muted-foreground" />
-                    <span className="ml-2 text-sm text-muted-foreground">
-                      {exercisesByMuscle[category].length} exercices
-                    </span>
-                  </CardFooter>
+        <TabsContent value="exercises" className="mt-6">
+          <div className="space-y-8">
+            {exercises.length > 0 ? (
+              exercises.map((exercise) => (
+                <Card key={exercise.id} className="overflow-hidden">
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold">{exercise.name}</h3>
+                        {exercise.tempsReps && (
+                          <p className="text-sm text-gray-600 mt-1">
+                            <span className="font-medium">Temps/Répétitions :</span> {exercise.tempsReps}
+                          </p>
+                        )}
+                      </div>
+                      
+                      {exercise.videoPublicId && (
+                        <div className="ml-4 flex-shrink-0">
+                          <div className="w-24 h-16 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
+                            <span className="text-xs text-gray-500">Vidéo disponible</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {exercise.instructions && (
+                      <div className="mt-3">
+                        <h4 className="text-sm font-medium text-gray-700">Instructions :</h4>
+                        <p className="text-sm text-gray-600 mt-1">{exercise.instructions}</p>
+                      </div>
+                    )}
+                  </div>
                 </Card>
-              </Link>
-            ))}
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500">Aucun exercice disponible pour le moment.</p>
+                <Button className="mt-4" asChild>
+                  <Link href="/admin/exercices/nouveau">Ajouter un exercice</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
-
-      <AdminLink />
     </div>
   )
 }
