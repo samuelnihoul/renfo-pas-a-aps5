@@ -138,6 +138,7 @@ export default function Home() {
   
   const [expandedPrograms, setExpandedPrograms] = useState<Record<number, boolean>>({})
   const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({})
+  const [videoView, setVideoView] = useState(false)
   const [loadingStates, setLoadingStates] = useState({
     programs: true,
     routines: true,
@@ -199,8 +200,11 @@ export default function Home() {
     <div className="container px-4 py-8 mx-auto">
       <header className="flex items-center justify-between mb-8">
         <div>
+          <div>
           <h1 className="text-2xl font-bold gradient-text">Renfo Pas à Pas</h1>
           <p className="text-sm text-muted-foreground">Renforcement pour la course à pied</p>
+        </div>
+       
         </div>
         <div className="w-8 h-8 relative">
           <Image 
@@ -221,6 +225,18 @@ export default function Home() {
         </TabsList>
 
         <TabsContent value="programs" className="mt-6">
+ <div className="flex items-center gap-2 mb-6">
+          <span className="text-sm text-muted-foreground">Vue normale</span>
+          <button
+            onClick={() => setVideoView(!videoView)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${videoView ? 'bg-blue-600' : 'bg-gray-200'}`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${videoView ? 'translate-x-6' : 'translate-x-1'}`}
+            />
+          </button>
+          <span className="text-sm text-muted-foreground">Vue vidéo</span>
+        </div>
           <div className="space-y-6">
             {programs.map((program) => {
               const isLoading = !programRoutines[program.id]
@@ -245,35 +261,63 @@ export default function Home() {
                 
                 {expandedPrograms[program.id] && (
                   <div className="p-4 pt-2">
-                    <div className="mb-4">
-                      <h3 className="font-medium text-gray-700 mb-2">Matériel nécessaire :</h3>
-                      <p className="text-gray-600">{program.material || "Aucun matériel spécifié"}</p>
-                    </div>
-                    
-                    <div>
-                      <h3 className="font-medium text-gray-700 mb-2">Routines :</h3>
-                      <div className="space-y-4">
-                        {isLoading ? (
-                          <div className="flex justify-center py-4">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                    {!videoView ? (
+                      <>
+                        <div className="mb-4">
+                          <h3 className="font-medium text-gray-700 mb-2">Matériel nécessaire :</h3>
+                          <p className="text-gray-600">{program.material || "Aucun matériel spécifié"}</p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-medium text-gray-700 mb-2">Routines :</h3>
+                          <div className="space-y-4">
+                            {isLoading ? (
+                              <div className="flex justify-center py-4">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                              </div>
+                            ) : programRoutines[program.id]?.length > 0 ? (
+                              programRoutines[program.id].map(routine => {
+                                const routineBlocks = blocks.filter(b => routine.blockId.includes(b.id))
+                                return (
+                                  <RoutineItem 
+                                    key={routine.id}
+                                    routine={routine}
+                                    blocks={routineBlocks}
+                                    exercises={exercises}
+                                  />
+                                )
+                              })
+                            ) : (
+                              <p className="text-gray-500 text-sm">Aucune routine disponible pour ce programme.</p>
+                            )}
                           </div>
-                        ) : programRoutines[program.id]?.length > 0 ? (
-                          programRoutines[program.id].map(routine => {
-                            const routineBlocks = blocks.filter(b => routine.blockId.includes(b.id))
-                            return (
-                              <RoutineItem 
-                                key={routine.id}
-                                routine={routine}
-                                blocks={routineBlocks}
-                                exercises={exercises}
-                              />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="space-y-6">
+                        {programRoutines[program.id]?.flatMap(routine => 
+                          blocks
+                            .filter(block => routine.blockId.includes(block.id))
+                            .flatMap(block => 
+                              exercises
+                                .filter(ex => block.exerciceId.includes(ex.id))
+                                .filter(ex => ex.videoPublicId)
+                                .map(exercise => (
+                                  <div key={`${routine.id}-${block.id}-${exercise.id}`} className="space-y-2">
+                                    <h4 className="font-medium">{exercise.name}</h4>
+                                    <div className="aspect-w-16 aspect-h-9">
+                                      <video 
+                                        src={`https://res.cloudinary.com/demo/video/upload/${exercise.videoPublicId}.mp4`}
+                                        controls 
+                                        className="w-full rounded-lg"
+                                      />
+                                    </div>
+                                  </div>
+                                ))
                             )
-                          })
-                        ) : (
-                          <p className="text-gray-500 text-sm">Aucune routine disponible pour ce programme.</p>
                         )}
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
               </Card>
