@@ -51,8 +51,6 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
         if (response.ok) {
           const data = await response.json()
           setFormData(data)
-	  toast({
-		  description:JSON.stringify(data)})
         } else {
           toast({
             title: "Erreur",
@@ -222,7 +220,7 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
                 <Input
                     id="name"
                     name="name"
-                    value={formData[0].name || ""}
+                    value={formData.name} 
                     onChange={handleInputChange}
                     className={errors.name ? "border-destructive" : ""}
                 />
