@@ -339,7 +339,7 @@ export default function Home() {
         </TabsContent>
 
         <TabsContent value="exercises" className="mt-6">
-          <div className="space-y-8">
+          <div className="space-y-8 w-full overflow-x-hidden">
             {exercises.length > 0 ? (
               exercises.map((exercise) => (
                 <Card key={exercise.id} className="overflow-hidden">
