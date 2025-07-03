@@ -220,7 +220,7 @@ export default function Home() {
         </div>
       </header>
 
-      <Tabs defaultValue="programs" className="w-full">
+      <Tabs defaultValue="programs" className="w-full overflow-x-hidden">
         <TabsList>
           <TabsTrigger value="programs">Programmes</TabsTrigger>
           <TabsTrigger value="exercises">Médiathèque d'exercices</TabsTrigger>
