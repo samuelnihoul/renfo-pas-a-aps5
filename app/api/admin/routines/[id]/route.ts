@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { db } from "@/db"
 import { routines } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import {notEqual} from "node:assert";
 
 
 
@@ -15,12 +14,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { name,blockId} = body
+    const { name, blockId } = body
 
     // Validation
-    if (!blockId || !name) {
+    if (!name) {
       return NextResponse.json(
-        { error: "Missing required fields: blockId, orderIndex, name" },
+        { error: "Missing required field: name" },
         { status: 400 }
       )
     }
@@ -35,12 +34,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     // Update the routine
+    const updateData: any = { name }
+    if (blockId !== undefined) {
+      updateData.blockId = blockId
+    }
+
     const result = await db
       .update(routines)
-      .set({
-        blockId,
-        name,
-      })
+      .set(updateData)
       .where(eq(routines.id, id))
       .returning()
 
