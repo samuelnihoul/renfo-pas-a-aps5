@@ -23,7 +23,7 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 255 }).notNull(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   isPremium: boolean('isPremium'),
-  isAdmin:boolean("isAdmin"),
+  isAdmin: boolean("isAdmin"),
   ...timestamps
 })
 
@@ -64,6 +64,17 @@ export const exercises = pgTable("exercises", {
   tempsReps: varchar('tempsReps'),
   ...timestamps
 })
+
+// Table de liaison pour les achats de programmes par utilisateur
+export const userPrograms = pgTable("user_programs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  programId: integer("program_id").notNull(),
+  purchaseDate: timestamp("purchase_date", { withTimezone: true }).defaultNow(),
+  // Possibilité d'ajouter d'autres champs (ex: prix, statut, etc.)
+  ...timestamps
+})
+
 export type Exercise = typeof exercises.$inferSelect
 export type ExerciseAdd = typeof exercises.$inferInsert
 export type Routine = typeof routines.$inferSelect
@@ -74,4 +85,6 @@ export type Program = typeof programs.$inferSelect
 export type ProgramAdd = typeof programs.$inferInsert
 export type User = typeof users.$inferSelect
 export type UserAdd = typeof users.$inferInsert
+export type UserProgram = typeof userPrograms.$inferSelect
+export type UserProgramAdd = typeof userPrograms.$inferInsert
 

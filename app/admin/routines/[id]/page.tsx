@@ -50,7 +50,9 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
         const response = await fetch(`/api/routines/${id}`)
         if (response.ok) {
           const data = await response.json()
+	  console.log('fetched data',data)
           setFormData(data)
+	  console.log('form data after the fetch',formData)
         } else {
           toast({
             title: "Erreur",
