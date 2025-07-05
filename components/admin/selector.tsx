@@ -54,6 +54,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, se
     const [tempItem, setTempItem] = useState({
         itemId: 0,
     });
+    const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
         const fetchItems = async () => {
@@ -88,7 +89,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, se
     }, [items]);
 
     useEffect(() => {
-        if (selectedItemIds && selectedItemIds.length > 0) {
+        if (selectedItemIds && selectedItemIds.length > 0 && availableItems.length > 0) {
             console.log("avaoilable items", availableItems)
             const selectedItems = availableItems.filter(item =>
                 selectedItemIds.includes(item.id)
@@ -96,16 +97,23 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, se
                 itemId: item.id,
                 itemName: item.name,
             }));
-            setItemList(selectedItems);
-            console.log("selectedItems", selectedItems)
+
+            // Only update if the items are actually different
+            const currentItemIds = itemList.map(item => item.itemId).sort();
+            const newItemIds = selectedItems.map(item => item.itemId).sort();
+
+            if (JSON.stringify(currentItemIds) !== JSON.stringify(newItemIds)) {
+                setItemList(selectedItems);
+                console.log("selectedItems", selectedItems)
+            }
         }
-    }, [selectedItemIds, availableItems]);
+    }, [selectedItemIds, availableItems]); // Remove itemList from dependencies
     useEffect(() => {
         // Mettre à jour le parent chaque fois que itemList change
         const selectedExerciseIds = itemList.map(item => item.itemId);
         const orderIndices = itemList.map((_, index) => index);
         onItemSelectAction(selectedExerciseIds, orderIndices);
-    }, [itemList, onItemSelectAction]);
+    }, [itemList]); // Remove onItemSelectAction from dependencies
 
     const openAddItemDialog = () => {
         setAddItemDialogOpen(true);
