@@ -89,7 +89,7 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, se
     }, [items]);
 
     useEffect(() => {
-        if (selectedItemIds && selectedItemIds.length > 0 && availableItems.length > 0) {
+        if (selectedItemIds && selectedItemIds.length > 0 && availableItems.length > 0 && !isInitialized) {
             console.log("avaoilable items", availableItems)
             const selectedItems = availableItems.filter(item =>
                 selectedItemIds.includes(item.id)
@@ -98,22 +98,20 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, se
                 itemName: item.name,
             }));
 
-            // Only update if the items are actually different
-            const currentItemIds = itemList.map(item => item.itemId).sort();
-            const newItemIds = selectedItems.map(item => item.itemId).sort();
-
-            if (JSON.stringify(currentItemIds) !== JSON.stringify(newItemIds)) {
-                setItemList(selectedItems);
-                console.log("selectedItems", selectedItems)
-            }
+            setItemList(selectedItems);
+            setIsInitialized(true);
+            console.log("selectedItems", selectedItems)
         }
-    }, [selectedItemIds, availableItems]); // Remove itemList from dependencies
+    }, [selectedItemIds, availableItems, isInitialized]);
     useEffect(() => {
         // Mettre à jour le parent chaque fois que itemList change
-        const selectedExerciseIds = itemList.map(item => item.itemId);
-        const orderIndices = itemList.map((_, index) => index);
-        onItemSelectAction(selectedExerciseIds, orderIndices);
-    }, [itemList]); // Remove onItemSelectAction from dependencies
+        // But only if we're initialized to avoid initial loop
+        if (isInitialized) {
+            const selectedExerciseIds = itemList.map(item => item.itemId);
+            const orderIndices = itemList.map((_, index) => index);
+            onItemSelectAction(selectedExerciseIds, orderIndices);
+        }
+    }, [itemList, isInitialized]); // Add isInitialized to dependencies
 
     const openAddItemDialog = () => {
         setAddItemDialogOpen(true);
