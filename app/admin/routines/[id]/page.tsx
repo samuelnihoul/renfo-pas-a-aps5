@@ -50,7 +50,9 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
         const response = await fetch(`/api/routines/${id}`)
         if (response.ok) {
           const data = await response.json()
-          setFormData(data)
+          console.log('fetched data', data)
+          setFormData(data[0]) // Fix: Use data[0] since API returns array
+          console.log('form data after the fetch', formData)
         } else {
           toast({
             title: "Erreur",
@@ -85,7 +87,7 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
     }
   }
 
-  const handleBlockSelection = (selectedBlockIds: number[]) => {
+  const handleBlockSelection = (selectedBlockIds: number[], orderIndices?: number[]) => {
     setFormData(prev => ({
       ...prev,
       blockId: selectedBlockIds,
@@ -179,100 +181,100 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <span className="ml-2">Chargement de la routine...</span>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <span className="ml-2">Chargement de la routine...</span>
+      </div>
     )
   }
 
   return (
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <Link href="/admin/routines">
-              <Button variant="ghost" size="sm" className="gap-1">
-                <ArrowLeft className="h-4 w-4" />
-                Retour
-              </Button>
-            </Link>
-            <h1 className="text-2xl font-bold ml-2">Modifier la Routine</h1>
-          </div>
-          <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setDeleteDialogOpen(true)}
-              disabled={deleting}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Supprimer
-          </Button>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <Link href="/admin/routines">
+            <Button variant="ghost" size="sm" className="gap-1">
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </Button>
+          </Link>
+          <h1 className="text-2xl font-bold ml-2">Modifier la Routine</h1>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations de la routine</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom de la routine</Label>
-                <Input
-                    id="name"
-                    name="name"
-                    value={formData.name} 
-                    onChange={handleInputChange}
-                    className={errors.name ? "border-destructive" : ""}
-                />
-                {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-              </div>
-
-              <ItemSelectorAndOrganizer items={"blocs"} onItemSelectAction={handleBlockSelection} />
-
-              <CardFooter className="px-0 pt-4">
-                <Button type="submit" disabled={saving} className="ml-auto">
-                  {saving ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Enregistrement...
-                      </>
-                  ) : (
-                      "Enregistrer les modifications"
-                  )}
-                </Button>
-              </CardFooter>
-            </form>
-          </CardContent>
-        </Card>
-
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette routine ?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Cette action est irréversible. La routine et tous ses exercices seront définitivement
-                supprimés.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={deleting}>Annuler</AlertDialogCancel>
-              <AlertDialogAction
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                {deleting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Suppression...
-                    </>
-                ) : (
-                    "Supprimer"
-                )}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => setDeleteDialogOpen(true)}
+          disabled={deleting}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Supprimer
+        </Button>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Informations de la routine</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nom de la routine</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className={errors.name ? "border-destructive" : ""}
+              />
+              {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+            </div>
+
+            <ItemSelectorAndOrganizer items={"blocs"} onItemSelectAction={handleBlockSelection} selectedItemIds={formData.blockId} />
+
+            <CardFooter className="px-0 pt-4">
+              <Button type="submit" disabled={saving} className="ml-auto">
+                {saving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Enregistrement...
+                  </>
+                ) : (
+                  "Enregistrer les modifications"
+                )}
+              </Button>
+            </CardFooter>
+          </form>
+        </CardContent>
+      </Card>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette routine ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. La routine et tous ses exercices seront définitivement
+              supprimés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                "Supprimer"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   )
 }

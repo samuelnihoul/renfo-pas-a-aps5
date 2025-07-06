@@ -35,7 +35,7 @@ type Exercise = {
   name: string
   videoPublicId: string | null
   instructions: string | null
-  tempsReps: string | null
+  objectifs: string | null
   createdAt: string
   updatedAt: string
 }
@@ -171,7 +171,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
       const program = programs.find(p => p.id === programId)
       if (!program) return []
-      
+
       const routinesResponse = await fetch(`/api/routines`)
       if (!routinesResponse.ok) {
         throw new Error("Failed to fetch routines")
@@ -188,7 +188,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
       const routine = routines.find(r => r.id === routineId)
       if (!routine) return []
-      
+
       const blocksResponse = await fetch(`/api/blocs`)
       if (!blocksResponse.ok) {
         throw new Error("Failed to fetch blocks")
@@ -205,7 +205,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
       const block = blocks.find(b => b.id === blockId)
       if (!block) return []
-      
+
       const exercisesResponse = await fetch(`/api/exercises`)
       if (!exercisesResponse.ok) {
         throw new Error("Failed to fetch exercises")

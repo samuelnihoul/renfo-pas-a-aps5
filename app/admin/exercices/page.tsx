@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import {Exercise} from "@/db/schema"
+import { Exercise } from "@/db/schema"
 
 
 
@@ -78,10 +78,17 @@ export default function ExercisesPage() {
         // Mettre à jour la liste des exercices
         setExercises((prev) => prev.filter((exercise) => exercise.id !== exerciseToDelete))
       } else {
-        const errorData = await response.json()
+        let errorMessage = "Erreur lors de la suppression de l'exercice"
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorMessage
+        } catch (parseError) {
+          console.error("Failed to parse error response:", parseError)
+          errorMessage = `Erreur ${response.status}: ${response.statusText}`
+        }
         toast({
           title: "Erreur",
-          description: errorData.error || "Erreur lors de la suppression de l'exercice",
+          description: errorMessage,
           variant: "destructive",
         })
       }
@@ -105,11 +112,11 @@ export default function ExercisesPage() {
       header: "Nom",
     },
     {
-      accessorKey: "tempsReps",
-      header: "Temps et répétitions"
+      accessorKey: "objectifs",
+      header: "Objectifs",
     },
     {
-      accessorKey:"instructions",
+      accessorKey: "instructions",
       header: "Instructions"
     },
     {

@@ -32,14 +32,14 @@ const exerciseSchema = z.object({
   name: z.string().min(1, "Le nom de l'exercice est requis"),
   instructions: z.string(),
   videoPublicId: z.string(),
-  tempsReps: z.string(),
+  objectifs: z.string(),
 })
 
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
-export default function EditExercisePage({ params }: { params: { id: string } }) {
-  const awaitedParams=React.use(params)
-  const { id } = awaitedParams
+export default function EditExercisePage({ params }: { params: Promise<{ id: string }> }) {
+  const awaitedParams = React.use(params)
+  const id = awaitedParams.id
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -52,7 +52,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
       name: "",
       instructions: "",
       videoPublicId: "",
-      tempsReps: "",
+      objectifs: "",
     },
   })
 
@@ -71,7 +71,7 @@ export default function EditExercisePage({ params }: { params: { id: string } })
           name: exercise.name,
           instructions: exercise.instructions || "",
           videoPublicId: exercise.videoPublicId || "",
-          tempsReps: exercise.tempsReps || "",
+          objectifs: exercise.objectifs || "",
         })
 
         // Set preview URL if there is an existing video
@@ -203,12 +203,17 @@ export default function EditExercisePage({ params }: { params: { id: string } })
 
               <FormField
                 control={form.control}
-                name="tempsReps"
+                name="instructions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Temps/Répétitions</FormLabel>
+                    <FormLabel>Instructions</FormLabel>
                     <FormControl>
-                      <Input placeholder="Temps/Répétitions" {...field} />
+                      <Textarea
+                        placeholder="Détaillez les étapes pour réaliser l'exercice"
+                        className="resize-none"
+                        rows={5}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -217,13 +222,13 @@ export default function EditExercisePage({ params }: { params: { id: string } })
 
               <FormField
                 control={form.control}
-                name="instructions"
+                name="objectifs"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Instructions</FormLabel>
+                    <FormLabel>Objectifs</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Détaillez les étapes pour réaliser l'exercice"
+                        placeholder="Détaillez les objectifs de l'exercice"
                         className="resize-none"
                         rows={5}
                         {...field}

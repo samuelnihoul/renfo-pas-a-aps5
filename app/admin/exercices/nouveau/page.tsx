@@ -21,7 +21,7 @@ export default function NewExercisePage() {
   const [formData, setFormData] = useState({
     name: "",
     instructions: "",
-    tempsReps: "",
+    objectifs: "",
     videoPublicId: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -160,18 +160,6 @@ export default function NewExercisePage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="tempsReps">
-                Temps/Répétitions
-              </label>
-              <Textarea
-                id="tempsReps"
-                name="tempsReps"
-                value={formData.tempsReps}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="space-y-2">
               <label htmlFor="instructions">Instructions</label>
               <Textarea
                 id="instructions"
@@ -180,6 +168,18 @@ export default function NewExercisePage() {
                 onChange={handleChange}
                 rows={4}
                 placeholder="Instructions détaillées pour réaliser l'exercice..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="objectifs">Objectifs</label>
+              <Textarea
+                id="objectifs"
+                name="objectifs"
+                value={formData.objectifs}
+                onChange={handleChange}
+                rows={4}
+                placeholder="Objectifs de l'exercice..."
               />
             </div>
 
