@@ -37,8 +37,9 @@ const exerciseSchema = z.object({
 
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
-export default function EditExercisePage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default function EditExercisePage({ params }: { params: Promise<{ id: string }> }) {
+  const awaitedParams = React.use(params)
+  const id = awaitedParams.id
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
