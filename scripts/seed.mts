@@ -2,9 +2,9 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { blocks, exercises, programs, routines, users } from '@/db/schema'; // Assurez-vous que le chemin est correct
 // Initialisation de la connexion à la base de données
-const databaseURL=process.env.DATABASE_URL
+const databaseURL = process.env.DATABASE_URL
 const pool = new Pool({
-  connectionString:databaseURL, // Remplacez par votre chaîne de connexion
+  connectionString: databaseURL, // Remplacez par votre chaîne de connexion
 });
 
 const db = drizzle(pool);
@@ -32,16 +32,16 @@ async function seedDatabase() {
     // Insérer des exercices
     const exerciseData: typeof exercises.$inferInsert[] = [
       {
-        name: 'Push-Up',
-        videoPublicId: 'a36xs7k8iyfz4keekw48',
-        instructions: 'Faites des pompes en gardant le dos droit.',
-        tempsReps: '10 reps',
+        name: 'Squats',
+        instructions: 'Pieds écartés à la largeur des épaules, descendre en gardant le dos droit',
+        objectifs: 'Renforcement des quadriceps et fessiers',
+        videoPublicId: null
       },
       {
-        name: 'Squat',
-        videoPublicId: 'another_video_id',
-        instructions: 'Faites des squats en gardant les pieds à plat.',
-        tempsReps: '15 reps',
+        name: 'Pompes',
+        instructions: 'Position planche, descendre le corps en pliant les bras',
+        objectifs: 'Renforcement des pectoraux et triceps',
+        videoPublicId: null
       },
     ];
 

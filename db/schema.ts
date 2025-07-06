@@ -61,7 +61,7 @@ export const exercises = pgTable("exercises", {
   name: varchar("name", { length: 255 }).notNull(),
   videoPublicId: varchar("video_url", { length: 255 }),
   instructions: text("instructions"),
-  tempsReps: varchar('tempsReps'),
+  objectifs: text("objectifs"),
   ...timestamps
 })
 

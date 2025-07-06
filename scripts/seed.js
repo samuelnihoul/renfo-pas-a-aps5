@@ -37,16 +37,16 @@ function seedDatabase() {
             // Insérer des exercices
             const exerciseData = [
                 {
-                    name: 'Push-Up',
-                    videoPublicId: 'a36xs7k8iyfz4keekw48',
-                    instructions: 'Faites des pompes en gardant le dos droit.',
-                    tempsReps: '10 reps',
+                    name: 'Squats',
+                    instructions: 'Pieds écartés à la largeur des épaules, descendre en gardant le dos droit',
+                    objectifs: 'Renforcement des quadriceps et fessiers',
+                    videoPublicId: null
                 },
                 {
-                    name: 'Squat',
-                    videoPublicId: 'another_video_id',
-                    instructions: 'Faites des squats en gardant les pieds à plat.',
-                    tempsReps: '15 reps',
+                    name: 'Pompes',
+                    instructions: 'Position planche, descendre le corps en pliant les bras',
+                    objectifs: 'Renforcement des pectoraux et triceps',
+                    videoPublicId: null
                 },
             ];
             const insertedExercises = yield db.insert(exercises).values(exerciseData).returning();

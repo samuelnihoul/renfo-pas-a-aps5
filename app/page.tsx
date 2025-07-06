@@ -14,9 +14,9 @@ import { AdminLink } from "@/components/admin-link"
 type Exercise = {
   id: number
   name: string
+  videoPublicId: string | null
   instructions: string | null
-  tempsReps: string | null
-  videoUrl: string | null
+  objectifs: string | null
   createdAt: string
   updatedAt: string
 }
@@ -60,8 +60,8 @@ function ExerciseItem({ exercise }: { exercise: Exercise }) {
       {exercise.instructions && (
         <p className="text-sm text-gray-600 mt-1">{exercise.instructions}</p>
       )}
-      {exercise.tempsReps && (
-        <p className="text-sm text-gray-600 mt-1">{exercise.tempsReps}</p>
+      {exercise.objectifs && (
+        <p className="text-sm text-gray-600 mt-1">{exercise.objectifs}</p>
       )}
     </div>
   )
@@ -347,9 +347,9 @@ export default function Home() {
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="text-lg font-semibold">{exercise.name}</h3>
-                        {exercise.tempsReps && (
+                        {exercise.objectifs && (
                           <p className="text-sm text-gray-600 mt-1">
-                            <span className="font-medium">Temps/Répétitions :</span> {exercise.tempsReps}
+                            <span className="font-medium">Objectifs :</span> {exercise.objectifs}
                           </p>
                         )}
                       </div>
@@ -382,10 +382,10 @@ export default function Home() {
                         <p className="text-sm text-gray-600 mt-1">{exercise.instructions}</p>
                       </div>
                     )}
-                    {exercise.tempsReps && (
+                    {exercise.objectifs && (
                       <div className="mt-3">
-                        <h4 className="text-sm font-medium text-gray-700">Temps par répétion :</h4>
-                        <p className="text-sm text-gray-600 mt-1">{exercise.tempsReps}</p>
+                        <h4 className="text-sm font-medium text-gray-700">Objectifs :</h4>
+                        <p className="text-sm text-gray-600 mt-1">{exercise.objectifs}</p>
                       </div>
                     )}
                   </div>

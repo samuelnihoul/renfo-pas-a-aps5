@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm"
 import { deleteVideo } from "@/lib/file-storage"
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const awaitedParams= await params
+  const awaitedParams = await params
   try {
     const id = Number.parseInt(awaitedParams.id)
 
@@ -53,7 +53,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { name, tempsReps, instructions,  videoPublicId } = body
+    const { name, objectifs, instructions, videoPublicId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom de l'exercice est requis" }, { status: 400 })
@@ -65,7 +65,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         name,
         instructions: instructions || null,
         videoPublicId: videoPublicId || null,
-        tempsReps
+        objectifs: objectifs || null,
       })
       .where(eq(exercises.id, id))
       .returning()

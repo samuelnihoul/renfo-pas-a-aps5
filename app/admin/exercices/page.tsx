@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import {Exercise} from "@/db/schema"
+import { Exercise } from "@/db/schema"
 
 
 
@@ -105,11 +105,11 @@ export default function ExercisesPage() {
       header: "Nom",
     },
     {
-      accessorKey: "tempsReps",
-      header: "Temps et répétitions"
+      accessorKey: "objectifs",
+      header: "Objectifs",
     },
     {
-      accessorKey:"instructions",
+      accessorKey: "instructions",
       header: "Instructions"
     },
     {
