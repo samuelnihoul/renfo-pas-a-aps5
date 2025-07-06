@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { db } from "@/db"
 import { userPrograms } from "@/db/schema"
+import { eq, and } from "drizzle-orm"
 
 export async function POST(request: Request) {
     try {
@@ -15,8 +16,10 @@ export async function POST(request: Request) {
             .select()
             .from(userPrograms)
             .where(
-                userPrograms.userId.equals(userId) &&
-                userPrograms.programId.equals(programId)
+                and(
+                    eq(userPrograms.userId, userId),
+                    eq(userPrograms.programId, programId)
+                )
             )
 
         if (existingPurchase.length > 0) {
