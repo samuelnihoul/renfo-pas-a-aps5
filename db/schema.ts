@@ -16,16 +16,49 @@ export const programs = pgTable("programs", {
   ...timestamps
 })
 
-// Table des utilisateurs
+// Table des utilisateurs (compatible Auth.js)
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 255 }).primaryKey(),
+  name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull().unique(),
-  name: varchar("name", { length: 255 }).notNull(),
-  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  isPremium: boolean('isPremium'),
-  isAdmin: boolean("isAdmin"),
+  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  image: varchar("image", { length: 255 }),
+  passwordHash: varchar("password_hash", { length: 255 }),
+  isPremium: boolean('isPremium').default(false),
+  isAdmin: boolean("isAdmin").default(false),
   ...timestamps
 })
+
+// Tables Auth.js requises
+export const accounts = pgTable("accounts", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("userId", { length: 255 }).notNull(),
+  type: varchar("type", { length: 255 }).notNull(),
+  provider: varchar("provider", { length: 255 }).notNull(),
+  providerAccountId: varchar("providerAccountId", { length: 255 }).notNull(),
+  refresh_token: varchar("refresh_token", { length: 255 }),
+  access_token: varchar("access_token", { length: 255 }),
+  expires_at: integer("expires_at"),
+  token_type: varchar("token_type", { length: 255 }),
+  scope: varchar("scope", { length: 255 }),
+  id_token: varchar("id_token", { length: 255 }),
+  session_state: varchar("session_state", { length: 255 }),
+})
+
+export const sessions = pgTable("sessions", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  sessionToken: varchar("sessionToken", { length: 255 }).notNull().unique(),
+  userId: varchar("userId", { length: 255 }).notNull(),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+})
+
+export const verificationTokens = pgTable("verificationToken", {
+  identifier: varchar("identifier", { length: 255 }).notNull(),
+  token: varchar("token", { length: 255 }).notNull(),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+}, (vt) => ({
+  compoundKey: unique().on(vt.identifier, vt.token),
+}))
 
 // Table des routines (jours d'entraînement)
 export const routines = pgTable(
@@ -68,7 +101,7 @@ export const exercises = pgTable("exercises", {
 // Table de liaison pour les achats de programmes par utilisateur
 export const userPrograms = pgTable("user_programs", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
   programId: integer("program_id").notNull(),
   purchaseDate: timestamp("purchase_date", { withTimezone: true }).defaultNow(),
   // Possibilité d'ajouter d'autres champs (ex: prix, statut, etc.)
@@ -87,4 +120,10 @@ export type User = typeof users.$inferSelect
 export type UserAdd = typeof users.$inferInsert
 export type UserProgram = typeof userPrograms.$inferSelect
 export type UserProgramAdd = typeof userPrograms.$inferInsert
+export type Account = typeof accounts.$inferSelect
+export type AccountAdd = typeof accounts.$inferInsert
+export type Session = typeof sessions.$inferSelect
+export type SessionAdd = typeof sessions.$inferInsert
+export type VerificationToken = typeof verificationTokens.$inferSelect
+export type VerificationTokenAdd = typeof verificationTokens.$inferInsert
 

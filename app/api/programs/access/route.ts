@@ -1,14 +1,21 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/db"
 import { userPrograms, programs } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
+import { getAuthenticatedUser } from "@/lib/auth-middleware"
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
-        const { userId, programId, dayNumber } = await request.json()
+        const user = await getAuthenticatedUser(request)
 
-        if (!userId || !programId) {
-            return NextResponse.json({ error: "userId et programId sont requis" }, { status: 400 })
+        if (!user) {
+            return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
+        }
+
+        const { programId, dayNumber } = await request.json()
+
+        if (!programId) {
+            return NextResponse.json({ error: "programId est requis" }, { status: 400 })
         }
 
         // Vérifier si l'utilisateur a acheté le programme
@@ -17,7 +24,7 @@ export async function POST(request: Request) {
             .from(userPrograms)
             .where(
                 and(
-                    eq(userPrograms.userId, userId),
+                    eq(userPrograms.userId, user.userId),
                     eq(userPrograms.programId, programId)
                 )
             )

@@ -18,18 +18,14 @@ interface PurchasedProgram {
     }
 }
 
-interface PurchasedProgramsProps {
-    userId: number
-}
-
-export function PurchasedPrograms({ userId }: PurchasedProgramsProps) {
+export function PurchasedPrograms() {
     const [purchasedPrograms, setPurchasedPrograms] = useState<PurchasedProgram[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchPurchasedPrograms = async () => {
             try {
-                const response = await fetch(`/api/programs/purchased?userId=${userId}`)
+                const response = await fetch("/api/programs/purchased")
                 if (!response.ok) {
                     throw new Error("Erreur lors du chargement des programmes achetés")
                 }
@@ -43,7 +39,7 @@ export function PurchasedPrograms({ userId }: PurchasedProgramsProps) {
         }
 
         fetchPurchasedPrograms()
-    }, [userId])
+    }, [])
 
     if (loading) {
         return (

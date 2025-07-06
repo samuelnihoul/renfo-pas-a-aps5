@@ -7,7 +7,7 @@ interface ProgramAccess {
     error?: string
 }
 
-export function useProgramAccess(userId: number, programId: number, dayNumber?: number) {
+export function useProgramAccess(userId: string, programId: number, dayNumber?: number) {
     const [access, setAccess] = useState<ProgramAccess>({
         hasAccess: false,
         loading: true,

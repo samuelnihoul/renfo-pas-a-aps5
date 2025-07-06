@@ -8,7 +8,7 @@ import { toast } from "@/components/ui/use-toast"
 import { useState } from "react"
 
 interface ProgramAccessGuardProps {
-    userId: number
+    userId: string
     programId: number
     dayNumber?: number
     children: React.ReactNode

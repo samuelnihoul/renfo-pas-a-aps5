@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/db"
 import { userPrograms, programs } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getAuthenticatedUser } from "@/lib/auth-middleware"
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url)
-        const userId = searchParams.get("userId")
+        const user = await getAuthenticatedUser(request)
 
-        if (!userId) {
-            return NextResponse.json({ error: "userId est requis" }, { status: 400 })
+        if (!user) {
+            return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
         }
 
         // Récupérer les programmes achetés par l'utilisateur
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
             })
             .from(userPrograms)
             .innerJoin(programs, eq(userPrograms.programId, programs.id))
-            .where(eq(userPrograms.userId, Number.parseInt(userId)))
+            .where(eq(userPrograms.userId, user.userId))
 
         return NextResponse.json(purchasedPrograms)
     } catch (error) {
