@@ -69,7 +69,7 @@ export default function ProgramsPage() {
     setIsDeleting(true)
 
     try {
-      const response = await fetch(`/api/admin/programmes/${programToDelete}`, {
+      const response = await fetch(`/api/admin/programs/${programToDelete}`, {
         method: "DELETE",
       })
 
@@ -80,10 +80,17 @@ export default function ProgramsPage() {
         })
         setPrograms((prev) => prev.filter((program) => program.id !== programToDelete))
       } else {
-        const errorData = await response.json()
+        let errorMessage = "Erreur lors de la suppression du programme"
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorMessage
+        } catch (parseError) {
+          console.error("Failed to parse error response:", parseError)
+          errorMessage = `Erreur ${response.status}: ${response.statusText}`
+        }
         toast({
           title: "Erreur",
-          description: errorData.error || "Erreur lors de la suppression du programme",
+          description: errorMessage,
           variant: "destructive",
         })
       }
@@ -117,22 +124,22 @@ export default function ProgramsPage() {
         const program = row.original
 
         return (
-            <div className="flex items-center gap-2">
-              <Link href={`/admin/programmes/${program.id}`}>
-                <Button variant="ghost" size="icon" title="Modifier">
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive"
-                  title="Supprimer"
-                  onClick={() => confirmDeleteProgram(program.id)}
-              >
-                <Trash2 className="h-4 w-4" />
+          <div className="flex items-center gap-2">
+            <Link href={`/admin/programmes/${program.id}`}>
+              <Button variant="ghost" size="icon" title="Modifier">
+                <Pencil className="h-4 w-4" />
               </Button>
-            </div>
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-destructive"
+              title="Supprimer"
+              onClick={() => confirmDeleteProgram(program.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         )
       },
     },
@@ -140,79 +147,79 @@ export default function ProgramsPage() {
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <span className="ml-2">Chargement des programmes...</span>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <span className="ml-2">Chargement des programmes...</span>
+      </div>
     )
   }
 
   if (error) {
     return (
-        <div className="p-4 bg-destructive/10 text-destructive rounded-md">
-          <p>{error}</p>
-          <Button variant="outline" className="mt-2" onClick={fetchPrograms}>
-            Réessayer
-          </Button>
-        </div>
+      <div className="p-4 bg-destructive/10 text-destructive rounded-md">
+        <p>{error}</p>
+        <Button variant="outline" className="mt-2" onClick={fetchPrograms}>
+          Réessayer
+        </Button>
+      </div>
     )
   }
 
   return (
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Programmes</h1>
-          <Link href="/admin/programmes/nouveau">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Nouveau programme
-            </Button>
-          </Link>
-        </div>
-
-        {programs.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-10">
-                <p className="text-muted-foreground mb-4">Aucun programme n'a été créé pour le moment.</p>
-                <Link href="/admin/programmes/nouveau">
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Créer un programme
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-        ) : (
-            <DataTable columns={columns} data={programs} searchKey="name" searchPlaceholder="Rechercher un programme..." />
-        )}
-
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce programme ?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Cette action est irréversible. Le programme et toutes ses routines seront définitivement supprimés.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
-              <AlertDialogAction
-                  onClick={handleDeleteProgram}
-                  disabled={isDeleting}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                {isDeleting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Suppression...
-                    </>
-                ) : (
-                    "Supprimer"
-                )}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Programmes</h1>
+        <Link href="/admin/programmes/nouveau">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouveau programme
+          </Button>
+        </Link>
       </div>
+
+      {programs.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-10">
+            <p className="text-muted-foreground mb-4">Aucun programme n'a été créé pour le moment.</p>
+            <Link href="/admin/programmes/nouveau">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Créer un programme
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ) : (
+        <DataTable columns={columns} data={programs} searchKey="name" searchPlaceholder="Rechercher un programme..." />
+      )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce programme ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Le programme et toutes ses routines seront définitivement supprimés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteProgram}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                "Supprimer"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   )
 }

@@ -76,10 +76,17 @@ export default function BlocsPage() {
         // Mettre à jour la liste des blocs
         setBlocs((prev) => prev.filter((bloc) => bloc.id !== blocToDelete))
       } else {
-        const errorData = await response.json()
+        let errorMessage = "Erreur lors de la suppression du bloc"
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorMessage
+        } catch (parseError) {
+          console.error("Failed to parse error response:", parseError)
+          errorMessage = `Erreur ${response.status}: ${response.statusText}`
+        }
         toast({
           title: "Erreur",
-          description: errorData.error || "Erreur lors de la suppression du bloc",
+          description: errorMessage,
           variant: "destructive",
         })
       }
