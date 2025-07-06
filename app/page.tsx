@@ -330,9 +330,6 @@ export default function Home() {
             {programs.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500">Aucun programme disponible pour le moment.</p>
-                <Button className="mt-4" asChild>
-                  <Link href="/admin/programmes/nouveau">Créer un programme</Link>
-                </Button>
               </div>
             )}
           </div>
