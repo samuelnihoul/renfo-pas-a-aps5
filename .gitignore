@@ -42,3 +42,6 @@ drizzle/meta
 
 #macintosh
 .DS_Store
+
+#vscode
+.vscode
