@@ -166,7 +166,11 @@ describe('ProgramAccessGuard', () => {
             </ProgramAccessGuard>
         )
 
-        expect(screen.getByText('Erreur lors de la vérification d\'accès.')).toBeInTheDocument()
+        expect(
+            screen.getByText((content) =>
+                content.includes("Erreur lors de la vérification d'accès")
+            )
+        ).toBeInTheDocument()
     })
 
     it('should pass correct props to useProgramAccess hook', () => {

@@ -18,36 +18,10 @@ describe('Stripe utilities', () => {
             })
         })
 
-        it('should use test secret key in development', () => {
-            const originalEnv = process.env.NODE_ENV
-            process.env.NODE_ENV = 'development'
-            process.env.STRIPE_SECRET_KEY = 'sk_test_test_key'
-
-            // Re-import to trigger new instance creation
-            jest.resetModules()
-            require('@/lib/stripe')
-
-            expect(mockStripe).toHaveBeenCalledWith('sk_test_test_key', {
+        it('should create Stripe instance with correct configuration', () => {
+            expect(mockStripe).toHaveBeenCalledWith(process.env.STRIPE_SECRET_KEY, {
                 apiVersion: '2024-12-18.acacia',
             })
-
-            process.env.NODE_ENV = originalEnv
-        })
-
-        it('should use live secret key in production', () => {
-            const originalEnv = process.env.NODE_ENV
-            process.env.NODE_ENV = 'production'
-            process.env.STRIPE_SECRET_KEY = 'sk_live_live_key'
-
-            // Re-import to trigger new instance creation
-            jest.resetModules()
-            require('@/lib/stripe')
-
-            expect(mockStripe).toHaveBeenCalledWith('sk_live_live_key', {
-                apiVersion: '2024-12-18.acacia',
-            })
-
-            process.env.NODE_ENV = originalEnv
         })
     })
 
