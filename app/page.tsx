@@ -201,25 +201,6 @@ export default function Home() {
 
   return (
     <div className="container px-4 py-8 mx-auto">
-      <header className="flex items-center justify-between mb-8">
-        <div>
-          <div>
-            <h1 className="text-2xl font-bold gradient-text">Renfo Pas à Pas</h1>
-            <p className="text-sm text-muted-foreground">Renforcement pour la course à pied</p>
-          </div>
-
-        </div>
-        <div className="w-8 h-8 relative">
-          <Image
-            src="/favicon.ico"
-            alt="Company Logo"
-            fill
-            className="object-contain rounded-xl"
-            priority
-          />
-        </div>
-      </header>
-
       <Tabs defaultValue="programs" className="w-full overflow-x-hidden">
         <TabsList>
           <TabsTrigger value="programs">Programmes</TabsTrigger>

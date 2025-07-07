@@ -12,7 +12,7 @@ interface ProgramCardProps {
         name: string
         material: string
     }
-    userId: number
+    userId: string
     hasAccess: boolean
     accessReason?: "purchased" | "free_trial" | "not_purchased"
 }
@@ -23,10 +23,10 @@ export function ProgramCard({ program, userId, hasAccess, accessReason }: Progra
     const handlePurchase = async () => {
         setIsPurchasing(true)
         try {
-            const response = await fetch("/api/programs/purchase", {
+            const response = await fetch("/api/programs/checkout", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId, programId: program.id }),
+                body: JSON.stringify({ programId: program.id }),
             })
 
             if (!response.ok) {
@@ -34,13 +34,12 @@ export function ProgramCard({ program, userId, hasAccess, accessReason }: Progra
                 throw new Error(error.error || "Erreur lors de l'achat")
             }
 
-            toast({
-                title: "Achat réussi !",
-                description: `Vous avez maintenant accès au programme "${program.name}"`,
-            })
+            const { url } = await response.json()
 
-            // Recharger la page pour mettre à jour l'état
-            window.location.reload()
+            // Rediriger vers Stripe Checkout
+            if (url) {
+                window.location.href = url
+            }
         } catch (error) {
             toast({
                 title: "Erreur",

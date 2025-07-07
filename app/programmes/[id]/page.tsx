@@ -6,6 +6,7 @@ import { ArrowLeft, Calendar } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useData } from "@/components/data-provider"
 import { ProgramAccessGuard } from "@/components/program-access-guard"
+import { useAuth } from "@/hooks/use-auth"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,9 +18,7 @@ export default function ProgrammePage({ params }: { params: { id: string } | Pro
   const [program, setProgram] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  // TODO: Récupérer l'utilisateur connecté depuis la session
-  const userId = 1 // Temporaire
+  const { user, loading: authLoading, isAuthenticated } = useAuth()
 
   useEffect(() => {
     const loadProgram = async () => {
@@ -43,7 +42,7 @@ export default function ProgrammePage({ params }: { params: { id: string } | Pro
     loadProgram()
   }, [id, fetchProgramDetails])
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="container px-4 py-8 mx-auto flex items-center justify-center min-h-screen">
         <p>Chargement du programme...</p>
@@ -51,13 +50,34 @@ export default function ProgrammePage({ params }: { params: { id: string } | Pro
     )
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="container px-4 py-8 mx-auto">
+        <Link href="/programmes">
+          <Button variant="ghost" size="sm" className="mb-2 pl-0">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Retour aux programmes
+          </Button>
+        </Link>
+        <div className="text-center py-12">
+          <p className="text-lg text-muted-foreground mb-4">
+            Connectez-vous pour accéder à ce programme
+          </p>
+          <Button asChild>
+            <Link href="/auth/signin">Se connecter</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   if (error || !program) {
     return (
       <div className="container px-4 py-8 mx-auto">
-        <Link href="/">
+        <Link href="/programmes">
           <Button variant="ghost" size="sm" className="mb-2 pl-0">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour
+            Retour aux programmes
           </Button>
         </Link>
         <p className="text-red-500">{error || "Programme non trouvé"}</p>
@@ -66,7 +86,7 @@ export default function ProgrammePage({ params }: { params: { id: string } | Pro
   }
 
   return (
-    <ProgramAccessGuard userId={userId} programId={Number.parseInt(id)}>
+    <ProgramAccessGuard userId={user!.userId} programId={Number.parseInt(id)}>
       <div className="container px-4 py-8 mx-auto">
         <header className="mb-6">
           <Link href="/programmes">
