@@ -104,14 +104,11 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, se
         }
     }, [selectedItemIds, availableItems, isInitialized]);
     useEffect(() => {
-        // Mettre à jour le parent chaque fois que itemList change
-        // But only if we're initialized to avoid initial loop
-        if (isInitialized) {
-            const selectedExerciseIds = itemList.map(item => item.itemId);
-            const orderIndices = itemList.map((_, index) => index);
-            onItemSelectAction(selectedExerciseIds, orderIndices);
-        }
-    }, [itemList, isInitialized]); // Add isInitialized to dependencies
+        // Always update parent when itemList changes
+        const selectedExerciseIds = itemList.map(item => item.itemId);
+        const orderIndices = itemList.map((_, index) => index);
+        onItemSelectAction(selectedExerciseIds, orderIndices);
+    }, [itemList]);
 
     const openAddItemDialog = () => {
         setAddItemDialogOpen(true);

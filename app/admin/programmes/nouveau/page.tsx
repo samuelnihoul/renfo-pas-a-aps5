@@ -40,10 +40,12 @@ export default function NewProgram() {
   }
 
   const handleRoutineSelection = (selectedRoutineIds: number[]) => {
+	  console.log("selecedrotuineId",selectedRoutineIds)
     setFormData(prev => ({
       ...prev,
-      routineId: selectedRoutineIds,
+      routineIds: selectedRoutineIds,
     }))
+    console.log("formaData",formData)
   }
 
   const validateForm = () => {
