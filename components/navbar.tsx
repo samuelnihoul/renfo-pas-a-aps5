@@ -31,14 +31,6 @@ export function Navbar() {
                         <Skeleton className="h-8 w-24 rounded" />
                     ) : isAuthenticated && user ? (
                         <div className="flex items-center gap-2">
-                            <Avatar className="h-8 w-8">
-                                <span className="sr-only">{user.name}</span>
-                                <img
-                                    src="/placeholder-user.jpg"
-                                    alt={user.name || "Utilisateur"}
-                                    className="h-8 w-8 rounded-full object-cover"
-                                />
-                            </Avatar>
                             <span className="text-sm font-medium max-w-[120px] truncate" title={user.name || user.email}>
                                 {user.name || user.email}
                             </span>
