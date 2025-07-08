@@ -49,17 +49,17 @@ export function Navbar() {
     )
 
     return (
-        <nav className="w-full border-b bg-background/80 backdrop-blur sticky top-0 z-50 shadow-sm">
+        <nav className="w-full border-b bg-background/80 backdrop-blur sticky top-0 z-50">
             <div className="container mx-auto flex items-center justify-between h-16 px-4">
                 {/* Logo/Brand */}
-                <Link href="/" className="flex items-center gap-2 font-bold text-lg min-w-0 mr-8">
+                <Link href="/" className="flex items-center gap-2 font-bold text-lg min-w-0">
                     <img src="/favicon.ico" alt="Logo" className="h-8 w-8" />
                     <span className="truncate">Renfo Pas à Pas</span>
                 </Link>
 
                 {/* Desktop Navigation */}
                 {!isMobile && (
-                    <div className="flex-1 flex items-center justify-center gap-12">
+                    <div className="flex-1 flex items-center justify-center gap-8">
                         {navLinks}
                     </div>
                 )}
