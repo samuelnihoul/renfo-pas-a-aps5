@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminLink } from "@/components/admin-link"
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogClose,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Types pour les composants
 type Exercise = {
@@ -333,24 +340,45 @@ export default function Home() {
                       </div>
 
                       {exercise.videoPublicId && (
-                        <div className="ml-4 flex-shrink-0">
-                          <div className="w-24 h-16 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
-                            <video
-                              src={typeof exercise.videoPublicId === 'string' ? exercise.videoPublicId : ''}
-                              className="w-full h-full object-cover"
-                              muted
-                              preload="metadata"
-                              poster="/placeholder.svg"
-                              onLoadedMetadata={(e) => {
-                                const video = e.target as HTMLVideoElement;
-                                video.currentTime = 0.1;
-                                video.onloadeddata = () => {
-                                  video.pause();
-                                };
-                              }}
-                            />
-                          </div>
-                        </div>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <button className="ml-4 flex-shrink-0 focus:outline-none group">
+                              <div className="w-24 h-16 bg-gray-100 rounded overflow-hidden flex items-center justify-center relative">
+                                <video
+                                  src={typeof exercise.videoPublicId === 'string' ? exercise.videoPublicId : ''}
+                                  className="w-full h-full object-cover"
+                                  muted
+                                  preload="metadata"
+                                  poster="/placeholder.svg"
+                                  onLoadedMetadata={(e) => {
+                                    const video = e.target as HTMLVideoElement;
+                                    video.currentTime = 0.1;
+                                    video.onloadeddata = () => {
+                                      video.pause();
+                                    };
+                                  }}
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-6.518-3.759A1 1 0 007 8.06v7.882a1 1 0 001.234.97l6.518-1.857A1 1 0 0016 14.06V9.94a1 1 0 00-1.248-.772z" /></svg>
+                                </div>
+                              </div>
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl w-full">
+                            <DialogTitle>
+                              <span className="sr-only">{exercise.name}</span>
+                            </DialogTitle>
+                            <div className="w-full aspect-video">
+                              <video
+                                src={typeof exercise.videoPublicId === 'string' ? exercise.videoPublicId : ''}
+                                controls
+                                autoPlay
+                                className="w-full h-full object-contain rounded"
+                                poster="/placeholder.svg"
+                              />
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       )}
                     </div>
 
