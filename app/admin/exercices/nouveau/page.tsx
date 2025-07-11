@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { toast } from "@/components/ui/use-toast"
+import VideoUpload from "@/components/video-upload";
 
 export default function NewExercisePage() {
   const router = useRouter()
@@ -43,13 +44,11 @@ export default function NewExercisePage() {
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-      setVideoFile(file)
-      const fileURL = URL.createObjectURL(file)
-      setPreviewUrl(fileURL)
-    }
+  const handleVideoUrlChange = (url: string) => {
+    setFormData(prev => ({
+      ...prev,
+      videoPublicId: url,
+    }))
   }
 
   const validateForm = () => {
@@ -74,21 +73,7 @@ export default function NewExercisePage() {
       let finalVideoPublicId = formData.videoPublicId
 
       if (videoFile) {
-        const uploadFormData = new FormData()
-        uploadFormData.append("video", videoFile)
-
-        const uploadResponse = await fetch("/api/upload/video", {
-          method: "POST",
-          body: uploadFormData,
-        })
-
-        if (!uploadResponse.ok) {
-          const errorData = await uploadResponse.json()
-          throw new Error(errorData.error || "Erreur lors du téléchargement de la vidéo")
-        }
-
-        const uploadData = await uploadResponse.json()
-        finalVideoPublicId = uploadData.fileUrl // Assuming the server returns the publicId
+        // No need to upload here, handled by VideoUpload
       }
 
       console.log(formData)
@@ -185,44 +170,11 @@ export default function NewExercisePage() {
 
             <div className="space-y-2">
               <label htmlFor="video">Vidéo de démonstration</label>
-              <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center">
-                {previewUrl ? (
-                  <div className="w-full">
-                    <video src={previewUrl} controls className="w-full h-48 object-cover rounded-md mb-2" />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setVideoFile(null)
-                        setPreviewUrl(null)
-                        setFormData(prev => ({
-                          ...prev,
-                          videoPublicId: "",
-                        }))
-                      }}
-                    >
-                      Supprimer
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center">
-                    <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">Glissez-déposez ou cliquez pour sélectionner une vidéo</p>
-                    <Input id="video" type="file" accept="video/*" onChange={handleFileChange} className="hidden" />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        document.getElementById("video")?.click()
-                      }}
-                    >
-                      Sélectionner un fichier
-                    </Button>
-                  </div>
-                )}
-              </div>
+              <VideoUpload
+                videoUrl={formData.videoPublicId}
+                onVideoChange={setVideoFile}
+                onVideoUrlChange={handleVideoUrlChange}
+              />
               <p className="text-xs text-muted-foreground mt-2">Formats acceptés: MP4, WebM. Taille maximale: 50MB</p>
             </div>
           </CardContent>

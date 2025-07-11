@@ -51,7 +51,6 @@
     "@vercel/blob": "^1.1.1",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
-    "cloudinary": "^2.6.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
     "drizzle-orm": "^0.30.0",

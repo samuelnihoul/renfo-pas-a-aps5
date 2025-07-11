@@ -1,31 +1,28 @@
 // video-upload
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { upload } from "@vercel/blob/client";
 
 interface VideoUploadProps {
     videoUrl: string | null;
     onVideoChange: (file: File | null) => void;
     onVideoUrlChange: (url: string) => void;
-    uploadProgress?: number;
-    uploadStatus?: "idle" | "uploading" | "success" | "error";
-    uploadError?: string;
 }
 
 export default function VideoUpload({
     videoUrl,
     onVideoChange,
     onVideoUrlChange,
-    uploadProgress = 0,
-    uploadStatus = "idle",
-    uploadError = ""
 }: VideoUploadProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [uploadProgress, setUploadProgress] = useState<number>(0);
+    const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
+    const [uploadError, setUploadError] = useState<string>("");
+    const [currentFile, setCurrentFile] = useState<File | null>(null);
 
-    // Set initial preview from videoUrl prop
     useEffect(() => {
         if (videoUrl) {
             setPreviewUrl(videoUrl);
@@ -34,19 +31,44 @@ export default function VideoUpload({
         }
     }, [videoUrl]);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            setCurrentFile(file);
             onVideoChange(file);
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
+            setUploadStatus("uploading");
+            setUploadProgress(0);
+            setUploadError("");
+            try {
+                // Upload to Vercel Blob Storage
+                const { url: blobUrl } = await upload(file.name, file, {
+                    access: "public",
+                    handleUploadUrl: "/api/upload/video",
+                    onUploadProgress: ({ percentage }) => {
+                        setUploadProgress(Math.round(percentage));
+                    },
+                });
+                setUploadStatus("success");
+                setUploadProgress(100);
+                onVideoUrlChange(blobUrl);
+            } catch (err: any) {
+                setUploadStatus("error");
+                setUploadError(err?.message || "Erreur lors du téléchargement");
+                onVideoUrlChange("");
+            }
         }
     };
 
     const handleRemoveVideo = () => {
+        setCurrentFile(null);
         onVideoChange(null);
         onVideoUrlChange("");
         setPreviewUrl(null);
+        setUploadStatus("idle");
+        setUploadProgress(0);
+        setUploadError("");
     };
 
     return (
