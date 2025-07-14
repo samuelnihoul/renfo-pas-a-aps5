@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 import { db } from "@/db"
 import { programs, blocks, exercises } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getAuthenticatedUser } from "@/lib/auth-middleware"
 
-export async function GET(request: Request, { params }: { params: { id: string; dayId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   const paramsAwaited = await params
   try {
     const id = Number.parseInt(paramsAwaited.id)
@@ -13,14 +14,39 @@ export async function GET(request: Request, { params }: { params: { id: string; 
     }
 
     // Récupérer l'ID de l'utilisateur depuis les headers ou la session
-    // TODO: Implémenter la récupération de l'utilisateur connecté
-    const userId = 1 // Temporaire, à remplacer par l'utilisateur connecté
+    const user = await getAuthenticatedUser(request)
+    console.log(user)
+    if (!user) {
+      return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
+    }
+    const userId = user.userId
 
-    // Vérifier l'accès au programme
+    // Si admin, accès total
+    if (user.isAdmin) {
+      // Récupérer les blocs du jour
+      const blockList = await db.select().from(programs).where(eq(programs.id, id))
+      const result = await Promise.all(
+        blockList.map(async (block) => {
+          const exerciseDetails = await db
+            .select()
+            .from(programs)
+            .where(eq(programs.id, id))
+            .limit(1)
+
+          return {
+            ...block,
+            exercise: exerciseDetails[0],
+          }
+        }),
+      )
+      return NextResponse.json(result)
+    }
+
+    // Vérifier l'accès au programme (pour les non-admins)
     const accessResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/programs/access`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, programId: id, dayNumber: 1 }) // dayNumber à adapter selon le contexte
+      body: JSON.stringify({ userId, programId: id }) // dayNumber à adapter selon le contexte
     })
 
     if (!accessResponse.ok) {
