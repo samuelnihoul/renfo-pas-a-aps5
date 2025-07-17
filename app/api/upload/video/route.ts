@@ -12,7 +12,7 @@ export async function POST(request: Request): Promise<NextResponse> {
                 // Only allow mp4 and webm, max 50MB
                 return {
                     allowedContentTypes: ['video/mp4', 'video/webm'],
-                    maximumSizeInBytes: 50 * 1024 * 1024,
+                    maximumSizeInBytes: 1000 * 1024 * 1024,
                     addRandomSuffix: true,
                 };
             },
