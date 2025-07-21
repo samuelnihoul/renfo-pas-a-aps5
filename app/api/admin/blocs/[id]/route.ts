@@ -40,15 +40,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         // Validate the incoming data
-        if (!data.exerciceId  || !Array.isArray(data.exerciceId)) {
+        if (!data.exerciceId || !Array.isArray(data.exerciceId)) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
         // Update the block with the specified ID
         const updatedBlock = await db.update(blocks).set({
             exerciceId: data.exerciceId,
-            sets: data.sets,
-            restTime: data.restTime || null,
+            instructions: data.instructions,
             focus: data.focus,
             name: data.name
         }).where(eq(blocks.id, Number(id))).returning();

@@ -24,6 +24,7 @@ export default function NewExercisePage() {
     instructions: "",
     objectifs: "",
     videoPublicId: "",
+    notes: ""
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -165,6 +166,18 @@ export default function NewExercisePage() {
                 onChange={handleChange}
                 rows={4}
                 placeholder="Objectifs de l'exercice..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="notes">Notes</label>
+              <Textarea
+                id="notes"
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                rows={3}
+                placeholder="Notes personnelles ou remarques sur l'exercice..."
               />
             </div>
 

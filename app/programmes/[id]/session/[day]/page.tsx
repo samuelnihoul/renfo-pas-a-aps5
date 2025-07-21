@@ -160,7 +160,7 @@ export default function SessionPage({ params }: { params: { id: string; day: str
                       <div className="grid grid-cols-3 gap-2 mb-4">
                         <div className="text-center p-2 bg-muted rounded-md">
                           <div className="text-xs text-muted-foreground">Séries</div>
-                          <div className="font-semibold">{dayExercise.sets}</div>
+                          <div className="font-semibold">{dayExercise.instructions}</div>
                         </div>
                         <div className="text-center p-2 bg-muted rounded-md">
                           <div className="text-xs text-muted-foreground">Répétitions</div>

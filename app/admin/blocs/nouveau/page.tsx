@@ -27,8 +27,7 @@ export default function NewProgram() {
         focus: BlockTypes.Activation,
         exerciceId: [],
         name: "",
-        sets: "",
-        restTime: ""
+        instructions: ""
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
@@ -162,24 +161,13 @@ export default function NewProgram() {
                         <ItemSelectorAndOrganizer items={"exercises"} onItemSelectAction={handleExerciseSelection} />
 
                         <div className="space-y-2">
-                            <Label htmlFor="sets">Sets</Label>
+                            <Label htmlFor="instructions">Instructions</Label>
                             <Input
-                                id="sets"
-                                name="sets"
-                                value={formData.sets}
+                                id="instructions"
+                                name="instructions"
+                                value={formData.instructions}
                                 onChange={handleChange}
-                                placeholder="Sets"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="restTime">Temps de repos</Label>
-                            <Input
-                                id="restTime"
-                                name="restTime"
-                                value={formData.restTime as string}
-                                onChange={handleChange}
-                                placeholder="Temps de repos"
+                                placeholder="Instructions du bloc"
                             />
                         </div>
 

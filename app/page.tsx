@@ -24,6 +24,7 @@ type Exercise = {
   videoPublicId: string | null
   instructions: string | null
   objectifs: string | null
+  notes: string | null
   createdAt: string
   updatedAt: string
 }
@@ -31,8 +32,7 @@ type Exercise = {
 type Block = {
   id: number
   name: string
-  sets: string
-  restTime: string | null
+  instructions: string
   focus: string
   exerciceId: number[]
   createdAt: string
@@ -92,7 +92,7 @@ function BlockItem({ block, exercises }: { block: Block, exercises: Exercise[] }
         }
         <ListChecks className="w-4 h-4 text-blue-500" />
         <span className="font-medium">{block.name}</span>
-        <span className="text-sm text-gray-500 ml-2">({block.sets})</span>
+        <span className="text-sm text-gray-500 ml-2">{block.instructions}</span>
       </div>
 
       {isExpanded && blockExercises.map((ex: any) => (

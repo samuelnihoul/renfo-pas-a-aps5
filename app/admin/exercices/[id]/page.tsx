@@ -34,6 +34,7 @@ const exerciseSchema = z.object({
   instructions: z.string(),
   videoPublicId: z.string(),
   objectifs: z.string(),
+  notes: z.string(),
 })
 
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
@@ -54,6 +55,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
       instructions: "",
       videoPublicId: "",
       objectifs: "",
+      notes: "",
     },
   })
 
@@ -73,6 +75,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
           instructions: exercise.instructions || "",
           videoPublicId: exercise.videoPublicId || "",
           objectifs: exercise.objectifs || "",
+          notes: exercise.notes || "",
         })
 
         // Set preview URL if there is an existing video
@@ -212,6 +215,25 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
                         placeholder="Détaillez les objectifs de l'exercice"
                         className="resize-none"
                         rows={5}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Notes personnelles ou remarques sur l'exercice"
+                        className="resize-none"
+                        rows={3}
                         {...field}
                       />
                     </FormControl>

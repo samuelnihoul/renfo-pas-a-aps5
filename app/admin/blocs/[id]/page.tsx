@@ -29,8 +29,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
         focus: BlockTypes.Activation,
         exerciceId: [],
         name: "",
-        sets: "",
-        restTime: ""
+        instructions: ""
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
@@ -168,7 +167,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                             <Input
                                 id="name"
                                 name="name"
-                                value={formData.name||""}
+                                value={formData.name || ""}
                                 onChange={handleChange}
                                 className={errors.name ? "border-destructive" : ""}
                             />
@@ -189,27 +188,16 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                             </Select>
                         </div>
 
-                        <ItemSelectorAndOrganizer items={"exercises"} onItemSelectAction={handleExerciseSelection}  />
+                        <ItemSelectorAndOrganizer items={"exercises"} onItemSelectAction={handleExerciseSelection} />
 
                         <div className="space-y-2">
-                            <Label htmlFor="sets">Sets</Label>
+                            <Label htmlFor="instructions">Instructions</Label>
                             <Input
-                                id="sets"
-                                name="sets"
-                                value={formData.sets||""}
+                                id="instructions"
+                                name="instructions"
+                                value={formData.instructions || ""}
                                 onChange={handleChange}
-                                placeholder="Sets"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="restTime">Temps de repos</Label>
-                            <Input
-                                id="restTime"
-                                name="restTime"
-                                value={formData.restTime ||""}
-                                onChange={handleChange}
-                                placeholder="Temps de repos"
+                                placeholder="Instructions du bloc"
                             />
                         </div>
 

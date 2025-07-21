@@ -23,8 +23,7 @@ type Block = {
   id: number
   exerciceId: number[]
   name: string
-  sets: string
-  restTime: string | null
+  instructions: string
   focus: string
   createdAt: string
   updatedAt: string
@@ -36,6 +35,7 @@ type Exercise = {
   videoPublicId: string | null
   instructions: string | null
   objectifs: string | null
+  notes: string | null
   createdAt: string
   updatedAt: string
 }

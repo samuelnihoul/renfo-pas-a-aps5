@@ -6,5 +6,5 @@ export default {
   dbCredentials: {
     connectionString: process.env.DATABASE_URL!,
   },
-  driver: "pg",
+  dialect: "postgresql",
 } satisfies Config

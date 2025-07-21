@@ -110,12 +110,8 @@ export default function BlocsPage() {
       header: "Nom",
     },
     {
-      accessorKey: "restTime",
-      header: "Temps de repos",
-    },
-    {
-      accessorKey: "sets",
-      header: "Sets",
+      accessorKey: "instructions",
+      header: "Instructions",
     },
     {
       id: "actions",

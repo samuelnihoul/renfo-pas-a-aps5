@@ -81,8 +81,7 @@ export const blocks = pgTable(
       .notNull()
     ,
     name: varchar("name").notNull(),
-    sets: varchar("sets").notNull(),
-    restTime: varchar("rest_time", { length: 50 }),
+    instructions: text("instructions").notNull(),
     focus: varchar("focus").notNull(),
     ...timestamps
   },
@@ -95,6 +94,7 @@ export const exercises = pgTable("exercises", {
   videoPublicId: varchar("video_url", { length: 255 }),
   instructions: text("instructions"),
   objectifs: text("objectifs"),
+  notes: text("notes"),
   ...timestamps
 })
 

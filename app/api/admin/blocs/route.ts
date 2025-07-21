@@ -13,8 +13,7 @@ export async function POST(request: NextRequest) {
     }
     const newBlock = await db.insert(blocks).values({
       exerciceId: data.exerciceId,
-      sets: data.sets,
-      restTime: data.restTime || null,
+      instructions: data.instructions,
       focus: data.focus,
       name: data.name
     }).returning()
