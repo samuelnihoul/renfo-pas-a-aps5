@@ -35,6 +35,7 @@ type Block = {
   instructions: string
   focus: string
   exerciceId: number[]
+  exerciseNotes: string[]
   createdAt: string
   updatedAt: string
 }
@@ -95,8 +96,13 @@ function BlockItem({ block, exercises }: { block: Block, exercises: Exercise[] }
         <span className="text-sm text-gray-500 ml-2">{block.instructions}</span>
       </div>
 
-      {isExpanded && blockExercises.map((ex: any) => (
-        <ExerciseItem key={ex.id} exercise={ex} />
+      {isExpanded && blockExercises.map((ex: any, idx: number) => (
+        <div key={ex.id}>
+          <ExerciseItem exercise={ex} />
+          {block.exerciseNotes && block.exerciseNotes[idx] && (
+            <div className="text-xs text-muted-foreground ml-8 mb-2">Note: {block.exerciseNotes[idx]}</div>
+          )}
+        </div>
       ))}
     </div>
   )

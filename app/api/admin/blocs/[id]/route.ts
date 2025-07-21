@@ -43,10 +43,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         if (!data.exerciceId || !Array.isArray(data.exerciceId)) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
-
+        if (!data.exerciseNotes || !Array.isArray(data.exerciseNotes) || data.exerciseNotes.length !== data.exerciceId.length) {
+            return NextResponse.json({ error: 'exerciseNotes must be an array of the same length as exerciceId' }, { status: 400 });
+        }
         // Update the block with the specified ID
         const updatedBlock = await db.update(blocks).set({
             exerciceId: data.exerciceId,
+            exerciseNotes: data.exerciseNotes,
             instructions: data.instructions,
             focus: data.focus,
             name: data.name

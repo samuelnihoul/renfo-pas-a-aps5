@@ -28,6 +28,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
     const [formData, setFormData] = useState<BlockAdd>({
         focus: BlockTypes.Activation,
         exerciceId: [],
+        exerciseNotes: [],
         name: "",
         instructions: ""
     })
@@ -84,6 +85,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
         setFormData(prev => ({
             ...prev,
             exerciceId: selectedExerciseIds,
+            exerciseNotes: selectedExerciseIds.map((_, idx) => (prev.exerciseNotes ? prev.exerciseNotes[idx] : "") || "")
         }))
     }
 
@@ -189,6 +191,22 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                         </div>
 
                         <ItemSelectorAndOrganizer items={"exercises"} onItemSelectAction={handleExerciseSelection} />
+                        {(formData.exerciseNotes ?? []).map((note, idx) => (
+                            <div key={(formData.exerciceId ?? [])[idx]} className="space-y-2">
+                                <Label htmlFor={`exerciseNote-${(formData.exerciceId ?? [])[idx]}`}>Note pour l'exercice {(formData.exerciceId ?? [])[idx]}</Label>
+                                <Input
+                                    id={`exerciseNote-${(formData.exerciceId ?? [])[idx]}`}
+                                    name={`exerciseNote-${(formData.exerciceId ?? [])[idx]}`}
+                                    value={note || ""}
+                                    onChange={e => {
+                                        const newNotes = [...(formData.exerciseNotes ?? [])]
+                                        newNotes[idx] = e.target.value
+                                        setFormData(prev => ({ ...prev, exerciseNotes: newNotes }))
+                                    }}
+                                    placeholder="Note personnalisée pour cet exercice"
+                                />
+                            </div>
+                        ))}
 
                         <div className="space-y-2">
                             <Label htmlFor="instructions">Instructions</Label>

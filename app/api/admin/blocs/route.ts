@@ -11,8 +11,12 @@ export async function POST(request: NextRequest) {
     if (!data.exerciceId || !Array.isArray(data.exerciceId)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
+    if (!data.exerciseNotes || !Array.isArray(data.exerciseNotes) || data.exerciseNotes.length !== data.exerciceId.length) {
+      return NextResponse.json({ error: 'exerciseNotes must be an array of the same length as exerciceId' }, { status: 400 });
+    }
     const newBlock = await db.insert(blocks).values({
       exerciceId: data.exerciceId,
+      exerciseNotes: data.exerciseNotes,
       instructions: data.instructions,
       focus: data.focus,
       name: data.name

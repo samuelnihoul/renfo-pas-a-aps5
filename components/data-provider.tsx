@@ -22,6 +22,7 @@ type Routine = {
 type Block = {
   id: number
   exerciceId: number[]
+  exerciseNotes: string[]
   name: string
   instructions: string
   focus: string
