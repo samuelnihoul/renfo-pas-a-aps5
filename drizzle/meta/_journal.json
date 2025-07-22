@@ -69,6 +69,13 @@
       "when": 1753099519278,
       "tag": "0009_charming_nemesis",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1753196051034,
+      "tag": "0010_flaky_lionheart",
+      "breakpoints": true
     }
   ]
 }

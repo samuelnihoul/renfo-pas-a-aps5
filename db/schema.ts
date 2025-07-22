@@ -78,7 +78,7 @@ export const blocks = pgTable(
   {
     id: serial("id").primaryKey(),
     exerciceId: integer("exerciceId").array().notNull(),
-    exerciseNotes: text("exercise_notes").array().notNull().default([]),
+    exerciseNotes: text("exercise_notes").array().default(["b"]),
     name: varchar("name").notNull(),
     instructions: text("instructions").notNull(),
     focus: varchar("focus").notNull(),
