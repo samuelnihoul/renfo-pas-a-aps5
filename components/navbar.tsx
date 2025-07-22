@@ -3,15 +3,12 @@
 import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
-import { Avatar } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
-import { useIsMobile } from "@/hooks/use-mobile"
 
 export function Navbar() {
     const { user, isAuthenticated, loading, signOut } = useAuth()
-    const isMobile = useIsMobile()
 
     // Navigation links
     const navLinks = (
@@ -58,21 +55,17 @@ export function Navbar() {
                 </Link>
 
                 {/* Desktop Navigation */}
-                {!isMobile && (
-                    <div className="flex-1 flex items-center justify-center gap-12">
-                        {navLinks}
-                    </div>
-                )}
+                <div className="hidden md:flex flex-1 items-center justify-center gap-12">
+                    {navLinks}
+                </div>
 
                 {/* Desktop Auth-Status */}
-                {!isMobile && (
-                    <div className="flex items-center gap-4">
-                        {authLinks}
-                    </div>
-                )}
+                <div className="hidden md:flex items-center gap-4">
+                    {authLinks}
+                </div>
 
                 {/* Mobile Hamburger */}
-                {isMobile && (
+                <div className="md:hidden">
                     <Sheet>
                         <SheetTrigger asChild>
                             <Button variant="ghost" size="icon" className="ml-2">
@@ -95,7 +88,7 @@ export function Navbar() {
                             </div>
                         </SheetContent>
                     </Sheet>
-                )}
+                </div>
             </div>
         </nav>
     )
