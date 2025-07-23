@@ -1,0 +1,1 @@
+alter table exercises drop column notes;

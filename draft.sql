@@ -1,2 +1,2 @@
 select *
-from blocks;
+from exercises;
