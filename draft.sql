@@ -1,2 +1,2 @@
-select *
-from exercises;
+alter table exercises
+add column notes text [];

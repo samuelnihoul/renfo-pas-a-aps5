@@ -45,3 +45,6 @@ drizzle/meta
 
 #vscode
 .vscode
+
+#sql commands
+draft.sql
