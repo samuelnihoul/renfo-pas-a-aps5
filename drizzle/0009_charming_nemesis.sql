@@ -45,7 +45,7 @@ ALTER TABLE "users" ALTER COLUMN "id" SET DATA TYPE varchar(255);--> statement-b
 ALTER TABLE "users" ALTER COLUMN "name" DROP NOT NULL;--> statement-breakpoint
 ALTER TABLE "users" ALTER COLUMN "password_hash" DROP NOT NULL;--> statement-breakpoint
 ALTER TABLE "users" ALTER COLUMN "isPremium" SET DEFAULT false;--> statement-breakpoint
-ALTER TABLE "blocks" ADD COLUMN "exercise_notes" text[] DEFAULT  NOT NULL;--> statement-breakpoint
+ALTER TABLE "blocks" ADD COLUMN "exercise_notes" text[] NOT NULL DEFAULT '{}'::text[];--> statement-breakpoint
 ALTER TABLE "exercises" ADD COLUMN "notes" text;--> statement-breakpoint
 ALTER TABLE "users" ADD COLUMN "emailVerified" timestamp;--> statement-breakpoint
 ALTER TABLE "users" ADD COLUMN "image" varchar(255);--> statement-breakpoint
