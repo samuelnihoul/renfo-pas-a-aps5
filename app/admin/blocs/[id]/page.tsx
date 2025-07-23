@@ -38,14 +38,17 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
     useEffect(() => {
         const fetchBlock = async () => {
             try {
-                const response = await fetch(`/api/blocs/${awaitedParams.id}`)
+                console.log("[Frontend] Fetching block with id:", awaitedParams.id);
+                const response = await fetch(`/api/blocs/${awaitedParams.id}`);
+                console.log("[Frontend] API response status:", response.status);
                 if (!response.ok) {
-                    throw new Error("Erreur lors de la récupération du bloc")
+                    throw new Error("Erreur lors de la récupération du bloc");
                 }
-                const block = await response.json()
+                const block = await response.json();
+                console.log("[Frontend] Block data received from API:", block);
                 setFormData(block)
             } catch (error) {
-                console.error("Error fetching block:", error)
+                console.error("[Frontend] Error fetching block:", error)
                 toast({
                     title: "Erreur",
                     description: "Erreur lors de la récupération du bloc",
@@ -58,6 +61,12 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
 
         fetchBlock()
     }, [awaitedParams.id])
+
+    useEffect(() => {
+        console.log("[Frontend] Current formData state:", formData);
+    }, [formData]);
+
+    console.log("[Frontend] Rendering form with formData:", formData);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
