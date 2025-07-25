@@ -46,7 +46,23 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                 }
                 const block = await response.json();
                 console.log("[Frontend] Block data received from API:", block);
-                setFormData(block)
+                // Normalize exerciseNotes to match exerciceId length
+                const exerciceId = block.exerciceId ?? [];
+                let exerciseNotes: string[] = [];
+                if (Array.isArray(block.exerciseNotes)) {
+                    if (block.exerciseNotes.length === exerciceId.length) {
+                        exerciseNotes = block.exerciseNotes;
+                    } else {
+                        exerciseNotes = exerciceId.map((_: any, idx: number) => block.exerciseNotes?.[idx] ?? "");
+                    }
+                } else {
+                    exerciseNotes = exerciceId.map((_: any) => "");
+                }
+                setFormData({
+                    ...block,
+                    exerciceId,
+                    exerciseNotes,
+                });
             } catch (error) {
                 console.error("[Frontend] Error fetching block:", error)
                 toast({
@@ -91,11 +107,15 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
     }
 
     const handleExerciseSelection = (selectedExerciseIds: number[]) => {
+        // Prevent resetting to empty if already set
+        if (selectedExerciseIds.length === 0 && (formData.exerciceId?.length ?? 0) > 0) {
+            return;
+        }
         setFormData(prev => ({
             ...prev,
             exerciceId: selectedExerciseIds,
             exerciseNotes: selectedExerciseIds.map((_, idx) => (prev.exerciseNotes ? prev.exerciseNotes[idx] : "") || "")
-        }))
+        }));
     }
 
     const validateForm = () => {
