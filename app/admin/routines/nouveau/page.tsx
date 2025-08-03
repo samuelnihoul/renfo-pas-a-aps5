@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/components/ui/use-toast"
@@ -19,11 +20,13 @@ export default function NewRoutine() {
   const [formData, setFormData] = useState<RoutineAdd>({
     blockId: [],
     name: "",
+    equipment: "",
+    sessionOutcome: "",
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -125,6 +128,30 @@ export default function NewRoutine() {
                 className={errors.name ? "border-destructive" : ""}
               />
               {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="equipment">Matériel nécessaire</Label>
+              <Textarea
+                id="equipment"
+                name="equipment"
+                value={formData.equipment || ""}
+                onChange={handleChange}
+                placeholder="Listez le matériel nécessaire pour cette routine..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sessionOutcome">Sortie de séance</Label>
+              <Textarea
+                id="sessionOutcome"
+                name="sessionOutcome"
+                value={formData.sessionOutcome || ""}
+                onChange={handleChange}
+                placeholder="Décrivez les objectifs et résultats attendus de cette séance..."
+                rows={3}
+              />
             </div>
 
             <ItemSelectorAndOrganizer items={"blocs"} onItemSelectAction={handleBlockSelection} />

@@ -68,6 +68,8 @@ export const routines = pgTable(
     blockId: integer("block_id").array()
       .notNull(),
     name: varchar("name", { length: 255 }).notNull(),
+    equipment: text("equipment"),
+    sessionOutcome: text("session_outcome"),
     ...timestamps
   },
 )

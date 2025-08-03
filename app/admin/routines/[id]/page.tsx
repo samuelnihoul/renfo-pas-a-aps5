@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Loader2, Trash2 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import React from "react"
@@ -26,6 +27,8 @@ type Routine = {
   id: number
   name: string
   blockId: number[]
+  equipment?: string | null
+  sessionOutcome?: string | null
 }
 
 export default function EditRoutinePage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
@@ -40,6 +43,8 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
     id: Number(id),
     name: "",
     blockId: [],
+    equipment: "",
+    sessionOutcome: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -75,7 +80,7 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
     fetchRoutine()
   }, [id])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (errors[name]) {
@@ -227,6 +232,30 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
                 className={errors.name ? "border-destructive" : ""}
               />
               {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="equipment">Matériel nécessaire</Label>
+              <Textarea
+                id="equipment"
+                name="equipment"
+                value={formData.equipment || ""}
+                onChange={handleInputChange}
+                placeholder="Listez le matériel nécessaire pour cette routine..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sessionOutcome">Sortie de séance</Label>
+              <Textarea
+                id="sessionOutcome"
+                name="sessionOutcome"
+                value={formData.sessionOutcome || ""}
+                onChange={handleInputChange}
+                placeholder="Décrivez les objectifs et résultats attendus de cette séance..."
+                rows={3}
+              />
             </div>
 
             <ItemSelectorAndOrganizer items={"blocs"} onItemSelectAction={handleBlockSelection} selectedItemIds={formData.blockId} />

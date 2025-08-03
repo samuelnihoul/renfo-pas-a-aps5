@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { blockId, orderIndex, name  } = body
+    const { blockId, orderIndex, name, equipment, sessionOutcome } = body
 
     // Validation
     if (!blockId || !name) {
@@ -20,6 +20,8 @@ export async function POST(request: Request) {
     const result = await db.insert(routines).values({
       blockId,
       name,
+      equipment: equipment || null,
+      sessionOutcome: sessionOutcome || null,
     }).returning()
 
     return NextResponse.json(result[0])

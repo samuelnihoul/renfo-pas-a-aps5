@@ -14,7 +14,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { name, blockId } = body
+    const { name, blockId, equipment, sessionOutcome } = body
 
     // Validation
     if (!name) {
@@ -37,6 +37,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const updateData: any = { name }
     if (blockId !== undefined) {
       updateData.blockId = blockId
+    }
+    if (equipment !== undefined) {
+      updateData.equipment = equipment
+    }
+    if (sessionOutcome !== undefined) {
+      updateData.sessionOutcome = sessionOutcome
     }
 
     const result = await db
