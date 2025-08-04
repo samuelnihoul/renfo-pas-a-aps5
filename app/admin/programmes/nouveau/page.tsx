@@ -19,7 +19,8 @@ export default function NewProgram() {
   const [formData, setFormData] = useState({
     name: "",
     requiredEquipment: "",
-    routineIds: []
+    routineIds: [] as number[],
+    instructions: ""
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -40,12 +41,12 @@ export default function NewProgram() {
   }
 
   const handleRoutineSelection = (selectedRoutineIds: number[]) => {
-	  console.log("selecedrotuineId",selectedRoutineIds)
+    console.log("selecedrotuineId", selectedRoutineIds)
     setFormData(prev => ({
       ...prev,
       routineIds: selectedRoutineIds,
     }))
-    console.log("formaData",formData)
+    console.log("formaData", formData)
   }
 
   const validateForm = () => {
@@ -100,64 +101,76 @@ export default function NewProgram() {
   }
 
   return (
-      <div>
-        <div className="flex items-center mb-6">
-          <Link href="/admin/programmes">
-            <Button variant="ghost" size="sm" className="gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Retour
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold ml-2">Nouveau Programme</h1>
-        </div>
-
-        <Card className="max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit}>
-            <CardHeader>
-              <CardTitle>Informations du programme</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className={errors.name ? "text-destructive" : ""}>
-                  Nom du programme*
-                </Label>
-                <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={errors.name ? "border-destructive" : ""}
-                />
-                {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="requiredEquipment">Matériel nécessaire</Label>
-                <Textarea
-                    id="requiredEquipment"
-                    name="requiredEquipment"
-                    value={formData.requiredEquipment}
-                    onChange={handleChange}
-                    rows={4}
-                />
-              </div>
-
-              <Selector items={"routines"} onItemSelectAction={handleRoutineSelection} />
-
-              <p className="text-sm text-muted-foreground">* Champs obligatoires</p>
-            </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-              <Link href="/admin/programmes">
-                <Button variant="outline" type="button">
-                  Annuler
-                </Button>
-              </Link>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Création..." : "Créer le programme"}
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
+    <div>
+      <div className="flex items-center mb-6">
+        <Link href="/admin/programmes">
+          <Button variant="ghost" size="sm" className="gap-1">
+            <ArrowLeft className="h-4 w-4" />
+            Retour
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold ml-2">Nouveau Programme</h1>
       </div>
+
+      <Card className="max-w-2xl mx-auto">
+        <form onSubmit={handleSubmit}>
+          <CardHeader>
+            <CardTitle>Informations du programme</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className={errors.name ? "text-destructive" : ""}>
+                Nom du programme*
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={errors.name ? "border-destructive" : ""}
+              />
+              {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="requiredEquipment">Matériel nécessaire</Label>
+              <Textarea
+                id="requiredEquipment"
+                name="requiredEquipment"
+                value={formData.requiredEquipment}
+                onChange={handleChange}
+                rows={4}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="instructions">Marche à suivre et appropriation</Label>
+              <Textarea
+                id="instructions"
+                name="instructions"
+                value={formData.instructions}
+                onChange={handleChange}
+                placeholder="Grandes lignes du programme, infos importantes, conseils..."
+                rows={4}
+              />
+            </div>
+
+            <Selector items={"routines"} onItemSelectAction={handleRoutineSelection} />
+
+            <p className="text-sm text-muted-foreground">* Champs obligatoires</p>
+          </CardContent>
+          <CardFooter className="flex justify-end gap-2">
+            <Link href="/admin/programmes">
+              <Button variant="outline" type="button">
+                Annuler
+              </Button>
+            </Link>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Création..." : "Créer le programme"}
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   )
 }

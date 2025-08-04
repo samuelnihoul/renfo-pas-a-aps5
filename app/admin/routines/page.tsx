@@ -27,6 +27,8 @@ type Routine = {
   name: string
   focus: string | null
   createdAt: string
+  equipment?: string | null
+  sessionOutcome?: string | null
   program?: {
     name: string
   }
@@ -120,7 +122,16 @@ export default function RoutinesPage() {
       accessorKey: "name",
       header: "Nom",
     },
-
+    {
+      accessorKey: "equipment",
+      header: "Matériel",
+      cell: ({ row }) => row.original.equipment || <span className="text-muted-foreground italic">-</span>,
+    },
+    {
+      accessorKey: "sessionOutcome",
+      header: "Sortie de séance",
+      cell: ({ row }) => row.original.sessionOutcome || <span className="text-muted-foreground italic">-</span>,
+    },
     {
       id: "actions",
       header: "Actions",
