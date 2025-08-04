@@ -78,9 +78,8 @@ export default function ProgrammesPage() {
             <h1 className="text-3xl font-bold mb-8">Programmes d'entraînement</h1>
 
             <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-1">
                     <TabsTrigger value="all">Tous les programmes</TabsTrigger>
-                    <TabsTrigger value="purchased">Mes programmes</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="all" className="mt-6">
@@ -89,10 +88,6 @@ export default function ProgrammesPage() {
                             <ProgramAccessWrapper key={program.id} program={program} userId={user!.userId} />
                         ))}
                     </div>
-                </TabsContent>
-
-                <TabsContent value="purchased" className="mt-6">
-                    <PurchasedPrograms />
                 </TabsContent>
             </Tabs>
         </div>

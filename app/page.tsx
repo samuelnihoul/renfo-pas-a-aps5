@@ -44,6 +44,8 @@ type Routine = {
   id: number
   name: string
   blockId: number[]
+  equipment?: string | null
+  sessionOutcome?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -51,7 +53,7 @@ type Routine = {
 type Program = {
   id: number
   name: string
-  material: string
+  instructions?: string
   routineId: number[]
   createdAt: string
   updatedAt: string
@@ -128,13 +130,33 @@ function RoutineItem({ routine, blocks, exercises }: { routine: Routine, blocks:
         <span className="font-medium">{routine.name}</span>
       </div>
 
-      {isExpanded && routineBlocks.map((block: any) => (
-        <BlockItem
-          key={block.id}
-          block={block}
-          exercises={exercises.filter(ex => block.exerciceId.includes(ex.id))}
-        />
-      ))}
+      {isExpanded && (
+        <div className="space-y-3">
+          {(routine as any).equipment && (
+            <div className="bg-blue-50 p-3 rounded-md">
+              <h4 className="font-medium text-blue-700 mb-1">Matériel nécessaire :</h4>
+              <p className="text-sm text-blue-600">{(routine as any).equipment}</p>
+            </div>
+          )}
+
+          {(routine as any).sessionOutcome && (
+            <div className="bg-green-50 p-3 rounded-md">
+              <h4 className="font-medium text-green-700 mb-1">Sortie de séance :</h4>
+              <p className="text-sm text-green-600">{(routine as any).sessionOutcome}</p>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            {routineBlocks.map((block: any) => (
+              <BlockItem
+                key={block.id}
+                block={block}
+                exercises={exercises.filter(ex => block.exerciceId.includes(ex.id))}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -260,8 +282,8 @@ export default function Home() {
                       {!videoView ? (
                         <>
                           <div className="mb-4">
-                            <h3 className="font-medium text-gray-700 mb-2">Matériel nécessaire :</h3>
-                            <p className="text-gray-600">{program.material || "Aucun matériel spécifié"}</p>
+                            <h3 className="font-medium text-gray-700 mb-2">Marche à suivre et appropriation :</h3>
+                            <p className="text-gray-600">{(program as any).instructions || "Aucune information spécifiée"}</p>
                           </div>
 
                           <div>

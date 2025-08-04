@@ -16,9 +16,8 @@ import Selector from "@/components/admin/selector"
 type Program = {
   id: number
   name: string
-  material: string
-  routineId: number[]
   instructions?: string
+  routineId: number[]
 }
 
 export default function EditProgramPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
@@ -144,16 +143,6 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
           <div className="space-y-2">
             <Label htmlFor="name">Nom du programme</Label>
             <Input id="name" name="name" value={program.name} onChange={handleProgramChange} required />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="material">Matériel nécessaire</Label>
-            <Input
-              id="material"
-              name="material"
-              value={program.material}
-              onChange={handleProgramChange}
-            />
           </div>
 
           <div className="space-y-2">

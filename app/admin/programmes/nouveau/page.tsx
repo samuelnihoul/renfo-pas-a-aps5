@@ -18,9 +18,8 @@ export default function NewProgram() {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
-    requiredEquipment: "",
-    routineIds: [] as number[],
-    instructions: ""
+    instructions: "",
+    routineIds: [] as number[]
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -130,17 +129,6 @@ export default function NewProgram() {
                 className={errors.name ? "border-destructive" : ""}
               />
               {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="requiredEquipment">Matériel nécessaire</Label>
-              <Textarea
-                id="requiredEquipment"
-                name="requiredEquipment"
-                value={formData.requiredEquipment}
-                onChange={handleChange}
-                rows={4}
-              />
             </div>
 
             <div className="space-y-2">
