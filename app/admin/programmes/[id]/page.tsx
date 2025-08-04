@@ -16,8 +16,9 @@ import Selector from "@/components/admin/selector"
 type Program = {
   id: number
   name: string
-  requiredEquipment: string
+  material: string
   routineId: number[]
+  instructions?: string
 }
 
 export default function EditProgramPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
@@ -112,10 +113,10 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <span className="ml-2">Chargement du programme...</span>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <span className="ml-2">Chargement du programme...</span>
+      </div>
     )
   }
 
@@ -124,46 +125,57 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
   }
 
   return (
-      <div>
-        <div className="flex items-center mb-6">
-          <Link href="/admin/programmes">
-            <Button variant="ghost" size="sm" className="gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Retour
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold ml-2">Modifier le programme</h1>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations du programme</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nom du programme</Label>
-              <Input id="name" name="name" value={program.name}  onChange={handleProgramChange} required />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="requiredEquipment">Matériel nécessaire</Label>
-              <Input
-                  id="requiredEquipment"
-                  name="requiredEquipment"
-		  
-                  value={program.material }
-                  onChange={handleProgramChange}
-              />
-            </div>
-
-            <Selector items={"routines"} onItemSelectAction={handleRoutineSelection}  selectedItemIds={program.routineId}/>
-          </CardContent>
-          <CardFooter className="flex justify-end">
-            <Button onClick={handleSaveProgram} disabled={saving}>
-              {saving ? "Enregistrement..." : "Enregistrer les modifications"}
-            </Button>
-          </CardFooter>
-        </Card>
+    <div>
+      <div className="flex items-center mb-6">
+        <Link href="/admin/programmes">
+          <Button variant="ghost" size="sm" className="gap-1">
+            <ArrowLeft className="h-4 w-4" />
+            Retour
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold ml-2">Modifier le programme</h1>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Informations du programme</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nom du programme</Label>
+            <Input id="name" name="name" value={program.name} onChange={handleProgramChange} required />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="material">Matériel nécessaire</Label>
+            <Input
+              id="material"
+              name="material"
+              value={program.material}
+              onChange={handleProgramChange}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="instructions">Marche à suivre et appropriation</Label>
+            <Textarea
+              id="instructions"
+              name="instructions"
+              value={program.instructions || ""}
+              onChange={handleProgramChange}
+              placeholder="Grandes lignes du programme, infos importantes, conseils..."
+              rows={4}
+            />
+          </div>
+
+          <Selector items={"routines"} onItemSelectAction={handleRoutineSelection} selectedItemIds={program.routineId} />
+        </CardContent>
+        <CardFooter className="flex justify-end">
+          <Button onClick={handleSaveProgram} disabled={saving}>
+            {saving ? "Enregistrement..." : "Enregistrer les modifications"}
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
   )
 }

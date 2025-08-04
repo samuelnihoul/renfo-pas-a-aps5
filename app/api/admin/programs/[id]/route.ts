@@ -4,8 +4,8 @@ import { programs } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
-	const awaitedParams=await params
-	console.log(awaitedParams)
+  const awaitedParams = await params
+  console.log(awaitedParams)
   try {
     const id = Number.parseInt(awaitedParams.id)
     if (isNaN(id)) {
@@ -14,7 +14,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     const body = await request.json()
     console.log(body)
-    const { name, description, orderIndex,routineId } = body
+    const { name, instructions, routineId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
@@ -24,7 +24,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .update(programs)
       .set({
         name,
-        description,
+        instructions,
         routineId
       })
       .where(eq(programs.id, id))
@@ -42,7 +42,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-	const awaitedParams=await params
+  const awaitedParams = await params
   try {
     const id = Number.parseInt(awaitedParams.id)
 

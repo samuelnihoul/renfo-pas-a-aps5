@@ -23,7 +23,8 @@ import {
 type Program = {
   id: number
   name: string
-  matearial: string
+  material: string
+  instructions?: string
 }
 
 export default function ProgramsPage() {
@@ -116,6 +117,11 @@ export default function ProgramsPage() {
     {
       accessorKey: "material",
       header: "Matériel nécessaire",
+    },
+    {
+      accessorKey: "instructions",
+      header: "Marche à suivre et appropriation",
+      cell: ({ row }) => row.original.instructions || <span className="text-muted-foreground italic">-</span>,
     },
     {
       id: "actions",
