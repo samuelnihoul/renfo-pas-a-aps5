@@ -1,0 +1,1 @@
+ALTER TABLE "blocks" ALTER COLUMN "exercise_notes" DROP DEFAULT;

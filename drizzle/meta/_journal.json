@@ -83,6 +83,13 @@
       "when": 1754221792976,
       "tag": "0011_faithful_menace",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1754291814690,
+      "tag": "0012_round_moonstone",
+      "breakpoints": true
     }
   ]
 }
