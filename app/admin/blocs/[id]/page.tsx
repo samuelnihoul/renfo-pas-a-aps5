@@ -219,7 +219,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
                             </Select>
                         </div>
 
-                        <ItemSelectorAndOrganizer items={"exercises"} onItemSelectAction={handleExerciseSelection} />
+                        <ItemSelectorAndOrganizer items={"exercises"} onItemSelectAction={handleExerciseSelection} selectedItemIds={formData.exerciceId} />
                         {(formData.exerciseNotes ?? []).map((note, idx) => (
                             <div key={(formData.exerciceId ?? [])[idx]} className="space-y-2">
                                 <Label htmlFor={`exerciseNote-${(formData.exerciceId ?? [])[idx]}`}>Note pour l'exercice {(formData.exerciceId ?? [])[idx]}</Label>
