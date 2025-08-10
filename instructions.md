@@ -1,0 +1,1 @@
+next-auth doesn't exist anymore.
