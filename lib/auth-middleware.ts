@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { verify } from "jsonwebtoken"
+import { jwtVerify } from "jose"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
+const secretKey = new TextEncoder().encode(JWT_SECRET)
 
 // Enable debug logging in development
 const isDev = process.env.NODE_ENV === 'development'
-const debug = (...args: any[]) => isDev && console.log('[Auth Debug]', ...args)
+const getTimestamp = () => new Date().toISOString()
+const debug = (...args: any[]) => isDev && console.log(`[${getTimestamp()}] [Auth Debug]`, ...args)
 
 export interface AuthenticatedUser {
     userId: string
@@ -26,9 +28,11 @@ export async function getAuthenticatedUser(request: NextRequest): Promise<Authen
         }
 
         debug('Verifying token...')
-        const decoded = verify(token, JWT_SECRET) as AuthenticatedUser
-        debug('Token verified successfully', { userId: decoded.userId, email: decoded.email })
-        return decoded
+        const { payload } = await jwtVerify(token, secretKey, {
+            algorithms: ['HS256']
+        }) as { payload: AuthenticatedUser }
+        debug('Token verified successfully', { userId: payload.userId, email: payload.email })
+        return payload
     } catch (error) {
         debug('Token verification failed', error instanceof Error ? error.message : 'Unknown error')
         return null
