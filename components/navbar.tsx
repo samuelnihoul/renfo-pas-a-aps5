@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 
 export function Navbar() {
@@ -75,6 +75,7 @@ export function Navbar() {
                         </SheetTrigger>
                         <SheetContent side="left" className="p-0 w-64">
                             <div className="flex flex-col h-full p-6 gap-6">
+                                <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
                                 <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
                                     <img src="/favicon.ico" alt="Logo" className="h-8 w-8" />
                                     Renfo Pas à Pas
