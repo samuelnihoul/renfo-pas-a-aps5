@@ -55,13 +55,30 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
         const response = await fetch(`/api/routines/${id}`)
         if (response.ok) {
           const data = await response.json()
-          console.log('fetched data', data)
-          setFormData(data[0]) // Fix: Use data[0] since API returns array
-          console.log('form data after the fetch', formData)
+          console.log('Fetched routine data:', data)
+          
+          // Handle both array and single object responses
+          const routineData = Array.isArray(data) ? data[0] : data
+          
+          setFormData(prev => ({
+            ...prev,
+            ...routineData,
+            blockId: Array.isArray(routineData.blockId) ? routineData.blockId : [],
+            equipment: routineData.equipment || "",
+            sessionOutcome: routineData.sessionOutcome || ""
+          }))
+          
+          console.log('Form data after fetch:', {
+            ...routineData,
+            blockId: Array.isArray(routineData.blockId) ? routineData.blockId : [],
+            equipment: routineData.equipment || "",
+            sessionOutcome: routineData.sessionOutcome || ""
+          })
         } else {
+          const errorData = await response.json().catch(() => ({}))
           toast({
             title: "Erreur",
-            description: "Impossible de charger les données de la routine",
+            description: errorData.error || "Impossible de charger les données de la routine",
             variant: "destructive",
           })
         }
@@ -69,7 +86,7 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
         console.error("Error fetching routine:", error)
         toast({
           title: "Erreur",
-          description: "Impossible de charger les données de la routine",
+          description: "Une erreur est survenue lors du chargement des données",
           variant: "destructive",
         })
       } finally {
@@ -92,11 +109,18 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
     }
   }
 
-  const handleBlockSelection = (selectedBlockIds: number[], orderIndices?: number[]) => {
+  const handleBlockSelection = (selectedBlockIds: number[]) => {
+    console.log('Selected block IDs:', selectedBlockIds)
     setFormData(prev => ({
       ...prev,
-      blockId: selectedBlockIds,
+      blockId: Array.isArray(selectedBlockIds) ? selectedBlockIds : [],
     }))
+    // Clear any previous block-related errors
+    setErrors(prev => {
+      const newErrors = { ...prev }
+      delete newErrors.blockId
+      return newErrors
+    })
   }
 
   const validateForm = () => {
@@ -110,9 +134,12 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('Form submission - current formData:', formData) // Debug log
+    
     if (!validateForm()) {
       return
     }
+    
     setSaving(true)
 
     try {
@@ -258,7 +285,17 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
               />
             </div>
 
-            <ItemSelectorAndOrganizer items={"blocs"} onItemSelectAction={handleBlockSelection} selectedItemIds={formData.blockId} />
+            <div className="space-y-2">
+              <Label>Blocs de la routine</Label>
+              <ItemSelectorAndOrganizer 
+                items="blocs" 
+                onItemSelectAction={handleBlockSelection} 
+                selectedItemIds={formData.blockId || []} 
+              />
+              {errors.blockId && (
+                <p className="text-sm text-destructive">{errors.blockId}</p>
+              )}
+            </div>
 
             <CardFooter className="px-0 pt-4">
               <Button type="submit" disabled={saving} className="ml-auto">
