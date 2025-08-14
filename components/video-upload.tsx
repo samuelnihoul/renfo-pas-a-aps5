@@ -153,9 +153,6 @@ export default function VideoUpload({
                     </>
                 )}
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-                Formats acceptés: MP4, WebM. Taille maximale: 50MB
-            </p>
         </div>
     );
 }

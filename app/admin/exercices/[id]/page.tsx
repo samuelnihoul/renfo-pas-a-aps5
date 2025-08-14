@@ -249,7 +249,6 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
                   onVideoChange={setVideoFile}
                   onVideoUrlChange={handleVideoUrlChange}
                 />
-                <p className="text-xs text-muted-foreground mt-2">Formats acceptés: MP4, WebM. Taille maximale: 50MB</p>
               </div>
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
