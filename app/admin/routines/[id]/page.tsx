@@ -60,17 +60,22 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
           // Handle both array and single object responses
           const routineData = Array.isArray(data) ? data[0] : data
           
-          setFormData(prev => ({
-            ...prev,
-            ...routineData,
-            blockId: Array.isArray(routineData.blockId) ? routineData.blockId : [],
+          // Normalize blockId to ensure it's an array
+          const blockId = Array.isArray(routineData.blockId) ? 
+            routineData.blockId : 
+            (routineData.blockId ? [routineData.blockId] : []);
+          
+          setFormData({
+            id: Number(id),
+            name: routineData.name || "",
+            blockId,
             equipment: routineData.equipment || "",
             sessionOutcome: routineData.sessionOutcome || ""
-          }))
+          })
           
           console.log('Form data after fetch:', {
             ...routineData,
-            blockId: Array.isArray(routineData.blockId) ? routineData.blockId : [],
+            blockId,
             equipment: routineData.equipment || "",
             sessionOutcome: routineData.sessionOutcome || ""
           })
@@ -111,6 +116,10 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
 
   const handleBlockSelection = (selectedBlockIds: number[]) => {
     console.log('Selected block IDs:', selectedBlockIds)
+    // Prevent resetting to empty if already set
+    if (selectedBlockIds.length === 0 && (formData.blockId?.length ?? 0) > 0) {
+      return;
+    }
     setFormData(prev => ({
       ...prev,
       blockId: Array.isArray(selectedBlockIds) ? selectedBlockIds : [],
