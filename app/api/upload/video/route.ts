@@ -32,10 +32,10 @@ export async function POST(request: Request): Promise<Response> {
             body,
             request,
             onBeforeGenerateToken: async (pathname, clientPayload) => {
-                // Only allow mp4 and webm, max 100MB
+                // Only allow mp4 and webm, max 10GB
                 return {
                     allowedContentTypes: ['video/mp4', 'video/webm'],
-                    maximumSizeInBytes: 100 * 1024 * 1024, // 100MB
+                    maximumSizeInBytes: 10000 * 1024 * 1024, // 100MB
                     addRandomSuffix: true,
                 };
             },
