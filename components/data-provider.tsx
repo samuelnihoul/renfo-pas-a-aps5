@@ -5,7 +5,6 @@ import { createContext, useContext, type ReactNode, useState, useEffect } from "
 type Program = {
   id: number
   name: string
-  material: string
   routineId: number[]
   createdAt: string
   updatedAt: string

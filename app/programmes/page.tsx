@@ -12,7 +12,6 @@ import Link from "next/link"
 interface Program {
     id: number
     name: string
-    material: string
 }
 
 export default function ProgrammesPage() {

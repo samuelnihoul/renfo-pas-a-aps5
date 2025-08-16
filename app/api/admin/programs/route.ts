@@ -27,7 +27,6 @@ export async function POST(request: Request) {
         .insert(programs)
         .values({
           name,
-          material: requiredEquipment,
           routineId: routineIds,
           instructions
         })

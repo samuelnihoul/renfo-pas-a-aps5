@@ -10,7 +10,6 @@ interface ProgramCardProps {
     program: {
         id: number
         name: string
-        material: string
     }
     userId: string
     hasAccess: boolean
@@ -97,7 +96,6 @@ export function ProgramCard({ program, userId, hasAccess, accessReason }: Progra
                     <CardTitle>{program.name}</CardTitle>
                     {getAccessBadge()}
                 </div>
-                <CardDescription>Matériel requis : {program.material}</CardDescription>
             </CardHeader>
             <CardContent>
                 {program.id === 1 && (

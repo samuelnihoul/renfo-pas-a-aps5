@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
                 program: {
                     id: programs.id,
                     name: programs.name,
-                    material: programs.material,
                 },
             })
             .from(userPrograms)

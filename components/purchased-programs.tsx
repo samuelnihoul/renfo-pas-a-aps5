@@ -14,7 +14,6 @@ interface PurchasedProgram {
     program: {
         id: number
         name: string
-        material: string
     }
 }
 
@@ -72,9 +71,6 @@ export function PurchasedPrograms() {
                             <CardTitle>{purchased.program.name}</CardTitle>
                             <Badge variant="default">Acheté</Badge>
                         </div>
-                        <CardDescription>
-                            Matériel requis : {purchased.program.material}
-                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-center justify-between">
