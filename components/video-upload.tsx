@@ -49,6 +49,12 @@ export default function VideoUpload({
                     onUploadProgress: ({ percentage }) => {
                         setUploadProgress(Math.round(percentage));
                     },
+                    multipart:true,
+ headers: {
+            'Access-Control-Allow-Origin': '*', // Allow all origins
+            'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS, PUT', // Allow specific methods
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization', // Allow specific headers
+          },
                 });
                 setUploadStatus("success");
                 setUploadProgress(100);
