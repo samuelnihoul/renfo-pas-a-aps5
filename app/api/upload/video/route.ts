@@ -1,30 +1,10 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
 
-// CORS headers configuration
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
 
-// Handle OPTIONS method for CORS preflight
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 204, // No Content
-    headers: corsHeaders,
-  });
-}
 
 export async function POST(request: Request): Promise<Response> {
-    // Handle preflight for older browsers
-    if (request.method === 'OPTIONS') {
-        return new Response(null, {
-            status: 204,
-            headers: corsHeaders,
-        });
-    }
-
+    
     try {
         const body = (await request.json()) as HandleUploadBody;
         
@@ -35,8 +15,8 @@ export async function POST(request: Request): Promise<Response> {
                 // Only allow mp4 and webm, max 10GB
                 return {
                     allowedContentTypes: ['video/mp4', 'video/webm'],
-                    maximumSizeInBytes: 10000 * 1024 * 1024, // 100MB
                     addRandomSuffix: true,
+		    multipart:true
                 };
             },
             onUploadCompleted: async ({ blob, tokenPayload }) => {
@@ -49,7 +29,6 @@ export async function POST(request: Request): Promise<Response> {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
-                ...corsHeaders
             },
         });
     } catch (error) {
@@ -63,7 +42,6 @@ export async function POST(request: Request): Promise<Response> {
                 status: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    ...corsHeaders
                 },
             }
         );
