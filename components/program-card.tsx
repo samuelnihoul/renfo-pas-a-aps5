@@ -63,19 +63,23 @@ export function ProgramCard({ program, userId, hasAccess, accessReason }: Progra
     const getActionButton = () => {
         if (hasAccess) {
             return (
-                <Button asChild>
-                    <a href={`/programmes/${program.id}`}>Commencer</a>
+                <Button asChild className="w-full">
+                    <a href={`/programmes/${program.id}`} className="w-full text-center">Commencer</a>
                 </Button>
             )
         }
 
         if (program.id === 1) {
             return (
-                <div className="space-y-2">
-                    <Button asChild variant="outline">
-                        <a href={`/programmes/${program.id}`}>Essayer gratuitement (2 semaines)</a>
+                <div className="space-y-2 w-full">
+                    <Button asChild variant="outline" className="w-full">
+                        <a href={`/programmes/${program.id}`} className="w-full text-center">Essayer gratuitement (2 semaines)</a>
                     </Button>
-                    <Button onClick={handlePurchase} disabled={isPurchasing}>
+                    <Button 
+                        onClick={handlePurchase} 
+                        disabled={isPurchasing} 
+                        className="w-full"
+                    >
                         {isPurchasing ? "Achat en cours..." : "Acheter le programme complet"}
                     </Button>
                 </div>
@@ -83,27 +87,35 @@ export function ProgramCard({ program, userId, hasAccess, accessReason }: Progra
         }
 
         return (
-            <Button onClick={handlePurchase} disabled={isPurchasing}>
+            <Button 
+                onClick={handlePurchase} 
+                disabled={isPurchasing}
+                className="w-full"
+            >
                 {isPurchasing ? "Achat en cours..." : "Acheter"}
             </Button>
         )
     }
 
     return (
-        <Card className="w-full max-w-sm">
-            <CardHeader>
-                <div className="flex items-center justify-between">
-                    <CardTitle>{program.name}</CardTitle>
-                    {getAccessBadge()}
+        <Card className="w-full max-w-sm mx-auto">
+            <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
+                <div className="flex items-center justify-between gap-2">
+                    <CardTitle className="text-base sm:text-lg line-clamp-2">{program.name}</CardTitle>
+                    <div className="flex-shrink-0">
+                        {getAccessBadge()}
+                    </div>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 py-3 sm:px-6 sm:py-4">
                 {program.id === 1 && (
-                    <p className="text-sm text-muted-foreground mb-4">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-3">
                         Les deux premières semaines sont gratuites pour tous les utilisateurs !
                     </p>
                 )}
-                {getActionButton()}
+                <div className="w-full">
+                    {getActionButton()}
+                </div>
             </CardContent>
         </Card>
     )
