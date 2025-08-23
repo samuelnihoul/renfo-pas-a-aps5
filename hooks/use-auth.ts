@@ -1,52 +1,54 @@
 import { useState, useEffect } from "react"
+import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession } from "next-auth/react"
 
 interface User {
-    userId: string
+    id: string
     email: string
     name: string
+    image?: string
     isAdmin: boolean
     isPremium: boolean
 }
 
 export function useAuth() {
+    const { data: session, status } = useSession()
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const response = await fetch("/api/auth/me")
-                if (response.ok) {
-                    const userData = await response.json()
-                    setUser(userData.user)
-                }
-            } catch (error) {
-                console.error("Auth check failed:", error)
-            } finally {
-                setLoading(false)
-            }
+        if (status === "loading") return
+        
+        if (session?.user) {
+            setUser({
+                id: session.user.id,
+                email: session.user.email || '',
+                name: session.user.name || '',
+                image: session.user.image,
+                isAdmin: (session.user as any).isAdmin || false,
+                isPremium: (session.user as any).isPremium || false
+            })
+        } else {
+            setUser(null)
         }
-
-        checkAuth()
-    }, [])
+        setLoading(status === "loading")
+    }, [session, status])
 
     const signIn = async (email: string, password: string) => {
         try {
-            const response = await fetch("/api/auth/signin", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
+            const result = await nextAuthSignIn('credentials', {
+                redirect: false,
+                email,
+                password,
             })
 
-            if (!response.ok) {
-                const error = await response.json()
-                throw new Error(error.error || "Erreur de connexion")
+            if (result?.error) {
+                throw new Error(result.error)
             }
 
-            const data = await response.json()
-            setUser(data.user)
+            // The session will be updated automatically by NextAuth
             return { success: true }
         } catch (error) {
+            console.error("Sign in error:", error)
             return { success: false, error: error instanceof Error ? error.message : "Erreur de connexion" }
         }
     }
@@ -61,23 +63,23 @@ export function useAuth() {
 
             if (!response.ok) {
                 const error = await response.json()
-                throw new Error(error.error || "Erreur d'inscription")
+                throw new Error(error.error || "Erreur lors de l'inscription")
             }
 
-            const data = await response.json()
-            setUser(data.user)
-            return { success: true }
+            // Automatically sign in after successful registration
+            return await signIn(email, password)
         } catch (error) {
-            return { success: false, error: error instanceof Error ? error.message : "Erreur d'inscription" }
+            return { success: false, error: error instanceof Error ? error.message : "Erreur lors de l'inscription" }
         }
     }
 
     const signOut = async () => {
         try {
-            await fetch("/api/auth/signout", { method: "POST" })
+            await nextAuthSignOut({ redirect: false })
             setUser(null)
+            return { success: true }
         } catch (error) {
-            console.error("Sign out failed:", error)
+            return { success: false, error: error instanceof Error ? error.message : "Erreur lors de la déconnexion" }
         }
     }
 

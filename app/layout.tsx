@@ -6,6 +6,7 @@ import { DataProvider } from "@/components/data-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { AuthProvider } from "@/components/auth-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,12 +24,14 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
-        <Navbar />
-        <main className="flex-1">
-          <DataProvider>{children}</DataProvider>
-        </main>
-        <Footer />
-        <Toaster />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1">
+            <DataProvider>{children}</DataProvider>
+          </main>
+          <Footer />
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   )

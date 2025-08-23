@@ -14,7 +14,7 @@ export default function SignInPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [isLoading, setIsLoading] = useState(false)
-    const { signIn } = useAuth()
+    const { signIn ,user} = useAuth()
     const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -38,6 +38,7 @@ export default function SignInPage() {
         }
 
         setIsLoading(false)
+	console.log("signin page > handleSubmit"+"The user is" + user)
     }
 
     return (

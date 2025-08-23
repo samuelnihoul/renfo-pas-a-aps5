@@ -25,10 +25,10 @@ export function Navbar() {
     // Auth links
     const authLinks = loading ? (
         <Skeleton className="h-8 w-24 rounded" />
-    ) : isAuthenticated && user ? (
+    ) : isAuthenticated  ? (
         <div className="flex flex-col md:flex-row items-start md:items-center gap-2 w-full">
-            <span className="text-sm font-medium max-w-[120px] truncate" title={user.name || user.email}>
-                {user.name || user.email}
+            <span className="text-sm font-medium max-w-[120px] truncate" title={user?.name || user?.email}>
+                {user?.name || user?.email}
             </span>
             <Button size="sm" variant="outline" onClick={signOut} className="w-full md:w-auto">
                 Se déconnecter
@@ -37,7 +37,7 @@ export function Navbar() {
     ) : (
         <div className="flex flex-col md:flex-row gap-2 w-full">
             <Button asChild size="sm" className="w-full md:w-auto">
-                <Link href="/auth/signin">Se connecter</Link>
+                <Link href="/auth/signin">Se connecterr{isAuthenticated+user}</Link>
             </Button>
             <Button asChild size="sm" variant="outline" className="w-full md:w-auto">
                 <Link href="/auth/signup">S'inscrire</Link>

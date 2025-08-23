@@ -1,73 +1,65 @@
-import { NextAuth } from "@auth/nextjs"
-import CredentialsProvider from "@auth/core/providers/credentials"
+import NextAuth from "next-auth"
+import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { db } from "@/db"
 import { users } from "@/db/schema"
-import { eq } from "drizzle-orm"
+import { eq } from "drizzle-orm/expressions"
+import { authConfig } from "@/auth.config"
 
 const handler = NextAuth({
-    providers: [
-        CredentialsProvider({
-            name: "credentials",
-            credentials: {
-                email: { label: "Email", type: "email" },
-                password: { label: "Mot de passe", type: "password" }
-            },
-            async authorize(credentials: any) {
-                if (!credentials?.email || !credentials?.password) {
-                    return null
-                }
-
-                const user = await db.select().from(users).where(eq(users.email, credentials.email as string)).limit(1)
-
-                if (!user[0] || !user[0].passwordHash) {
-                    return null
-                }
-
-                const isPasswordValid = await bcrypt.compare(credentials.password as string, user[0].passwordHash)
-
-                if (!isPasswordValid) {
-                    return null
-                }
-
-                return {
-                    id: user[0].id,
-                    email: user[0].email,
-                    name: user[0].name,
-                    image: user[0].image,
-                }
-            }
-        })
-    ],
-    session: {
-        strategy: "jwt"
-    },
-    pages: {
-        signIn: "/auth/signin",
-        signUp: "/auth/signup",
-    },
-    callbacks: {
-        async jwt({ token, user }: any) {
-            if (user) {
-                token.id = user.id
-                token.email = user.email
-                token.name = user.name
-                token.image = user.image
-                token.isAdmin=user.isAdmin
-            }
-            return token
-        },
-        async session({ session, token }: any) {
-            if (token) {
-                session.user.id = token.id as string
-                session.user.email = token.email as string
-                session.user.name = token.name as string
-                session.user.image = token.image as string
-                session.user.isAdmin=token.isAdmin 
-            }
-            return session
+  ...authConfig,
+  providers: [
+    Credentials({
+      name: 'credentials',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Mot de passe", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
         }
+
+        const user = await db.query.users.findFirst({
+          where: eq(users.email, credentials.email as string)
+        });
+
+        if (!user || !user.passwordHash) {
+          return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password as string,
+          user.passwordHash
+        );
+
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+          isAdmin: user.isAdmin || false,
+          isPremium: user.isPremium || false
+        };
+      },
+    }),
+  ],
+  cookies: {
+    sessionToken: {
+      name: 'auth-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 // 30 days
+      }
     }
+  },
 })
 
 export { handler as GET, handler as POST } 
