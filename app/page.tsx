@@ -17,7 +17,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Types pour les composants
+// ======================
+// TYPE DEFINITIONS
+// ======================
+// Define the shape of our data models to ensure type safety throughout the application
 type Exercise = {
   id: number
   name: string
@@ -59,43 +62,52 @@ type Program = {
   updatedAt: string
 }
 
-// Composant pour afficher un exercice
+// ======================
+// EXERCISE COMPONENT
+// ======================
+// Displays individual exercise details including name, instructions, and objectives
 function ExerciseItem({ exercise }: { exercise: Exercise }) {
   return (
-    <div className="ml-8 p-2 border-l-2 border-gray-200 pl-4">
-      <div className="flex items-center gap-2">
-        <Dumbbell className="w-4 h-4 text-gray-500" />
-        <span className="font-medium">{exercise.name}</span>
+    <div className="ml-2 sm:ml-4 p-1 sm:p-2 border-l-2 border-gray-200 pl-2 sm:pl-4">
+      <div className="flex items-center gap-1 sm:gap-2">
+        <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
+        <span className="font-medium text-sm sm:text-base">{exercise.name}</span>
       </div>
       {exercise.instructions && (
-        <p className="text-sm text-gray-600 mt-1">{exercise.instructions}</p>
+        <p className="text-xs sm:text-sm text-gray-600 mt-1">{exercise.instructions}</p>
       )}
       {exercise.objectifs && (
-        <p className="text-sm text-gray-600 mt-1">{exercise.objectifs}</p>
+        <p className="text-xs sm:text-sm text-gray-600 mt-1">{exercise.objectifs}</p>
       )}
     </div>
   )
 }
 
-// Composant pour afficher un bloc d'exercices
+// ======================
+// BLOCK COMPONENT
+// ======================
+// Displays a collapsible block containing multiple exercises
+// Handles expansion/collapse state and renders child exercises
 function BlockItem({ block, exercises }: { block: Block, exercises: Exercise[] }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const blockExercises = exercises.filter(ex => block.exerciceId.includes(ex.id))
 
   return (
-    <div className="ml-6 border-l-2 border-gray-200 pl-4">
+    <div className="ml-2 sm:ml-4 border-l-2 border-gray-200 pl-2 sm:pl-4">
       <div
-        className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+        className="flex items-center gap-1 sm:gap-2 cursor-pointer hover:bg-gray-50 p-1 sm:p-2 rounded"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         {isExpanded ?
-          <ChevronDown className="w-4 h-4" /> :
-          <ChevronRight className="w-4 h-4" />
+          <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" /> :
+          <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
         }
-        <ListChecks className="w-4 h-4 text-blue-500" />
-        <span className="font-medium">{block.name}</span>
-        <span className="text-sm text-gray-500 ml-2">{block.instructions}</span>
+        <ListChecks className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0" />
+        <span className="font-medium text-sm sm:text-base">{block.name}</span>
+        {block.instructions && (
+          <span className="text-xs sm:text-sm text-gray-500 ml-1 sm:ml-2 truncate">{block.instructions}</span>
+        )}
       </div>
 
       {isExpanded && blockExercises.map((ex: any, idx: number) => (
@@ -110,43 +122,47 @@ function BlockItem({ block, exercises }: { block: Block, exercises: Exercise[] }
   )
 }
 
-// Composant pour afficher une routine
+// ======================
+// ROUTINE COMPONENT
+// ======================
+// Displays a collapsible routine section containing multiple blocks
+// Shows equipment requirements and session outcomes if available
 function RoutineItem({ routine, blocks, exercises }: { routine: Routine, blocks: Block[], exercises: Exercise[] }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const routineBlocks = blocks.filter(block => routine.blockId.includes(block.id))
 
   return (
-    <div className="ml-4 border-l-2 border-blue-200 pl-4">
+    <div className="ml-2 sm:ml-4 border-l-2 border-blue-200 pl-2 sm:pl-4">
       <div
-        className="flex items-center gap-2 cursor-pointer hover:bg-blue-50 p-2 rounded"
+        className="flex items-center gap-1 sm:gap-2 cursor-pointer hover:bg-blue-50 p-1 sm:p-2 rounded"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         {isExpanded ?
-          <ChevronDown className="w-4 h-4" /> :
-          <ChevronRight className="w-4 h-4" />
+          <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" /> :
+          <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
         }
-        <Calendar className="w-4 h-4 text-blue-500" />
-        <span className="font-medium">{routine.name}</span>
+        <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0" />
+        <span className="font-medium text-sm sm:text-base">{routine.name}</span>
       </div>
 
       {isExpanded && (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3 mt-1 sm:mt-2">
           {(routine as any).equipment && (
-            <div className="bg-blue-50 p-3 rounded-md">
+            <div className="bg-blue-50 p-2 sm:p-3 rounded-md text-xs sm:text-sm">
               <h4 className="font-medium text-blue-700 mb-1">Matériel nécessaire :</h4>
-              <p className="text-sm text-blue-600">{(routine as any).equipment}</p>
+              <p className="text-blue-600">{(routine as any).equipment}</p>
             </div>
           )}
 
           {(routine as any).sessionOutcome && (
-            <div className="bg-green-50 p-3 rounded-md">
+            <div className="bg-green-50 p-2 sm:p-3 rounded-md text-xs sm:text-sm">
               <h4 className="font-medium text-green-700 mb-1">Sortie de séance :</h4>
-              <p className="text-sm text-green-600">{(routine as any).sessionOutcome}</p>
+              <p className="text-green-600">{(routine as any).sessionOutcome}</p>
             </div>
           )}
 
-          <div className="space-y-2">
+          <div className="space-y-1 sm:space-y-2">
             {routineBlocks.map((block: any) => (
               <BlockItem
                 key={block.id}
@@ -161,7 +177,25 @@ function RoutineItem({ routine, blocks, exercises }: { routine: Routine, blocks:
   )
 }
 
+// ======================
+// MAIN PAGE COMPONENT
+// ======================
+// The home page that displays programs, routines, blocks, and exercises in a hierarchical view
 export default function Home() {
+  // State management for expanded programs and their routines
+  const [expandedPrograms, setExpandedPrograms] = useState<Record<number, boolean>>({})
+  const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({})
+  
+  // UI state for video view and loading indicators
+  const [videoView, setVideoView] = useState(false)
+  const [loadingStates, setLoadingStates] = useState({
+    programs: true,
+    routines: true,
+    blocks: true,
+    exercises: true
+  })
+
+  // Data fetching and state management from context
   const {
     programs,
     routines,
@@ -174,19 +208,16 @@ export default function Home() {
     fetchExercisesByBlock
   } = useData()
 
-  const [expandedPrograms, setExpandedPrograms] = useState<Record<number, boolean>>({})
-  const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({})
-  const [videoView, setVideoView] = useState(false)
-  const [loadingStates, setLoadingStates] = useState({
-    programs: true,
-    routines: true,
-    blocks: true,
-    exercises: true
-  })
-
-  // Charger les données initiales
+  // ======================
+  // SIDE EFFECTS
+  // ======================
+  // Load initial data when component mounts or dependencies change
   useEffect(() => {
-    const loadInitialData = async () => {
+    /**
+   * Fetches and caches routines for all programs
+   * Updates loading states and error handling
+   */
+  const loadInitialData = async () => {
       try {
         // Charger les routines pour chaque programme
         if (programs.length > 0) {
@@ -227,6 +258,18 @@ export default function Home() {
     )
   }
 
+  /**
+   * Toggles between list view and video view modes
+   * @param show - Boolean indicating whether to show video view
+   */
+  const toggleVideoView = (show: boolean) => {
+    setVideoView(show)
+  }
+
+  /**
+   * Toggles the expanded/collapsed state of a program
+   * @param programId - The ID of the program to toggle
+   */
   const toggleProgram = (programId: number) => {
     setExpandedPrograms(prev => ({
       ...prev,
@@ -235,63 +278,63 @@ export default function Home() {
   }
 
   return (
-    <div className="container px-4 py-8 mx-auto">
+    <div className="container px-2 sm:px-4 py-4 sm:py-6 mx-auto">
       <Tabs defaultValue="programs" className="w-full overflow-x-hidden">
-        <TabsList>
-          <TabsTrigger value="programs">Programmes</TabsTrigger>
-          <TabsTrigger value="exercises">Médiathèque d'exercices</TabsTrigger>
+        <TabsList className="w-full flex">
+          <TabsTrigger value="programs" className="flex-1 text-sm sm:text-base">Programmes</TabsTrigger>
+          <TabsTrigger value="exercises" className="flex-1 text-sm sm:text-base">Exercices</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="programs" className="mt-6">
-          <div className="flex items-center gap-2 mb-6">
-            <span className="text-sm text-muted-foreground">Vue normale</span>
+        <TabsContent value="programs" className="mt-4">
+          <div className="flex items-center justify-center gap-2 mb-4 px-2">
+            <span className="text-xs sm:text-sm text-muted-foreground">Vue normale</span>
             <button
-              onClick={() => setVideoView(!videoView)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${videoView ? 'bg-blue-600' : 'bg-gray-200'}`}
+              onClick={() => toggleVideoView(!videoView)}
+              className={`relative inline-flex h-5 w-10 sm:h-6 sm:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${videoView ? 'bg-blue-600' : 'bg-gray-200'}`}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${videoView ? 'translate-x-6' : 'translate-x-1'}`}
+                className={`inline-block h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white transition-transform ${videoView ? 'translate-x-5 sm:translate-x-6' : 'translate-x-1'}`}
               />
             </button>
-            <span className="text-sm text-muted-foreground">Vue vidéo</span>
+            <span className="text-xs sm:text-sm text-muted-foreground">Vue vidéo</span>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-3 sm:space-y-4 px-1">
             {programs.map((program) => {
               const isLoading = !programRoutines[program.id]
 
               return (
                 <Card key={program.id} className="overflow-hidden">
                   <div
-                    className="p-4 bg-gray-50 border-b cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-between"
+                    className="p-3 sm:p-4 bg-gray-50 border-b cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-between"
                     onClick={() => toggleProgram(program.id)}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                       {expandedPrograms[program.id] ?
-                        <ChevronDown className="w-5 h-5 text-gray-500" /> :
-                        <ChevronRight className="w-5 h-5 text-gray-500" />
+                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 flex-shrink-0" /> :
+                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 flex-shrink-0" />
                       }
-                      <h2 className="text-xl font-semibold">{program.name}</h2>
+                      <h2 className="text-base sm:text-xl font-semibold truncate">{program.name}</h2>
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-xs sm:text-sm text-gray-500 whitespace-nowrap ml-2">
                       {programRoutines[program.id]?.length || 0} routines
                     </div>
                   </div>
 
                   {expandedPrograms[program.id] && (
-                    <div className="p-4 pt-2">
+                    <div className="p-3 sm:p-4 pt-1 sm:pt-2">
                       {!videoView ? (
                         <>
-                          <div className="mb-4">
-                            <h3 className="font-medium text-gray-700 mb-2">Marche à suivre et appropriation :</h3>
-                            <p className="text-gray-600">{(program as any).instructions || "Aucune information spécifiée"}</p>
+                          <div className="mb-3 sm:mb-4">
+                            <h3 className="text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Marche à suivre :</h3>
+                            <p className="text-xs sm:text-sm text-gray-600">{(program as any).instructions || "Aucune information spécifiée"}</p>
                           </div>
 
                           <div>
-                            <h3 className="font-medium text-gray-700 mb-2">Routines :</h3>
-                            <div className="space-y-4">
+                            <h3 className="text-sm sm:text-base font-medium text-gray-700 mb-2">Routines :</h3>
+                            <div className="space-y-3 sm:space-y-4">
                               {isLoading ? (
-                                <div className="flex justify-center py-4">
-                                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                <div className="flex justify-center py-3 sm:py-4">
+                                  <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-blue-500"></div>
                                 </div>
                               ) : programRoutines[program.id]?.length > 0 ? (
                                 programRoutines[program.id].map(routine => {
@@ -306,7 +349,7 @@ export default function Home() {
                                   )
                                 })
                               ) : (
-                                <p className="text-gray-500 text-sm">Aucune routine disponible pour ce programme.</p>
+                                <p className="text-xs sm:text-sm text-gray-500 px-2">Aucune routine disponible pour ce programme.</p>
                               )}
                             </div>
                           </div>
