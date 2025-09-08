@@ -185,9 +185,8 @@ export default function Home() {
   // State management for expanded programs and their routines
   const [expandedPrograms, setExpandedPrograms] = useState<Record<number, boolean>>({})
   const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({})
-  
+
   // UI state for video view and loading indicators
-  const [videoView, setVideoView] = useState(false)
   const [loadingStates, setLoadingStates] = useState({
     programs: true,
     routines: true,
@@ -217,7 +216,7 @@ export default function Home() {
    * Fetches and caches routines for all programs
    * Updates loading states and error handling
    */
-  const loadInitialData = async () => {
+    const loadInitialData = async () => {
       try {
         // Charger les routines pour chaque programme
         if (programs.length > 0) {
@@ -259,14 +258,6 @@ export default function Home() {
   }
 
   /**
-   * Toggles between list view and video view modes
-   * @param show - Boolean indicating whether to show video view
-   */
-  const toggleVideoView = (show: boolean) => {
-    setVideoView(show)
-  }
-
-  /**
    * Toggles the expanded/collapsed state of a program
    * @param programId - The ID of the program to toggle
    */
@@ -286,18 +277,6 @@ export default function Home() {
         </TabsList>
 
         <TabsContent value="programs" className="mt-4">
-          <div className="flex items-center justify-center gap-2 mb-4 px-2">
-            <span className="text-xs sm:text-sm text-muted-foreground">Vue normale</span>
-            <button
-              onClick={() => toggleVideoView(!videoView)}
-              className={`relative inline-flex h-5 w-10 sm:h-6 sm:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${videoView ? 'bg-blue-600' : 'bg-gray-200'}`}
-            >
-              <span
-                className={`inline-block h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white transition-transform ${videoView ? 'translate-x-5 sm:translate-x-6' : 'translate-x-1'}`}
-              />
-            </button>
-            <span className="text-xs sm:text-sm text-muted-foreground">Vue vidéo</span>
-          </div>
           <div className="space-y-3 sm:space-y-4 px-1">
             {programs.map((program) => {
               const isLoading = !programRoutines[program.id]
@@ -322,64 +301,70 @@ export default function Home() {
 
                   {expandedPrograms[program.id] && (
                     <div className="p-3 sm:p-4 pt-1 sm:pt-2">
-                      {!videoView ? (
-                        <>
-                          <div className="mb-3 sm:mb-4">
-                            <h3 className="text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Marche à suivre :</h3>
-                            <p className="text-xs sm:text-sm text-gray-600">{(program as any).instructions || "Aucune information spécifiée"}</p>
-                          </div>
+                      <div className="space-y-8">
+                        {programRoutines[program.id]?.flatMap(routine =>
+                          blocks
+                            .filter(block => routine.blockId.includes(block.id))
+                            .flatMap(block => {
+                              const blockExercises = exercises
+                                .filter(ex => block.exerciceId.includes(ex.id))
+                                .filter(ex => ex.videoPublicId);
 
-                          <div>
-                            <h3 className="text-sm sm:text-base font-medium text-gray-700 mb-2">Routines :</h3>
-                            <div className="space-y-3 sm:space-y-4">
-                              {isLoading ? (
-                                <div className="flex justify-center py-3 sm:py-4">
-                                  <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-blue-500"></div>
-                                </div>
-                              ) : programRoutines[program.id]?.length > 0 ? (
-                                programRoutines[program.id].map(routine => {
-                                  const routineBlocks = blocks.filter(b => routine.blockId.includes(b.id))
-                                  return (
-                                    <RoutineItem
-                                      key={routine.id}
-                                      routine={routine}
-                                      blocks={routineBlocks}
-                                      exercises={exercises}
-                                    />
-                                  )
-                                })
-                              ) : (
-                                <p className="text-xs sm:text-sm text-gray-500 px-2">Aucune routine disponible pour ce programme.</p>
-                              )}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="space-y-6">
-                          {programRoutines[program.id]?.flatMap(routine =>
-                            blocks
-                              .filter(block => routine.blockId.includes(block.id))
-                              .flatMap(block =>
-                                exercises
-                                  .filter(ex => block.exerciceId.includes(ex.id))
-                                  .filter(ex => ex.videoPublicId)
-                                  .map(exercise => (
-                                    <div key={`${routine.id}-${block.id}-${exercise.id}`} className="space-y-2">
-                                      <h4 className="font-medium">{exercise.name}</h4>
-                                      <div className="aspect-w-16 aspect-h-9">
-                                        <video
-                                          src={typeof exercise.videoPublicId === 'string' ? exercise.videoPublicId : ''}
-                                          controls
-                                          className="w-full rounded-lg"
-                                          preload="metadata"
-                                        />
+                              if (blockExercises.length === 0) return null;
+
+                              return (
+                                <div key={`${routine.id}-${block.id}`} className="space-y-4 border-b pb-6 last:border-b-0 last:pb-0">
+                                  <div className="bg-blue-50 p-3 rounded-lg">
+                                    <h3 className="font-semibold text-blue-800">{block.name}</h3>
+                                    {block.instructions && (
+                                      <p className="text-sm text-blue-700 mt-1">{block.instructions}</p>
+                                    )}
+                                    {block.focus && (
+                                      <div className="mt-2">
+                                        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                          {block.focus}
+                                        </span>
                                       </div>
-                                    </div>
-                                  ))
-                              )
-                          )}
-                        </div>
-                      )}
+                                    )}
+                                  </div>
+
+                                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    {blockExercises.map((exercise, index) => (
+                                      <div
+                                        key={`${block.id}-${exercise.id}-${index}`}
+                                        className="bg-white rounded-lg border overflow-hidden shadow-sm hover:shadow transition-shadow"
+                                      >
+                                        <div className="aspect-video bg-black">
+                                          <video
+                                            src={typeof exercise.videoPublicId === 'string' ? exercise.videoPublicId : ''}
+                                            controls
+                                            className="w-full h-full object-cover"
+                                            preload="metadata"
+                                          />
+                                        </div>
+                                        <div className="p-3">
+                                          <h4 className="font-medium text-sm sm:text-base">{exercise.name}</h4>
+                                          {exercise.instructions && (
+                                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                                              {exercise.instructions}
+                                            </p>
+                                          )}
+                                          {exercise.objectifs && (
+                                            <div className="mt-2 pt-2 border-t border-gray-100">
+                                              <p className="text-xs font-medium text-gray-500">Objectifs:</p>
+                                              <p className="text-xs text-gray-600">{exercise.objectifs}</p>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })
+                            .filter(Boolean)
+                        )}
+                      </div>
                     </div>
                   )}
                 </Card>

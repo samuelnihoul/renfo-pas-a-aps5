@@ -1,2 +1,2 @@
 select *
-from routines;
+from blocks;
