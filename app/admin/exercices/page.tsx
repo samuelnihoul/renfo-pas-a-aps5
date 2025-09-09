@@ -128,6 +128,14 @@ export default function ExercisesPage() {
       },
     },
     {
+      accessorKey: "short",
+      header: "Short",
+      cell: ({ row }) => {
+        const shortUrl = row.getValue("short") as string | null
+        return shortUrl ? "Oui" : "Non"
+      },
+    },
+    {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {

@@ -24,6 +24,7 @@ export default function NewExercisePage() {
     instructions: "",
     objectifs: "",
     videoPublicId: "",
+    short: "",
     notes: ""
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -49,6 +50,13 @@ export default function NewExercisePage() {
     setFormData(prev => ({
       ...prev,
       videoPublicId: url,
+    }))
+  }
+
+  const handleShortUrlChange = (url: string) => {
+    setFormData(prev => ({
+      ...prev,
+      short: url,
     }))
   }
 
@@ -187,6 +195,17 @@ export default function NewExercisePage() {
                 videoUrl={formData.videoPublicId}
                 onVideoChange={setVideoFile}
                 onVideoUrlChange={handleVideoUrlChange}
+                inputId="video-upload-main"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="short">Vidéo courte</label>
+              <VideoUpload
+                videoUrl={formData.short}
+                onVideoChange={setVideoFile}
+                onVideoUrlChange={handleShortUrlChange}
+                inputId="video-upload-short"
               />
             </div>
           </CardContent>

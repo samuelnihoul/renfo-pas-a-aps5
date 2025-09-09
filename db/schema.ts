@@ -93,6 +93,7 @@ export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   videoPublicId: varchar("video_url", { length: 255 }),
+  short: varchar("short", { length: 255 }),
   instructions: text("instructions"),
   objectifs: text("objectifs"),
   notes: text("notes"),

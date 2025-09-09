@@ -10,12 +10,14 @@ interface VideoUploadProps {
     videoUrl: string | null;
     onVideoChange: (file: File | null) => void;
     onVideoUrlChange: (url: string) => void;
+    inputId?: string;
 }
 
 export default function VideoUpload({
     videoUrl,
     onVideoChange,
     onVideoUrlChange,
+    inputId,
 }: VideoUploadProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -49,7 +51,7 @@ export default function VideoUpload({
                     onUploadProgress: ({ percentage }) => {
                         setUploadProgress(Math.round(percentage));
                     },
-                    multipart:true,
+                    multipart: true,
                 });
                 setUploadStatus("success");
                 setUploadProgress(100);
@@ -71,6 +73,8 @@ export default function VideoUpload({
         setUploadProgress(0);
         setUploadError("");
     };
+
+    const computedInputId = inputId || "video-upload";
 
     return (
         <div className="space-y-2">
@@ -134,7 +138,7 @@ export default function VideoUpload({
                                 Glissez-déposez ou cliquez pour sélectionner une vidéo
                             </p>
                             <Input
-                                id="video-upload"
+                                id={computedInputId}
                                 type="file"
                                 accept="video/*"
                                 onChange={handleFileChange}
@@ -145,7 +149,7 @@ export default function VideoUpload({
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                    document.getElementById("video-upload")?.click();
+                                    document.getElementById(computedInputId)?.click();
                                 }}
                             >
                                 Sélectionner un fichier

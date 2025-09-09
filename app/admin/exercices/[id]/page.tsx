@@ -33,6 +33,7 @@ const exerciseSchema = z.object({
   name: z.string().min(1, "Le nom de l'exercice est requis"),
   instructions: z.string(),
   videoPublicId: z.string(),
+  short: z.string(),
   objectifs: z.string(),
   notes: z.string(),
 })
@@ -54,6 +55,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
       name: "",
       instructions: "",
       videoPublicId: "",
+      short: "",
       objectifs: "",
       notes: "",
     },
@@ -74,6 +76,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
           name: exercise.name,
           instructions: exercise.instructions || "",
           videoPublicId: exercise.videoPublicId || "",
+          short: exercise.short || "",
           objectifs: exercise.objectifs || "",
           notes: exercise.notes || "",
         })
@@ -99,6 +102,10 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
 
   const handleVideoUrlChange = (url: string) => {
     form.setValue("videoPublicId", url);
+  };
+
+  const handleShortUrlChange = (url: string) => {
+    form.setValue("short", url);
   };
 
   const onSubmit = async (data: ExerciseFormValues) => {
@@ -248,6 +255,17 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
                   videoUrl={form.getValues("videoPublicId")}
                   onVideoChange={setVideoFile}
                   onVideoUrlChange={handleVideoUrlChange}
+                  inputId="video-upload-main"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <FormLabel>Vidéo courte</FormLabel>
+                <VideoUpload
+                  videoUrl={form.getValues("short")}
+                  onVideoChange={setVideoFile}
+                  onVideoUrlChange={handleShortUrlChange}
+                  inputId="video-upload-short"
                 />
               </div>
             </CardContent>

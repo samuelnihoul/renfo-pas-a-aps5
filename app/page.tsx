@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ChevronRight, ChevronDown, Dumbbell, ListChecks, Calendar } from "lucide-react"
+import { useSearchParams } from "next/navigation"
+import { ChevronRight, ChevronDown, Dumbbell, ListChecks, Calendar, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import { useData } from "@/components/data-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminLink } from "@/components/admin-link"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   Dialog,
   DialogTrigger,
@@ -194,6 +196,10 @@ export default function Home() {
     exercises: true
   })
 
+  // Check for error parameters in URL
+  const searchParams = useSearchParams()
+  const errorParam = searchParams.get('error')
+
   // Data fetching and state management from context
   const {
     programs,
@@ -270,6 +276,16 @@ export default function Home() {
 
   return (
     <div className="container px-2 sm:px-4 py-4 sm:py-6 mx-auto">
+      {/* Display error message if redirected due to unauthorized access */}
+      {errorParam === 'unauthorized' && (
+        <Alert className="mb-6" variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Accès non autorisé. Vous devez être administrateur pour accéder à cette section.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Tabs defaultValue="programs" className="w-full overflow-x-hidden">
         <TabsList className="w-full flex">
           <TabsTrigger value="programs" className="flex-1 text-sm sm:text-base">Programmes</TabsTrigger>
