@@ -9,7 +9,8 @@ export async function middleware(request: NextRequest) {
   const isProtected = pathname.startsWith('/admin')
 
   if (isProtected) {
-    const token = await getToken({ req: request })
+    // Read token from our custom session cookie name used in auth config
+    const token = await getToken({ req: request, cookieName: 'auth-token' })
 
     // If user is not authenticated, redirect to signin
     if (!token) {
@@ -30,15 +31,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|auth).*)',
-  ],
+  // Only run middleware on admin routes
+  matcher: ['/admin/:path*'],
 }

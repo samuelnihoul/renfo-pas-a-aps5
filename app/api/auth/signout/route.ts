@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server"
-import { signOut } from "next-auth/react"
 
 export async function POST() {
   try {
-    // This will remove the session cookie
-    await signOut({ redirect: false })
-    
-    return NextResponse.json({ message: "Déconnexion réussie" })
+    // Clear the NextAuth session cookie we configured (auth-token)
+    const response = NextResponse.json({ message: "Déconnexion réussie" })
+    response.headers.append(
+      "Set-Cookie",
+      [
+        // Invalidate the auth-token cookie
+        `auth-token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax; ${process.env.NODE_ENV === 'production' ? 'Secure; ' : ''}`,
+      ].join("\n")
+    )
+    return response
   } catch (error) {
     console.error("Error signing out:", error)
     return NextResponse.json(
-      { error: "Erreur lors de la déconnexion" }, 
+      { error: "Erreur lors de la déconnexion" },
       { status: 500 }
     )
   }
-} 
+}
