@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
 
   if (isProtected) {
     // Read token from our custom session cookie name used in auth config
-    const token = await getToken({ req: request, cookieName: 'auth-token' })
+    const token = await getToken({ req: request, cookieName: 'auth-token', secret: process.env.NEXTAUTH_SECRET })
 
     // If user is not authenticated, redirect to signin
     if (!token) {
