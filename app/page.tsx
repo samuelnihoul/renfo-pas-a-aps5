@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { ChevronRight, ChevronDown, Dumbbell, ListChecks, Calendar, AlertCircle } from "lucide-react"
@@ -196,9 +196,7 @@ export default function Home() {
     exercises: true
   })
 
-  // Check for error parameters in URL
-  const searchParams = useSearchParams()
-  const errorParam = searchParams.get('error')
+  // Error alert handled in a Suspense-wrapped child component
 
   // Data fetching and state management from context
   const {
@@ -277,14 +275,9 @@ export default function Home() {
   return (
     <div className="container px-2 sm:px-4 py-4 sm:py-6 mx-auto">
       {/* Display error message if redirected due to unauthorized access */}
-      {errorParam === 'unauthorized' && (
-        <Alert className="mb-6" variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Accès non autorisé. Vous devez être administrateur pour accéder à cette section.
-          </AlertDescription>
-        </Alert>
-      )}
+      <Suspense fallback={null}>
+        <ErrorAlert />
+      </Suspense>
 
       <Tabs defaultValue="programs" className="w-full overflow-x-hidden">
         <TabsList className="w-full flex">
@@ -481,5 +474,21 @@ export default function Home() {
         </TabsContent>
       </Tabs>
     </div>
+  )
+}
+
+function ErrorAlert() {
+  const searchParams = useSearchParams()
+  const errorParam = searchParams.get('error')
+
+  if (errorParam !== 'unauthorized') return null
+
+  return (
+    <Alert className="mb-6" variant="destructive">
+      <AlertCircle className="h-4 w-4" />
+      <AlertDescription>
+        Accès non autorisé. Vous devez être administrateur pour accéder à cette section.
+      </AlertDescription>
+    </Alert>
   )
 }
