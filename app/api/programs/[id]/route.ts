@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Récupérer l'ID de l'utilisateur depuis les headers ou la session
-    const token = await getToken({ req: request, cookieName: 'auth-token', secret: process.env.NEXTAUTH_SECRET })
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
     if (!token) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
     }

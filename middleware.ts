@@ -3,31 +3,41 @@ import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  try {
+    const { pathname } = request.nextUrl
 
-  // Protected routes
-  const isProtected = pathname.startsWith('/admin')
+    // Protected routes
+    const isProtected = pathname.startsWith('/admin')
 
-  if (isProtected) {
-    // Read token from our custom session cookie name used in auth config
-    const token = await getToken({ req: request, cookieName: 'auth-token', secret: process.env.NEXTAUTH_SECRET })
+    if (isProtected) {
+      // Use default NextAuth token reading (without custom cookie name)
+      const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET
+      })
 
-    // If user is not authenticated, redirect to signin
-    if (!token) {
-      const signInUrl = new URL('/auth/signin', request.url)
-      signInUrl.searchParams.set('callbackUrl', encodeURI(request.url))
-      return NextResponse.redirect(signInUrl)
+      // If user is not authenticated, redirect to signin
+      if (!token) {
+        const signInUrl = new URL('/auth/signin', request.url)
+        signInUrl.searchParams.set('callbackUrl', encodeURI(request.url))
+        return NextResponse.redirect(signInUrl)
+      }
+
+      // Check if user has admin privileges
+      const isAdmin = Boolean(token.isAdmin)
+      if (!isAdmin) {
+        const homeUrl = new URL('/', request.url)
+        homeUrl.searchParams.set('error', 'unauthorized')
+        return NextResponse.redirect(homeUrl)
+      }
     }
 
-    // Check if user has admin privileges
-    if (pathname.startsWith('/admin') && !token.isAdmin) {
-      const homeUrl = new URL('/', request.url)
-      homeUrl.searchParams.set('error', 'unauthorized')
-      return NextResponse.redirect(homeUrl)
-    }
+    return NextResponse.next()
+  } catch (error) {
+    console.error('Middleware error:', error)
+    // On error, redirect to signin to avoid breaking the app
+    return NextResponse.redirect(new URL('/auth/signin', request.url))
   }
-
-  return NextResponse.next()
 }
 
 export const config = {

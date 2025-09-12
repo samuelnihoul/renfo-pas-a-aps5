@@ -2,13 +2,13 @@ import { NextResponse } from "next/server"
 
 export async function POST() {
   try {
-    // Clear the NextAuth session cookie we configured (auth-token)
+    // Clear the default NextAuth session cookie
     const response = NextResponse.json({ message: "Déconnexion réussie" })
     response.headers.append(
       "Set-Cookie",
       [
-        // Invalidate the auth-token cookie
-        `auth-token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax; ${process.env.NODE_ENV === 'production' ? 'Secure; ' : ''}`,
+        // Invalidate the default NextAuth session cookie
+        `next-auth.session-token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax; ${process.env.NODE_ENV === 'production' ? 'Secure; ' : ''}`,
       ].join("\n")
     )
     return response
