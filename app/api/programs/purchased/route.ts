@@ -2,15 +2,17 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/db"
 import { userPrograms, programs } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { getAuthenticatedUser } from "@/lib/auth-middleware"
+import { getToken } from "next-auth/jwt"
 
 export async function GET(request: NextRequest) {
     try {
-        const user = await getAuthenticatedUser(request)
+        const token = await getToken({ req: request, cookieName: 'auth-token', secret: process.env.NEXTAUTH_SECRET })
 
-        if (!user) {
+        if (!token) {
             return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
         }
+
+        const userId = token.sub || token.id as string || ''
 
         // Récupérer les programmes achetés par l'utilisateur
         const purchasedPrograms = await db
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
             })
             .from(userPrograms)
             .innerJoin(programs, eq(userPrograms.programId, programs.id))
-            .where(eq(userPrograms.userId, user.userId))
+            .where(eq(userPrograms.userId, userId))
 
         return NextResponse.json(purchasedPrograms)
     } catch (error) {

@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createCheckoutSession } from "@/lib/stripe"
-import { getAuthenticatedUser } from "@/lib/auth-middleware"
+import { getToken } from "next-auth/jwt"
 import { db } from "@/db"
 import { programs } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function POST(request: NextRequest) {
     try {
-        const user = await getAuthenticatedUser(request)
+        const token = await getToken({ req: request, cookieName: 'auth-token', secret: process.env.NEXTAUTH_SECRET })
 
-        if (!user) {
+        if (!token) {
             return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
         }
 
+        const userId = token.sub || token.id as string || ''
         const { programId } = await request.json()
 
         if (!programId) {
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
 
         // Créer la session de paiement
         const session = await createCheckoutSession({
-            userId: user.userId,
+            userId: userId,
             programId,
             programName: program[0].name,
             price,

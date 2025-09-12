@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server"
 import { db } from "@/db"
 import { programs, blocks, exercises } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { getAuthenticatedUser } from "@/lib/auth-middleware"
+import { getToken } from "next-auth/jwt"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   const paramsAwaited = await params
@@ -14,15 +14,16 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Récupérer l'ID de l'utilisateur depuis les headers ou la session
-    const user = await getAuthenticatedUser(request)
-    console.log(user)
-    if (!user) {
+    const token = await getToken({ req: request, cookieName: 'auth-token', secret: process.env.NEXTAUTH_SECRET })
+    if (!token) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
     }
-    const userId = user.userId
+    const userId = token.sub || token.id as string || ''
+    const isAdmin = Boolean((token as any).isAdmin)
+    console.log({ userId, isAdmin })
 
     // Si admin, accès total
-    if (user.isAdmin) {
+    if (isAdmin) {
       // Récupérer les blocs du jour
       const blockList = await db.select().from(programs).where(eq(programs.id, id))
       const result = await Promise.all(

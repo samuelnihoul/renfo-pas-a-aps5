@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/db"
 import { userPrograms, programs } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
-import { getAuthenticatedUser } from "@/lib/auth-middleware"
+import { getToken } from "next-auth/jwt"
 
 export async function POST(request: NextRequest) {
     try {
-        const user = await getAuthenticatedUser(request)
+        const token = await getToken({ req: request, cookieName: 'auth-token', secret: process.env.NEXTAUTH_SECRET })
 
-        if (!user) {
+        if (!token) {
             return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
         }
 
+        const userId = token.sub || token.id as string || ''
         const { programId, dayNumber } = await request.json()
 
         if (!programId) {
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
             .from(userPrograms)
             .where(
                 and(
-                    eq(userPrograms.userId, user.userId),
+                    eq(userPrograms.userId, userId),
                     eq(userPrograms.programId, programId)
                 )
             )
