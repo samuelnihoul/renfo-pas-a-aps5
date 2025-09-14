@@ -1,6 +1,6 @@
-import type { AuthConfig } from '@auth/core/types';
+import type { NextAuthConfig } from 'next-auth';
 
-export const authConfig: AuthConfig = {
+export const authConfig = {
   providers: [], // We'll add providers in the route handler
   pages: {
     signIn: '/auth/signin', // Custom sign-in page
@@ -18,8 +18,8 @@ export const authConfig: AuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.isAdmin = user.isAdmin || false;
-        token.isPremium = user.isPremium || false;
+        token.isAdmin = (user as any).isAdmin || false;
+        token.isPremium = (user as any).isPremium || false;
       }
       return token;
     },
@@ -30,5 +30,4 @@ export const authConfig: AuthConfig = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
-  trustHost: true
-};
+} satisfies NextAuthConfig;

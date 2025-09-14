@@ -1,47 +1,36 @@
 import { useState, useEffect } from "react"
-import { useSession, signIn as nextAuthSignIn, signOut as nextAuthSignOut } from "next-auth/react"
-import { Session } from "next-auth"
+import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession } from "next-auth/react"
 
-interface AuthUser {
+interface User {
     id: string
     email: string
-    name?: string | null
-    image?: string | null
+    name: string
+    image?: string
     isAdmin: boolean
     isPremium: boolean
 }
 
-type SessionUser = {
-    id: string
-    email: string
-    name?: string | null
-    image?: string | null
-    isAdmin?: boolean
-    isPremium?: boolean
-}
-
 export function useAuth() {
     const { data: session, status } = useSession()
-    const [user, setUser] = useState<AuthUser | null>(null)
+    const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (status === "loading") return
         
         if (session?.user) {
-            const sessionUser = session.user as SessionUser
             setUser({
-                id: sessionUser.id,
-                email: sessionUser.email || '',
-                name: sessionUser.name || null,
-                image: sessionUser.image || null,
-                isAdmin: sessionUser.isAdmin || false,
-                isPremium: sessionUser.isPremium || false
+                id: session.user.id,
+                email: session.user.email || '',
+                name: session.user.name || '',
+                image: session.user.image,
+                isAdmin: (session.user as any).isAdmin || false,
+                isPremium: (session.user as any).isPremium || false
             })
         } else {
             setUser(null)
         }
-        setLoading(false)
+        setLoading(status === "loading")
     }, [session, status])
 
     const signIn = async (email: string, password: string) => {

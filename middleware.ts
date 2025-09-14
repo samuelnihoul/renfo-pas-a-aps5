@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { authHandler } from '@/lib/auth'
+import { getToken } from 'next-auth/jwt'
 
 export async function middleware(request: NextRequest) {
   try {
@@ -10,25 +10,32 @@ export async function middleware(request: NextRequest) {
     const isProtected = pathname.startsWith('/admin')
 
     if (isProtected) {
-      // Get the session
-      const session = await authHandler()
-      // Handle case where authHandler returns a Response (for API routes)
-      if (session instanceof Response) {
-        return session
-      }
-      
-      const user = session?.user
+      // Use default NextAuth token reading with production-safe options
+      const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET,
+        cookieName: process.env.NODE_ENV === 'production'
+          ? '__Secure-next-auth.session-token'
+          : 'next-auth.session-token'
+      })
 
       // If user is not authenticated, redirect to signin
-      if (!user) {
-        console.log('No user found in session, redirecting to signin')
+      if (!token) {
+        console.log('No token found, redirecting to signin')
         const signInUrl = new URL('/auth/signin', request.url)
         signInUrl.searchParams.set('callbackUrl', encodeURI(request.url))
         return NextResponse.redirect(signInUrl)
       }
 
       // Check if user has admin privileges
-      if (pathname.startsWith('/admin') && !user.isAdmin) {
+      const isAdmin = Boolean(token.isAdmin)
+      console.log('Token found:', {
+        email: token.email,
+        isAdmin: token.isAdmin,
+        hasAdminFlag: 'isAdmin' in token
+      })
+
+      if (!isAdmin) {
         console.log('User is not admin, redirecting to home')
         const homeUrl = new URL('/', request.url)
         homeUrl.searchParams.set('error', 'unauthorized')
