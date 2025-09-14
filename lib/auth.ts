@@ -1,14 +1,13 @@
-import NextAuth from "next-auth"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
-import CredentialsProvider from "next-auth/providers/credentials"
+import Credentials from "@auth/core/providers/credentials"
 import bcrypt from "bcryptjs"
 import { db } from "@/db"
 import { users, accounts, sessions, verificationTokens } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import type { NextAuthConfig, User } from "next-auth"
+import type { AuthConfig, DefaultSession, DefaultUser } from "@auth/core/types"
 
-declare module "next-auth" {
-  interface User {
+declare module "@auth/core/types" {
+  interface User extends DefaultUser {
     id: string
     email: string
     name?: string | null
@@ -17,7 +16,7 @@ declare module "next-auth" {
     isPremium?: boolean
   }
 
-  interface Session {
+  interface Session extends DefaultSession {
     user: {
       id: string
       email: string
@@ -29,15 +28,18 @@ declare module "next-auth" {
   }
 }
 
-export const authConfig: NextAuthConfig = {
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+// Using type assertion to bypass DrizzleAdapter type issues
+const adapter = DrizzleAdapter(db as any, {
+  usersTable: users as any,
+  accountsTable: accounts as any,
+  sessionsTable: sessions as any,
+  verificationTokensTable: verificationTokens as any,
+})
+
+export const authConfig: AuthConfig = {
+  adapter,
   providers: [
-    CredentialsProvider({
+    Credentials({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
@@ -48,7 +50,7 @@ export const authConfig: NextAuthConfig = {
           return null
         }
 
-        const user = await db.query.users.findFirst({
+        const user: any = await db.query.users.findFirst({
           where: eq(users.email, credentials.email as string)
         })
 
@@ -72,7 +74,7 @@ export const authConfig: NextAuthConfig = {
           image: user.image,
           isAdmin: user.isAdmin || false,
           isPremium: user.isPremium || false
-        } as User
+        } as const
       }
     })
   ],
@@ -85,22 +87,19 @@ export const authConfig: NextAuthConfig = {
     error: '/auth/error',
   },
   callbacks: {
-    async session({ session, token }) {
+    session({ session, token }: { session: any; token: any }) {
       if (session.user) {
         session.user.id = token.sub || ''
         session.user.isAdmin = token.isAdmin as boolean
         session.user.isPremium = token.isPremium as boolean
-        if (token.image) {
-          session.user.image = token.image as string
-        }
       }
       return session
     },
-    async jwt({ token, user }) {
+    jwt({ token, user }: { token: any; user: any }) {
       if (user) {
         token.id = user.id
-        token.isAdmin = (user as any).isAdmin || false
-        token.isPremium = (user as any).isPremium || false
+        token.isAdmin = user.isAdmin || false
+        token.isPremium = user.isPremium || false
       }
       return token
     },
@@ -110,4 +109,15 @@ export const authConfig: NextAuthConfig = {
   trustHost: true
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig) 
+import NextAuth from "next-auth"
+
+const auth = NextAuth(authConfig)
+
+const { 
+  handlers: { GET, POST }, 
+  auth: authHandler, 
+  signIn, 
+  signOut 
+} = auth
+
+export { GET, POST, authHandler, signIn, signOut }
