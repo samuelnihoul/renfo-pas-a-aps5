@@ -17,7 +17,7 @@ try {
       const token = await getToken({
         req: request,
         secret: "se45!!23soy",
-        cookieName:"__Secure-next-auth.session-token"
+        cookieName:"__Secure-authjs.session-token"
       })
 
       // If user is not authenticated, redirect to signin
