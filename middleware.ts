@@ -16,8 +16,7 @@ try {
       // Use default NextAuth token reading with production-safe options
       const token = await getToken({
         req: request,
-        secret: process.env.NEXTAUTH_SECRET,
-        cookieName:process.env.COOKIE_NAME
+        secret: "se45!!23soy",
       })
 
       // If user is not authenticated, redirect to signin
