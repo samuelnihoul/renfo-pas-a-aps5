@@ -3,7 +3,10 @@ import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
 export async function middleware(request: NextRequest) {
-  try {
+  if (!process.env.NEXTAUTH_SECRET) { 
+  throw new Error('NEXTAUTH_SECRET not defined in middleware')
+}
+try {
     const { pathname } = request.nextUrl
 
     // Protected routes
