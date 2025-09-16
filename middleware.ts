@@ -17,7 +17,7 @@ try {
       const token = await getToken({
         req: request,
         secret: process.env.NEXTAUTH_SECRET,
-        secureCookie:process.env.NODE_ENV==="production"
+        cookieName:process.env.COOKIE_NAME
       })
 
       // If user is not authenticated, redirect to signin
