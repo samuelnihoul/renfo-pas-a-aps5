@@ -96,7 +96,7 @@ export const exercises = pgTable("exercises", {
   short: varchar("short", { length: 255 }),
   instructions: text("instructions"),
   objectifs: text("objectifs"),
-  notes: text("notes"),
+  notes: text("notes").default("-"),
   ...timestamps
 })
 

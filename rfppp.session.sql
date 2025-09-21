@@ -1,2 +1,2 @@
 select *
-from users;
+from exercises;
