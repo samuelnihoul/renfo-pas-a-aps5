@@ -337,33 +337,35 @@ export default function Home() {
                                     )}
                                   </div>
 
-                                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                  <div className="space-y-2">
                                     {blockExercises.map((exercise, index) => (
                                       <div
                                         key={`${block.id}-${exercise.id}-${index}`}
-                                        className="bg-white rounded-lg border overflow-hidden shadow-sm hover:shadow transition-shadow"
+                                        className="bg-white rounded border p-2 hover:bg-gray-50 transition-colors"
                                       >
-                                        <div className="aspect-video bg-black">
-                                          <video
-                                            src={typeof exercise.videoPublicId === 'string' ? exercise.videoPublicId : ''}
-                                            controls
-                                            className="w-full h-full object-cover"
-                                            preload="metadata"
-                                          />
-                                        </div>
-                                        <div className="p-3">
-                                          <h4 className="font-medium text-sm sm:text-base">{exercise.name}</h4>
-                                          {exercise.instructions && (
-                                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                                              {exercise.instructions}
-                                            </p>
-                                          )}
-                                          {exercise.objectifs && (
-                                            <div className="mt-2 pt-2 border-t border-gray-100">
-                                              <p className="text-xs font-medium text-gray-500">Objectifs:</p>
-                                              <p className="text-xs text-gray-600">{exercise.objectifs}</p>
+                                        <div className="flex items-start">
+                                          {exercise.videoPublicId ? (
+                                            <div className="relative w-16 h-12 flex-shrink-0 mr-2 rounded overflow-hidden">
+                                              <video
+                                                src={`https://res.cloudinary.com/demo/video/upload/c_thumb,w_100,h_75/${exercise.videoPublicId}.jpg`}
+                                                className="w-full h-full object-cover"
+                                                muted
+                                                preload="metadata"
+                                              />
+                                            </div>
+                                          ) : (
+                                            <div className="w-16 h-12 flex-shrink-0 mr-2 rounded bg-gray-100 flex items-center justify-center">
+                                              <Dumbbell className="w-4 h-4 text-gray-400" />
                                             </div>
                                           )}
+                                          <div className="flex-grow min-w-0">
+                                            <div className="flex items-center justify-between">
+                                              <h4 className="font-medium text-sm">{exercise.name}</h4>
+                                            </div>
+                                            {exercise.notes && (
+                                              <p className="text-xs text-gray-600 mt-0.5">{exercise.notes}</p>
+                                            )}
+                                          </div>
                                         </div>
                                       </div>
                                     ))}
