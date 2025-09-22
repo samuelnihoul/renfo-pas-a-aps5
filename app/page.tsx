@@ -347,7 +347,7 @@ export default function Home() {
                                           {exercise.videoPublicId ? (
                                             <div className="relative w-16 h-12 flex-shrink-0 mr-2 rounded overflow-hidden">
                                               <video
-                                                src={`https://res.cloudinary.com/demo/video/upload/c_thumb,w_100,h_75/${exercise.videoPublicId}.jpg`}
+                                                src={exercise.videoPublicId}
                                                 className="w-full h-full object-cover"
                                                 muted
                                                 preload="metadata"
