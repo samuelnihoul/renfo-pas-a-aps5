@@ -323,8 +323,16 @@ export default function Home() {
 
                               return (
                                 <div key={`${routine.id}-${block.id}`} className="space-y-4 border-b pb-6 last:border-b-0 last:pb-0">
-                                  <div className="bg-blue-50 p-3 rounded-lg">
-                                    <h3 className="font-semibold text-blue-800">{block.name}</h3>
+                                  <div className={`p-3 rounded-lg ${
+                                    block.name.includes('Activation') ? 'bg-blue-50' :
+                                    block.name.includes('Mobilité') ? 'bg-green-50' :
+                                    block.name.includes('Développement') ? 'bg-orange-50' : 'bg-gray-50'
+                                  }`}>
+                                    <h3 className={`font-semibold ${
+                                      block.name.includes('Activation') ? 'text-blue-800' :
+                                      block.name.includes('Mobilité') ? 'text-green-800' :
+                                      block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
+                                    }`}>{block.name}</h3>
                                     {block.instructions && (
                                       <p className="text-sm text-blue-700 mt-1">{block.instructions}</p>
                                     )}
