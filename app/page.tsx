@@ -317,8 +317,10 @@ export default function Home() {
                                             <div className="flex items-center justify-between">
                                               <h4 className="font-medium text-sm">{exercise.name}</h4>
                                             </div>
-                                            {exercise.notes && (
-                                              <p className="text-xs text-gray-600 mt-0.5">{exercise.notes}</p>
+                                            {block.exerciseNotes && block.exerciseNotes[block.exerciceId.indexOf(exercise.id)] && (
+                                              <p className="text-xs text-gray-600 mt-0.5">
+                                                {block.exerciseNotes[block.exerciceId.indexOf(exercise.id)]}
+                                              </p>
                                             )}
                                           </div>
                                         </div>
