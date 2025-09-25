@@ -124,60 +124,7 @@ function BlockItem({ block, exercises }: { block: Block, exercises: Exercise[] }
   )
 }
 
-// ======================
-// ROUTINE COMPONENT
-// ======================
-// Displays a collapsible routine section containing multiple blocks
-// Shows equipment requirements and session outcomes if available
-function RoutineItem({ routine, blocks, exercises }: { routine: Routine, blocks: Block[], exercises: Exercise[] }) {
-  const [isExpanded, setIsExpanded] = useState(false)
 
-  const routineBlocks = blocks.filter(block => routine.blockId.includes(block.id))
-
-  return (
-    <div className="ml-2 sm:ml-4 border-l-2 border-blue-200 pl-2 sm:pl-4">
-      <div
-        className="flex items-center gap-1 sm:gap-2 cursor-pointer hover:bg-blue-50 p-1 sm:p-2 rounded"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        {isExpanded ?
-          <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" /> :
-          <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-        }
-        <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0" />
-        <span className="font-medium text-sm sm:text-base">{routine.name}</span>
-      </div>
-
-      {isExpanded && (
-        <div className="space-y-2 sm:space-y-3 mt-1 sm:mt-2">
-          {(routine as any).equipment && (
-            <div className="bg-blue-50 p-2 sm:p-3 rounded-md text-xs sm:text-sm">
-              <h4 className="font-medium text-blue-700 mb-1">Matériel nécessaire :</h4>
-              <p className="text-blue-600">{(routine as any).equipment}</p>
-            </div>
-          )}
-
-          {(routine as any).sessionOutcome && (
-            <div className="bg-green-50 p-2 sm:p-3 rounded-md text-xs sm:text-sm">
-              <h4 className="font-medium text-green-700 mb-1">Sortie de séance :</h4>
-              <p className="text-green-600">{(routine as any).sessionOutcome}</p>
-            </div>
-          )}
-
-          <div className="space-y-1 sm:space-y-2">
-            {routineBlocks.map((block: any) => (
-              <BlockItem
-                key={block.id}
-                block={block}
-                exercises={exercises.filter(ex => block.exerciceId.includes(ex.id))}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
 
 // ======================
 // MAIN PAGE COMPONENT
