@@ -3,10 +3,11 @@
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { ChevronRight, ChevronDown, Dumbbell, ListChecks, Calendar, AlertCircle } from "lucide-react"
+import { ChevronRight, ChevronDown, ChevronLeft, Dumbbell, ListChecks, Calendar, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import { useData } from "@/components/data-provider"
 import { Button } from "@/components/ui/button"
+import { Carousel } from "@/components/ui/carousel"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminLink } from "@/components/admin-link"
@@ -233,106 +234,117 @@ export default function Home() {
         </TabsList>
 
         <TabsContent value="programs" className="mt-4">
-          <div className="space-y-3 sm:space-y-4 px-1">
+          <div className="space-y-6 px-1">
             {programs.map((program) => {
               const isLoading = !programRoutines[program.id]
+              const programBlocks = blocks.filter(block => 
+                programRoutines[program.id]?.some(routine => routine.blockId.includes(block.id))
+              )
 
               return (
                 <Card key={program.id} className="overflow-hidden">
                   <div
-                    className="p-3 sm:p-4 bg-gray-50 border-b cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-between"
+                    className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 border-b cursor-pointer hover:from-gray-100 hover:to-gray-200 transition-colors"
                     onClick={() => toggleProgram(program.id)}
                   >
-                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                      {expandedPrograms[program.id] ?
-                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 flex-shrink-0" /> :
-                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 flex-shrink-0" />
-                      }
-                      <h2 className="text-base sm:text-xl font-semibold truncate">{program.name}</h2>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {expandedPrograms[program.id] ? (
+                          <ChevronDown className="w-5 h-5 text-gray-600" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-gray-600" />
+                        )}
+                        <h2 className="text-lg sm:text-xl font-bold text-gray-800">{program.name}</h2>
+                      </div>
+                      <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
+                        {programRoutines[program.id]?.length || 0} routines
+                      </div>
                     </div>
-                    <div className="text-xs sm:text-sm text-gray-500 whitespace-nowrap ml-2">
-                      {programRoutines[program.id]?.length || 0} routines
-                    </div>
+                    {program.instructions && (
+                      <p className="text-sm text-gray-600 mt-2 ml-8">{program.instructions}</p>
+                    )}
                   </div>
 
                   {expandedPrograms[program.id] && (
-                    <div className="p-3 sm:p-4 pt-1 sm:pt-2">
-                      <div className="space-y-8">
-                        {programRoutines[program.id]?.flatMap(routine =>
-                          blocks
-                            .filter(block => routine.blockId.includes(block.id))
-                            .flatMap(block => {
-                              const blockExercises = exercises
-                                .filter(ex => block.exerciceId.includes(ex.id))
-                                .filter(ex => ex.videoPublicId);
-
-                              if (blockExercises.length === 0) return null;
-
-                              return (
-                                <div key={`${routine.id}-${block.id}`} className="space-y-4 border-b pb-6 last:border-b-0 last:pb-0">
-                                  <div className={`p-3 rounded-lg ${
-                                    block.name.includes('Activation') ? 'bg-blue-50' :
-                                    block.name.includes('Mobilité') ? 'bg-green-50' :
-                                    block.name.includes('Développement') ? 'bg-orange-50' : 'bg-gray-50'
-                                  }`}>
-                                    <h3 className={`font-semibold ${
-                                      block.name.includes('Activation') ? 'text-blue-800' :
-                                      block.name.includes('Mobilité') ? 'text-green-800' :
-                                      block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
-                                    }`}>{block.name}</h3>
-                                    {block.instructions && (
-                                      <p className="text-sm text-blue-700 mt-1">{block.instructions}</p>
-                                    )}
-                                    {block.focus && (
-                                      <div className="mt-2">
-                                        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                                          {block.focus}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  <div className="space-y-2">
-                                    {blockExercises.map((exercise, index) => (
-                                      <div
-                                        key={`${block.id}-${exercise.id}-${index}`}
-                                        className="bg-white rounded border p-2 hover:bg-gray-50 transition-colors"
-                                      >
-                                        <div className="flex items-start">
-                                          {exercise.videoPublicId ? (
-                                            <div className="relative w-16 h-12 flex-shrink-0 mr-2 rounded overflow-hidden">
-                                              <video
-                                                src={exercise.videoPublicId}
-                                                className="w-full h-full object-cover"
-                                                muted
-                                                preload="metadata"
-                                              />
-                                            </div>
-                                          ) : (
-                                            <div className="w-16 h-12 flex-shrink-0 mr-2 rounded bg-gray-100 flex items-center justify-center">
-                                              <Dumbbell className="w-4 h-4 text-gray-400" />
-                                            </div>
-                                          )}
-                                          <div className="flex-grow min-w-0">
-                                            <div className="flex items-center justify-between">
-                                              <h4 className="font-medium text-sm">{exercise.name}</h4>
-                                            </div>
-                                            {block.exerciseNotes && block.exerciseNotes[block.exerciceId.indexOf(exercise.id)] && (
-                                              <p className="text-xs text-gray-600 mt-0.5">
-                                                {block.exerciseNotes[block.exerciceId.indexOf(exercise.id)]}
-                                              </p>
+                    <div className="p-4">
+                      <Carousel className="py-2">
+                        {programRoutines[program.id]?.map((routine) => (
+                          <Card key={routine.id} className="h-full border shadow-sm hover:shadow-md transition-shadow">
+                            <CardHeader className="pb-3 border-b">
+                              <CardTitle className="text-lg font-semibold">{routine.name}</CardTitle>
+                              {routine.equipment && (
+                                <CardDescription className="text-sm">
+                                  Matériel: {routine.equipment}
+                                </CardDescription>
+                              )}
+                              {routine.sessionOutcome && (
+                                <CardDescription className="text-sm mt-1">
+                                  Objectif: {routine.sessionOutcome}
+                                </CardDescription>
+                              )}
+                            </CardHeader>
+                            <CardContent className="p-4 space-y-4">
+                              {blocks
+                                .filter(block => routine.blockId.includes(block.id))
+                                .map((block) => (
+                                  <div key={block.id} className="space-y-3">
+                                    <div className={`p-2 rounded-md ${
+                                      block.name.includes('Activation') ? 'bg-blue-50 border border-blue-100' :
+                                      block.name.includes('Mobilité') ? 'bg-green-50 border border-green-100' :
+                                      block.name.includes('Développement') ? 'bg-orange-50 border border-orange-100' : 
+                                      'bg-gray-50 border border-gray-100'
+                                    }`}>
+                                      <h3 className={`font-medium text-sm ${
+                                        block.name.includes('Activation') ? 'text-blue-800' :
+                                        block.name.includes('Mobilité') ? 'text-green-800' :
+                                        block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
+                                      }`}>
+                                        {block.name}
+                                      </h3>
+                                      {block.instructions && (
+                                        <p className="text-xs text-gray-600 mt-1">{block.instructions}</p>
+                                      )}
+                                    </div>
+                                    
+                                    <div className="space-y-2 ml-2">
+                                      {exercises
+                                        .filter(ex => block.exerciceId.includes(ex.id))
+                                        .map((exercise, idx) => (
+                                          <div 
+                                            key={`${block.id}-${exercise.id}`}
+                                            className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
+                                          >
+                                            {exercise.videoPublicId ? (
+                                              <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden mr-2">
+                                                <video
+                                                  src={exercise.videoPublicId}
+                                                  className="w-full h-full object-cover"
+                                                  muted
+                                                  preload="metadata"
+                                                />
+                                              </div>
+                                            ) : (
+                                              <div className="w-12 h-12 flex-shrink-0 mr-2 rounded bg-gray-100 flex items-center justify-center">
+                                                <Dumbbell className="w-4 h-4 text-gray-400" />
+                                              </div>
                                             )}
+                                            <div className="flex-1 min-w-0">
+                                              <h4 className="text-sm font-medium text-gray-900">{exercise.name}</h4>
+                                              {block.exerciseNotes?.[idx] && (
+                                                <p className="text-xs text-gray-600 mt-0.5">
+                                                  {block.exerciseNotes[idx]}
+                                                </p>
+                                              )}
+                                            </div>
                                           </div>
-                                        </div>
-                                      </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                   </div>
-                                </div>
-                              );
-                            })
-                            .filter(Boolean)
-                        )}
-                      </div>
+                                ))}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </Carousel>
                     </div>
                   )}
                 </Card>
@@ -340,7 +352,7 @@ export default function Home() {
             })}
 
             {programs.length === 0 && (
-              <div className="text-center py-12">
+              <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed">
                 <p className="text-gray-500">Aucun programme disponible pour le moment.</p>
               </div>
             )}
