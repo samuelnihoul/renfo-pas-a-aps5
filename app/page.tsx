@@ -278,7 +278,7 @@ export default function Home() {
   }
 
   return (
-    <div className="container px-2 sm:px-4 py-4 sm:py-6 mx-auto">
+    <div className="container px-0 py-4 sm:py-6 mx-auto">
       {/* Display error message if redirected due to unauthorized access */}
       <Suspense fallback={null}>
         <ErrorAlert />
@@ -323,7 +323,7 @@ export default function Home() {
                   </div>
 
                   {expandedPrograms[program.id] && programRoutines[program.id]?.length > 0 && (
-                    <div className="p-4 w-full">
+                    <div className="w-full">
                       <div className="mb-4">
                         <Card className="border shadow-sm">
                           {(() => {
