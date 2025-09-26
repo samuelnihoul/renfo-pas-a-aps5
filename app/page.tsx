@@ -3,11 +3,15 @@
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { ChevronRight, ChevronDown, ChevronLeft, Dumbbell, ListChecks, Calendar, AlertCircle } from "lucide-react"
+import { ChevronRight, ChevronDown, ChevronLeft, ChevronsLeft, ChevronsRight, Dumbbell, ListChecks, Calendar, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import { useData } from "@/components/data-provider"
 import { Button } from "@/components/ui/button"
-import { Carousel } from "@/components/ui/carousel"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from "@/components/ui/pagination"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminLink } from "@/components/admin-link"
@@ -59,10 +63,11 @@ type Routine = {
 type Program = {
   id: number
   name: string
-  instructions?: string
+  description?: string
   routineId: number[]
   createdAt: string
   updatedAt: string
+  [key: string]: any // Permet des propriétés supplémentaires comme 'instructions'
 }
 
 // ======================
@@ -128,13 +133,36 @@ function BlockItem({ block, exercises }: { block: Block, exercises: Exercise[] }
 
 
 // ======================
+// ERROR ALERT COMPONENT
+// ======================
+// Displays error messages for unauthorized access or other errors
+function ErrorAlert() {
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+
+  if (!error) return null
+
+  return (
+    <Alert variant="destructive" className="mb-6">
+      <AlertCircle className="h-4 w-4" />
+      <AlertDescription>
+        {error === 'AccessDenied' 
+          ? 'Vous devez être connecté pour accéder à cette page.' 
+          : 'Une erreur est survenue. Veuillez réessayer.'}
+      </AlertDescription>
+    </Alert>
+  )
+}
+
+// ======================
 // MAIN PAGE COMPONENT
 // ======================
 // The home page that displays programs, routines, blocks, and exercises in a hierarchical view
 export default function Home() {
-  // State management for expanded programs and their routines
+  // State management for expanded programs, their routines and pagination
   const [expandedPrograms, setExpandedPrograms] = useState<Record<number, boolean>>({})
   const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({})
+  const [currentRoutineIndices, setCurrentRoutineIndices] = useState<Record<number, number>>({})
 
   // UI state for video view and loading indicators
   const [loadingStates, setLoadingStates] = useState({
@@ -144,7 +172,6 @@ export default function Home() {
     exercises: true
   })
 
-  // Error alert handled in a Suspense-wrapped child component
 
   // Data fetching and state management from context
   const {
@@ -218,6 +245,36 @@ export default function Home() {
       ...prev,
       [programId]: !prev[programId]
     }))
+    
+    // Initialize or reset the current routine index when expanding
+    if (!expandedPrograms[programId]) {
+      setCurrentRoutineIndices(prev => ({
+        ...prev,
+        [programId]: 0
+      }))
+    }
+  }
+  
+  const goToRoutine = (programId: number, index: number) => {
+    setCurrentRoutineIndices(prev => ({
+      ...prev,
+      [programId]: index
+    }))
+  }
+  
+  const goToNextRoutine = (programId: number) => {
+    const currentIndex = currentRoutineIndices[programId] || 0
+    const routines = programRoutines[programId] || []
+    if (currentIndex < routines.length - 1) {
+      goToRoutine(programId, currentIndex + 1)
+    }
+  }
+  
+  const goToPrevRoutine = (programId: number) => {
+    const currentIndex = currentRoutineIndices[programId] || 0
+    if (currentIndex > 0) {
+      goToRoutine(programId, currentIndex - 1)
+    }
   }
 
   return (
@@ -227,7 +284,7 @@ export default function Home() {
         <ErrorAlert />
       </Suspense>
 
-      <Tabs defaultValue="programs" className="w-full overflow-x-hidden">
+      <Tabs defaultValue="programs" className="w-full">
         <TabsList className="w-full flex">
           <TabsTrigger value="programs" className="flex-1 text-sm sm:text-base">Programmes</TabsTrigger>
           <TabsTrigger value="exercises" className="flex-1 text-sm sm:text-base">Exercices</TabsTrigger>
@@ -260,91 +317,162 @@ export default function Home() {
                         {programRoutines[program.id]?.length || 0} routines
                       </div>
                     </div>
-                    {program.instructions && (
-                      <p className="text-sm text-gray-600 mt-2 ml-8">{program.instructions}</p>
+                    {program.description && (
+                      <p className="text-sm text-gray-600 mt-2 ml-8">{program.description}</p>
                     )}
                   </div>
 
-                  {expandedPrograms[program.id] && (
-                    <div className="p-4">
-                      <Carousel className="py-2">
-                        {programRoutines[program.id]?.map((routine) => (
-                          <Card key={routine.id} className="h-full border shadow-sm hover:shadow-md transition-shadow">
-                            <CardHeader className="pb-3 border-b">
-                              <CardTitle className="text-lg font-semibold">{routine.name}</CardTitle>
-                              {routine.equipment && (
-                                <CardDescription className="text-sm">
-                                  Matériel: {routine.equipment}
-                                </CardDescription>
-                              )}
-                              {routine.sessionOutcome && (
-                                <CardDescription className="text-sm mt-1">
-                                  Objectif: {routine.sessionOutcome}
-                                </CardDescription>
-                              )}
-                            </CardHeader>
-                            <CardContent className="p-4 space-y-4">
-                              {blocks
-                                .filter(block => routine.blockId.includes(block.id))
-                                .map((block) => (
-                                  <div key={block.id} className="space-y-3">
-                                    <div className={`p-2 rounded-md ${
-                                      block.name.includes('Activation') ? 'bg-blue-50 border border-blue-100' :
-                                      block.name.includes('Mobilité') ? 'bg-green-50 border border-green-100' :
-                                      block.name.includes('Développement') ? 'bg-orange-50 border border-orange-100' : 
-                                      'bg-gray-50 border border-gray-100'
-                                    }`}>
-                                      <h3 className={`font-medium text-sm ${
-                                        block.name.includes('Activation') ? 'text-blue-800' :
-                                        block.name.includes('Mobilité') ? 'text-green-800' :
-                                        block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
-                                      }`}>
-                                        {block.name}
-                                      </h3>
-                                      {block.instructions && (
-                                        <p className="text-xs text-gray-600 mt-1">{block.instructions}</p>
-                                      )}
-                                    </div>
-                                    
-                                    <div className="space-y-2 ml-2">
-                                      {exercises
-                                        .filter(ex => block.exerciceId.includes(ex.id))
-                                        .map((exercise, idx) => (
-                                          <div 
-                                            key={`${block.id}-${exercise.id}`}
-                                            className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
-                                          >
-                                            {exercise.videoPublicId ? (
-                                              <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden mr-2">
-                                                <video
-                                                  src={exercise.videoPublicId}
-                                                  className="w-full h-full object-cover"
-                                                  muted
-                                                  preload="metadata"
-                                                />
+                  {expandedPrograms[program.id] && programRoutines[program.id]?.length > 0 && (
+                    <div className="p-4 w-full">
+                      <div className="mb-4">
+                        <Card className="border shadow-sm">
+                          {(() => {
+                            const currentIndex = currentRoutineIndices[program.id] || 0
+                            const routine = programRoutines[program.id][currentIndex]
+                            const totalRoutines = programRoutines[program.id].length
+                            
+                            return (
+                              <>
+                                <CardHeader className="pb-3 border-b px-4 py-3">
+                                  <CardTitle className="text-base sm:text-lg font-semibold">
+                                    {routine.name} <span className="text-sm font-normal text-muted-foreground">({currentIndex + 1}/{totalRoutines})</span>
+                                  </CardTitle>
+                                  {routine.equipment && (
+                                    <CardDescription className="text-sm">
+                                      Matériel: {routine.equipment}
+                                    </CardDescription>
+                                  )}
+                                  {routine.sessionOutcome && (
+                                    <CardDescription className="text-sm mt-1">
+                                      Objectif: {routine.sessionOutcome}
+                                    </CardDescription>
+                                  )}
+                                </CardHeader>
+                                <CardContent className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
+                                  {blocks
+                                    .filter(block => routine.blockId.includes(block.id))
+                                    .map((block) => (
+                                      <div key={block.id} className="space-y-3">
+                                        <div className={`p-3 rounded-md ${
+                                          block.name.includes('Activation') ? 'bg-blue-50 border border-blue-100' :
+                                          block.name.includes('Mobilité') ? 'bg-green-50 border border-green-100' :
+                                          block.name.includes('Développement') ? 'bg-orange-50 border border-orange-100' : 
+                                          'bg-gray-50 border border-gray-100'
+                                        }`}>
+                                          <h3 className={`font-medium ${
+                                            block.name.includes('Activation') ? 'text-blue-800' :
+                                            block.name.includes('Mobilité') ? 'text-green-800' :
+                                            block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
+                                          }`}>
+                                            {block.name}
+                                          </h3>
+                                          {block.instructions && (
+                                            <p className="text-sm text-gray-600 mt-1">{block.instructions}</p>
+                                          )}
+                                        </div>
+                                        
+                                        <div className="space-y-2 ml-1">
+                                          {exercises
+                                            .filter(ex => block.exerciceId.includes(ex.id))
+                                            .map((exercise, idx) => (
+                                              <div 
+                                                key={`${block.id}-${exercise.id}`}
+                                                className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
+                                              >
+                                                {exercise.videoPublicId ? (
+                                                  <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden mr-3">
+                                                    <video
+                                                      src={exercise.videoPublicId}
+                                                      className="w-full h-full object-cover"
+                                                      muted
+                                                      preload="metadata"
+                                                    />
+                                                  </div>
+                                                ) : (
+                                                  <div className="w-12 h-12 flex-shrink-0 mr-3 rounded bg-gray-100 flex items-center justify-center">
+                                                    <Dumbbell className="w-4 h-4 text-gray-400" />
+                                                  </div>
+                                                )}
+                                                <div className="flex-1 min-w-0">
+                                                  <h4 className="text-sm font-medium text-gray-900">{exercise.name}</h4>
+                                                  {block.exerciseNotes?.[idx] && (
+                                                    <p className="text-xs text-gray-600 mt-1">
+                                                      {block.exerciseNotes[idx]}
+                                                    </p>
+                                                  )}
+                                                </div>
                                               </div>
-                                            ) : (
-                                              <div className="w-12 h-12 flex-shrink-0 mr-2 rounded bg-gray-100 flex items-center justify-center">
-                                                <Dumbbell className="w-4 h-4 text-gray-400" />
-                                              </div>
-                                            )}
-                                            <div className="flex-1 min-w-0">
-                                              <h4 className="text-sm font-medium text-gray-900">{exercise.name}</h4>
-                                              {block.exerciseNotes?.[idx] && (
-                                                <p className="text-xs text-gray-600 mt-0.5">
-                                                  {block.exerciseNotes[idx]}
-                                                </p>
-                                              )}
-                                            </div>
-                                          </div>
-                                        ))}
-                                    </div>
-                                  </div>
-                                ))}
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </Carousel>
+                                            ))}
+                                        </div>
+                                      </div>
+                                    ))}
+                                </CardContent>
+                              </>
+                            )
+                          })()}
+                        </Card>
+                      </div>
+                      
+                      <Pagination className="mt-4">
+                        <PaginationContent className="w-full flex justify-between">
+                          <PaginationItem>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="gap-1"
+                              onClick={() => goToRoutine(program.id, 0)}
+                              disabled={(currentRoutineIndices[program.id] || 0) === 0}
+                            >
+                              <ChevronsLeft className="h-4 w-4" />
+                              <span className="sr-only sm:not-sr-only sm:ml-2">Première</span>
+                            </Button>
+                          </PaginationItem>
+                          
+                          <PaginationItem>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="h-9 w-9"
+                                onClick={() => goToPrevRoutine(program.id)}
+                                disabled={(currentRoutineIndices[program.id] || 0) === 0}
+                              >
+                                <ChevronLeft className="h-4 w-4" />
+                              </Button>
+                              
+                              <div className="px-4 text-sm text-muted-foreground">
+                                {((currentRoutineIndices[program.id] || 0) + 1)} / {programRoutines[program.id]?.length || 0}
+                              </div>
+                              
+                              <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="h-9 w-9"
+                                onClick={() => goToNextRoutine(program.id)}
+                                disabled={(currentRoutineIndices[program.id] || 0) >= (programRoutines[program.id]?.length || 1) - 1}
+                              >
+                                <ChevronRight className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </PaginationItem>
+                          
+                          <PaginationItem>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="gap-1"
+                              onClick={() => {
+                                const lastIndex = (programRoutines[program.id]?.length || 1) - 1
+                                goToRoutine(program.id, lastIndex)
+                              }}
+                              disabled={(currentRoutineIndices[program.id] || 0) >= (programRoutines[program.id]?.length || 1) - 1}
+                            >
+                              <span className="sr-only sm:not-sr-only sm:mr-2">Dernière</span>
+                              <ChevronsRight className="h-4 w-4" />
+                            </Button>
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
                     </div>
                   )}
                 </Card>
@@ -448,18 +576,3 @@ export default function Home() {
   )
 }
 
-function ErrorAlert() {
-  const searchParams = useSearchParams()
-  const errorParam = searchParams.get('error')
-
-  if (errorParam !== 'unauthorized') return null
-
-  return (
-    <Alert className="mb-6" variant="destructive">
-      <AlertCircle className="h-4 w-4" />
-      <AlertDescription>
-        Accès non autorisé. Vous devez être administrateur pour accéder à cette section.
-      </AlertDescription>
-    </Alert>
-  )
-}
