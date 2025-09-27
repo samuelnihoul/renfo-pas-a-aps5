@@ -13,7 +13,6 @@ import {
   PaginationItem,
 } from "@/components/ui/pagination"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminLink } from "@/components/admin-link"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
@@ -284,14 +283,7 @@ export default function Home() {
         <ErrorAlert />
       </Suspense>
 
-      <Tabs defaultValue="programs" className="w-full">
-        <TabsList className="w-full flex">
-          <TabsTrigger value="programs" className="flex-1 text-sm sm:text-base">Programmes</TabsTrigger>
-          <TabsTrigger value="exercises" className="flex-1 text-sm sm:text-base">Exercices</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="programs" className="mt-4">
-          <div className="space-y-6 px-1">
+               <div className="space-y-6 px-1">
             {programs.map((program) => {
               const isLoading = !programRoutines[program.id]
               const programBlocks = blocks.filter(block => 
@@ -485,94 +477,8 @@ export default function Home() {
               </div>
             )}
           </div>
-        </TabsContent>
 
-        <TabsContent value="exercises" className="mt-6">
-          <div className="space-y-8 w-full overflow-x-hidden">
-            {exercises.length > 0 ? (
-              exercises.map((exercise) => (
-                <Card key={exercise.id} className="overflow-hidden">
-                  <div className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold">{exercise.name}</h3>
-                        {exercise.objectifs && (
-                          <p className="text-sm text-gray-600 mt-1">
-                            <span className="font-medium">Objectifs :</span> {exercise.objectifs}
-                          </p>
-                        )}
-                      </div>
-
-                      {exercise.videoPublicId && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <button className="ml-4 flex-shrink-0 focus:outline-none group">
-                              <div className="w-24 h-16 bg-gray-100 rounded overflow-hidden flex items-center justify-center relative">
-                                <video
-                                  src={typeof exercise.videoPublicId === 'string' ? exercise.videoPublicId : ''}
-                                  className="w-full h-full object-cover"
-                                  muted
-                                  preload="metadata"
-                                  poster="/placeholder.svg"
-                                  onLoadedMetadata={(e) => {
-                                    const video = e.target as HTMLVideoElement;
-                                    video.currentTime = 0.1;
-                                    video.onloadeddata = () => {
-                                      video.pause();
-                                    };
-                                  }}
-                                />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-6.518-3.759A1 1 0 007 8.06v7.882a1 1 0 001.234.97l6.518-1.857A1 1 0 0016 14.06V9.94a1 1 0 00-1.248-.772z" /></svg>
-                                </div>
-                              </div>
-                            </button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl w-full">
-                            <DialogTitle>
-                              <span className="sr-only">{exercise.name}</span>
-                            </DialogTitle>
-                            <div className="w-full aspect-video">
-                              <video
-                                src={typeof exercise.videoPublicId === 'string' ? exercise.videoPublicId : ''}
-                                controls
-                                autoPlay
-                                className="w-full h-full object-contain rounded"
-                                poster="/placeholder.svg"
-                              />
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      )}
-                    </div>
-
-                    {exercise.instructions && (
-                      <div className="mt-3">
-                        <h4 className="text-sm font-medium text-gray-700">Instructions :</h4>
-                        <p className="text-sm text-gray-600 mt-1">{exercise.instructions}</p>
-                      </div>
-                    )}
-                    {exercise.objectifs && (
-                      <div className="mt-3">
-                        <h4 className="text-sm font-medium text-gray-700">Objectifs :</h4>
-                        <p className="text-sm text-gray-600 mt-1">{exercise.objectifs}</p>
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-500">Aucun exercice disponible pour le moment.</p>
-                <Button className="mt-4" asChild>
-                  <Link href="/admin/exercices/nouveau">Ajouter un exercice</Link>
-                </Button>
-              </div>
-            )}
           </div>
-        </TabsContent>
-      </Tabs>
-    </div>
   )
 }
 
