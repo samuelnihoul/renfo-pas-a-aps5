@@ -33,9 +33,11 @@ type Exercise = {
   id: number
   name: string
   videoPublicId: string | null
+  videoUrl?: string
   instructions: string | null
   objectifs: string | null
   notes: string | null
+  muscleGroup?: string
   createdAt: string
   updatedAt: string
 }
@@ -54,6 +56,8 @@ type DataContextType = {
   fetchRoutinesByProgram: (programId: number) => Promise<Routine[]>
   fetchBlocksByRoutine: (routineId: number) => Promise<Block[]>
   fetchExercisesByBlock: (blockId: number) => Promise<Exercise[]>
+  fetchExercisesByMuscleGroup: (muscleGroup: string) => Promise<Exercise[]>
+  fetchAllExercises: () => Promise<Exercise[]>
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined)
@@ -218,6 +222,32 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const fetchExercisesByMuscleGroup = async (muscleGroup: string): Promise<Exercise[]> => {
+    try {
+      const response = await fetch(`/api/exercises?muscleGroup=${encodeURIComponent(muscleGroup)}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch exercises by muscle group')
+      }
+      return await response.json()
+    } catch (err) {
+      console.error('Error fetching exercises by muscle group:', err)
+      throw err
+    }
+  }
+
+  const fetchAllExercises = async (): Promise<Exercise[]> => {
+    try {
+      const response = await fetch('/api/exercises')
+      if (!response.ok) {
+        throw new Error('Failed to fetch all exercises')
+      }
+      return await response.json()
+    } catch (err) {
+      console.error('Error fetching all exercises:', err)
+      throw err
+    }
+  }
+
   const value = {
     programs,
     routines,
@@ -231,10 +261,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchExerciseDetails,
     fetchRoutinesByProgram,
     fetchBlocksByRoutine,
-    fetchExercisesByBlock
+    fetchExercisesByBlock,
+    fetchExercisesByMuscleGroup,
+    fetchAllExercises,
   }
 
-  return <DataContext.Provider value={value}>{children}</DataContext.Provider>
+  return (
+    <DataContext.Provider value={value}>
+      {children}
+    </DataContext.Provider>
+  )
 }
 
 export function useData() {
