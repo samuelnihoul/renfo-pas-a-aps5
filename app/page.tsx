@@ -21,7 +21,7 @@ import {
   DialogContent,
   DialogClose,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 
 // ======================
 // TYPE DEFINITIONS
@@ -145,8 +145,8 @@ function ErrorAlert() {
     <Alert variant="destructive" className="mb-6">
       <AlertCircle className="h-4 w-4" />
       <AlertDescription>
-        {error === 'AccessDenied' 
-          ? 'Vous devez être connecté pour accéder à cette page.' 
+        {error === 'AccessDenied'
+          ? 'Vous devez être connecté pour accéder à cette page.'
           : 'Une erreur est survenue. Veuillez réessayer.'}
       </AlertDescription>
     </Alert>
@@ -244,7 +244,7 @@ export default function Home() {
       ...prev,
       [programId]: !prev[programId]
     }))
-    
+
     // Initialize or reset the current routine index when expanding
     if (!expandedPrograms[programId]) {
       setCurrentRoutineIndices(prev => ({
@@ -253,14 +253,14 @@ export default function Home() {
       }))
     }
   }
-  
+
   const goToRoutine = (programId: number, index: number) => {
     setCurrentRoutineIndices(prev => ({
       ...prev,
       [programId]: index
     }))
   }
-  
+
   const goToNextRoutine = (programId: number) => {
     const currentIndex = currentRoutineIndices[programId] || 0
     const routines = programRoutines[programId] || []
@@ -268,7 +268,7 @@ export default function Home() {
       goToRoutine(programId, currentIndex + 1)
     }
   }
-  
+
   const goToPrevRoutine = (programId: number) => {
     const currentIndex = currentRoutineIndices[programId] || 0
     if (currentIndex > 0) {
@@ -283,202 +283,231 @@ export default function Home() {
         <ErrorAlert />
       </Suspense>
 
-               <div className="space-y-6 px-1">
-            {programs.map((program) => {
-              const isLoading = !programRoutines[program.id]
-              const programBlocks = blocks.filter(block => 
-                programRoutines[program.id]?.some(routine => routine.blockId.includes(block.id))
-              )
+      <div className="space-y-6 px-1">
+        {programs.map((program) => {
+          const isLoading = !programRoutines[program.id]
+          const programBlocks = blocks.filter(block =>
+            programRoutines[program.id]?.some(routine => routine.blockId.includes(block.id))
+          )
 
-              return (
-                <Card key={program.id} className="overflow-hidden">
-                  <div
-                    className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 border-b cursor-pointer hover:from-gray-100 hover:to-gray-200 transition-colors"
-                    onClick={() => toggleProgram(program.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {expandedPrograms[program.id] ? (
-                          <ChevronDown className="w-5 h-5 text-gray-600" />
-                        ) : (
-                          <ChevronRight className="w-5 h-5 text-gray-600" />
-                        )}
-                        <h2 className="text-lg sm:text-xl font-bold text-gray-800">{program.name}</h2>
-                      </div>
-                      <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
-                        {programRoutines[program.id]?.length || 0} routines
-                      </div>
-                    </div>
-                    {program.description && (
-                      <p className="text-sm text-gray-600 mt-2 ml-8">{program.description}</p>
+          return (
+            <Card key={program.id} className="overflow-hidden">
+              <div
+                className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 border-b cursor-pointer hover:from-gray-100 hover:to-gray-200 transition-colors"
+                onClick={() => toggleProgram(program.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {expandedPrograms[program.id] ? (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-600" />
                     )}
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-800">{program.name}</h2>
                   </div>
+                  <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
+                    {programRoutines[program.id]?.length || 0} routines
+                  </div>
+                </div>
+                {program.description && (
+                  <p className="text-sm text-gray-600 mt-2 ml-8">{program.description}</p>
+                )}
+              </div>
 
-                  {expandedPrograms[program.id] && programRoutines[program.id]?.length > 0 && (
-                    <div className="w-full">
-                      <div className="mb-4">
-                        <Card className="border shadow-sm">
-                          {(() => {
-                            const currentIndex = currentRoutineIndices[program.id] || 0
-                            const routine = programRoutines[program.id][currentIndex]
-                            const totalRoutines = programRoutines[program.id].length
-                            
-                            return (
-                              <>
-                                <CardHeader className="pb-3 border-b px-4 py-3">
-                                  <CardTitle className="text-base sm:text-lg font-semibold">
-                                    {routine.name} <span className="text-sm font-normal text-muted-foreground">({currentIndex + 1}/{totalRoutines})</span>
-                                  </CardTitle>
-                                  {routine.equipment && (
-                                    <CardDescription className="text-sm">
-                                      Matériel: {routine.equipment}
-                                    </CardDescription>
-                                  )}
-                                  {routine.sessionOutcome && (
-                                    <CardDescription className="text-sm mt-1">
-                                      Objectif: {routine.sessionOutcome}
-                                    </CardDescription>
-                                  )}
-                                </CardHeader>
-                                <CardContent className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
-                                  {blocks
-                                    .filter(block => routine.blockId.includes(block.id))
-                                    .map((block) => (
-                                      <div key={block.id} className="space-y-3">
-                                        <div className={`p-3 rounded-md ${
-                                          block.name.includes('Activation') ? 'bg-blue-50 border border-blue-100' :
-                                          block.name.includes('Mobilité') ? 'bg-green-50 border border-green-100' :
-                                          block.name.includes('Développement') ? 'bg-orange-50 border border-orange-100' : 
+              {expandedPrograms[program.id] && programRoutines[program.id]?.length > 0 && (
+                <div className="w-full">
+                  <div className="mb-4">
+                    <Card className="border shadow-sm">
+                      {(() => {
+                        const currentIndex = currentRoutineIndices[program.id] || 0
+                        const routine = programRoutines[program.id][currentIndex]
+                        const totalRoutines = programRoutines[program.id].length
+
+                        return (
+                          <>
+                            <CardHeader className="pb-3 border-b px-4 py-3">
+                              <CardTitle className="text-base sm:text-lg font-semibold">
+                                {routine.name} <span className="text-sm font-normal text-muted-foreground">({currentIndex + 1}/{totalRoutines})</span>
+                              </CardTitle>
+                              {routine.equipment && (
+                                <CardDescription className="text-sm">
+                                  Matériel: {routine.equipment}
+                                </CardDescription>
+                              )}
+                              {routine.sessionOutcome && (
+                                <CardDescription className="text-sm mt-1">
+                                  Objectif: {routine.sessionOutcome}
+                                </CardDescription>
+                              )}
+                            </CardHeader>
+                            <CardContent className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
+                              {blocks
+                                .filter(block => routine.blockId.includes(block.id))
+                                .map((block) => (
+                                  <div key={block.id} className="space-y-3">
+                                    <div className={`p-3 rounded-md ${block.name.includes('Activation') ? 'bg-blue-50 border border-blue-100' :
+                                      block.name.includes('Mobilité') ? 'bg-green-50 border border-green-100' :
+                                        block.name.includes('Développement') ? 'bg-orange-50 border border-orange-100' :
                                           'bg-gray-50 border border-gray-100'
+                                      }`}>
+                                      <h3 className={`font-medium ${block.name.includes('Activation') ? 'text-blue-800' :
+                                        block.name.includes('Mobilité') ? 'text-green-800' :
+                                          block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
                                         }`}>
-                                          <h3 className={`font-medium ${
-                                            block.name.includes('Activation') ? 'text-blue-800' :
-                                            block.name.includes('Mobilité') ? 'text-green-800' :
-                                            block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
-                                          }`}>
-                                            {block.name}
-                                          </h3>
-                                          {block.instructions && (
-                                            <p className="text-sm text-gray-600 mt-1">{block.instructions}</p>
-                                          )}
-                                        </div>
-                                        
-                                        <div className="space-y-2 ml-1">
-                                          {exercises
-                                            .filter(ex => block.exerciceId.includes(ex.id))
-                                            .map((exercise, idx) => (
-                                              <div 
-                                                key={`${block.id}-${exercise.id}`}
-                                                className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
-                                              >
-                                                {exercise.videoPublicId ? (
-                                                  <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden mr-3">
+                                        {block.name}
+                                      </h3>
+                                      {block.instructions && (
+                                        <p className="text-sm text-gray-600 mt-1">{block.instructions}</p>
+                                      )}
+                                    </div>
+
+                                    <div className="space-y-2 ml-1">
+                                      {exercises
+                                        .filter(ex => block.exerciceId.includes(ex.id))
+                                        .map((exercise, idx) => (
+                                          <div
+                                            key={`${block.id}-${exercise.id}`}
+                                            className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
+                                          >
+                                            {exercise.short ? (
+                                              <Dialog>
+                                                <DialogTrigger asChild>
+                                                  <button className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden mr-3 focus:outline-none group">
                                                     <video
-                                                      src={exercise.videoPublicId}
+                                                      src={exercise.short}
                                                       className="w-full h-full object-cover"
                                                       muted
                                                       preload="metadata"
+                                                      poster="/placeholder.svg"
+                                                      onLoadedMetadata={(e) => {
+                                                        const video = e.target as HTMLVideoElement;
+                                                        video.currentTime = 0.1;
+                                                        video.onloadeddata = () => {
+                                                          video.pause();
+                                                        };
+                                                      }}
+                                                    />
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-6.518-3.759A1 1 0 007 8.06v7.882a1 1 0 001.234.97l6.518-1.857A1 1 0 0016 14.06V9.94a1 1 0 00-1.248-.772z" />
+                                                      </svg>
+                                                    </div>
+                                                  </button>
+                                                </DialogTrigger>
+                                                <DialogContent className="max-w-2xl w-full">
+                                                  <DialogTitle>
+                                                    <span className="sr-only">{exercise.name}</span>
+                                                  </DialogTitle>
+                                                  <div className="w-full aspect-video">
+                                                    <video
+                                                      src={exercise.short}
+                                                      controls
+                                                      autoPlay
+                                                      className="w-full h-full object-contain rounded"
+                                                      poster="/placeholder.svg"
                                                     />
                                                   </div>
-                                                ) : (
-                                                  <div className="w-12 h-12 flex-shrink-0 mr-3 rounded bg-gray-100 flex items-center justify-center">
-                                                    <Dumbbell className="w-4 h-4 text-gray-400" />
-                                                  </div>
-                                                )}
-                                                <div className="flex-1 min-w-0">
-                                                  <h4 className="text-sm font-medium text-gray-900">{exercise.name}</h4>
-                                                  {block.exerciseNotes?.[idx] && (
-                                                    <p className="text-xs text-gray-600 mt-1">
-                                                      {block.exerciseNotes[idx]}
-                                                    </p>
-                                                  )}
-                                                </div>
+                                                </DialogContent>
+                                              </Dialog>
+                                            ) : (
+                                              <div className="w-12 h-12 flex-shrink-0 mr-3 rounded bg-gray-100 flex items-center justify-center">
+                                                <Dumbbell className="w-4 h-4 text-gray-400" />
                                               </div>
-                                            ))}
-                                        </div>
-                                      </div>
-                                    ))}
-                                </CardContent>
-                              </>
-                            )
-                          })()}
-                        </Card>
-                      </div>
-                      
-                      <Pagination className="mt-4">
-                        <PaginationContent className="w-full flex justify-between">
-                          <PaginationItem>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="gap-1"
-                              onClick={() => goToRoutine(program.id, 0)}
-                              disabled={(currentRoutineIndices[program.id] || 0) === 0}
-                            >
-                              <ChevronsLeft className="h-4 w-4" />
-                              <span className="sr-only sm:not-sr-only sm:ml-2">Première</span>
-                            </Button>
-                          </PaginationItem>
-                          
-                          <PaginationItem>
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="icon" 
-                                className="h-9 w-9"
-                                onClick={() => goToPrevRoutine(program.id)}
-                                disabled={(currentRoutineIndices[program.id] || 0) === 0}
-                              >
-                                <ChevronLeft className="h-4 w-4" />
-                              </Button>
-                              
-                              <div className="px-4 text-sm text-muted-foreground">
-                                {((currentRoutineIndices[program.id] || 0) + 1)} / {programRoutines[program.id]?.length || 0}
-                              </div>
-                              
-                              <Button 
-                                variant="outline" 
-                                size="icon" 
-                                className="h-9 w-9"
-                                onClick={() => goToNextRoutine(program.id)}
-                                disabled={(currentRoutineIndices[program.id] || 0) >= (programRoutines[program.id]?.length || 1) - 1}
-                              >
-                                <ChevronRight className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </PaginationItem>
-                          
-                          <PaginationItem>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="gap-1"
-                              onClick={() => {
-                                const lastIndex = (programRoutines[program.id]?.length || 1) - 1
-                                goToRoutine(program.id, lastIndex)
-                              }}
-                              disabled={(currentRoutineIndices[program.id] || 0) >= (programRoutines[program.id]?.length || 1) - 1}
-                            >
-                              <span className="sr-only sm:not-sr-only sm:mr-2">Dernière</span>
-                              <ChevronsRight className="h-4 w-4" />
-                            </Button>
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
-                    </div>
-                  )}
-                </Card>
-              )
-            })}
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                              <h4 className="text-sm font-medium text-gray-900">{exercise.name}</h4>
+                                              {block.exerciseNotes?.[idx] && (
+                                                <p className="text-xs text-gray-600 mt-1">
+                                                  {block.exerciseNotes[idx]}
+                                                </p>
+                                              )}
+                                            </div>
+                                          </div>
+                                        ))}
+                                    </div>
+                                  </div>
+                                ))}
+                            </CardContent>
+                          </>
+                        )
+                      })()}
+                    </Card>
+                  </div>
 
-            {programs.length === 0 && (
-              <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed">
-                <p className="text-gray-500">Aucun programme disponible pour le moment.</p>
-              </div>
-            )}
-          </div>
+                  <Pagination className="mt-4">
+                    <PaginationContent className="w-full flex justify-between">
+                      <PaginationItem>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() => goToRoutine(program.id, 0)}
+                          disabled={(currentRoutineIndices[program.id] || 0) === 0}
+                        >
+                          <ChevronsLeft className="h-4 w-4" />
+                          <span className="sr-only sm:not-sr-only sm:ml-2">Première</span>
+                        </Button>
+                      </PaginationItem>
 
+                      <PaginationItem>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9"
+                            onClick={() => goToPrevRoutine(program.id)}
+                            disabled={(currentRoutineIndices[program.id] || 0) === 0}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </Button>
+
+                          <div className="px-4 text-sm text-muted-foreground">
+                            {((currentRoutineIndices[program.id] || 0) + 1)} / {programRoutines[program.id]?.length || 0}
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9"
+                            onClick={() => goToNextRoutine(program.id)}
+                            disabled={(currentRoutineIndices[program.id] || 0) >= (programRoutines[program.id]?.length || 1) - 1}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </PaginationItem>
+
+                      <PaginationItem>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() => {
+                            const lastIndex = (programRoutines[program.id]?.length || 1) - 1
+                            goToRoutine(program.id, lastIndex)
+                          }}
+                          disabled={(currentRoutineIndices[program.id] || 0) >= (programRoutines[program.id]?.length || 1) - 1}
+                        >
+                          <span className="sr-only sm:not-sr-only sm:mr-2">Dernière</span>
+                          <ChevronsRight className="h-4 w-4" />
+                        </Button>
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </Card>
+          )
+        })}
+
+        {programs.length === 0 && (
+          <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed">
+            <p className="text-gray-500">Aucun programme disponible pour le moment.</p>
           </div>
+        )}
+      </div>
+
+    </div>
   )
 }
 
