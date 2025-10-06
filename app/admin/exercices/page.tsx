@@ -116,6 +116,10 @@ export default function ExercisesPage() {
       header: "Objectifs",
     },
     {
+      accessorKey: "muscleGroup",
+      header: "Groupe musculaire",
+    },
+    {
       accessorKey: "instructions",
       header: "Instructions"
     },

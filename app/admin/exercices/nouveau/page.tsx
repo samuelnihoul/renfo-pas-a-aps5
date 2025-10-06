@@ -21,6 +21,7 @@ export default function NewExercisePage() {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
+    muscleGroup: "",
     instructions: "",
     objectifs: "",
     videoPublicId: "",
@@ -151,6 +152,17 @@ export default function NewExercisePage() {
                 className={errors.name ? "border-destructive" : ""}
               />
               {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="muscleGroup">Groupe musculaire</label>
+              <Input
+                id="muscleGroup"
+                name="muscleGroup"
+                value={formData.muscleGroup}
+                onChange={handleChange}
+                placeholder="ex: Quadriceps, Pectoraux, Dos..."
+              />
             </div>
 
             <div className="space-y-2">

@@ -31,6 +31,7 @@ import VideoUpload from "@/components/video-upload";
 // Define validation schema
 const exerciseSchema = z.object({
   name: z.string().min(1, "Le nom de l'exercice est requis"),
+  muscleGroup: z.string().optional(),
   instructions: z.string(),
   videoPublicId: z.string(),
   short: z.string(),
@@ -53,6 +54,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
     resolver: zodResolver(exerciseSchema),
     defaultValues: {
       name: "",
+      muscleGroup: "",
       instructions: "",
       videoPublicId: "",
       short: "",
@@ -74,6 +76,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
         const exercise = await response.json()
         form.reset({
           name: exercise.name,
+          muscleGroup: exercise.muscleGroup || "",
           instructions: exercise.instructions || "",
           videoPublicId: exercise.videoPublicId || "",
           short: exercise.short || "",
@@ -186,6 +189,20 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
                     <FormLabel>Nom de l'exercice*</FormLabel>
                     <FormControl>
                       <Input placeholder="Nom de l'exercice" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="muscleGroup"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Groupe musculaire</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ex: Ischios, Pectoraux, Dos..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

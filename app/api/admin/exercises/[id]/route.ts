@@ -42,7 +42,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    const { name, objectifs, instructions, videoPublicId, short } = body
+    const { name, objectifs, instructions, videoPublicId, short, muscleGroup } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom de l'exercice est requis" }, { status: 400 })
@@ -56,6 +56,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         videoPublicId: videoPublicId || null,
         short: short || null,
         objectifs: objectifs || null,
+        muscleGroup: muscleGroup || null,
       })
       .where(eq(exercises.id, id))
       .returning()
