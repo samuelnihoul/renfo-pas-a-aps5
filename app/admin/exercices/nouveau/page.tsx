@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, ArrowLeft, Upload } from "lucide-react"
+import { Loader2, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -13,114 +13,82 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { toast } from "@/components/ui/use-toast"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 import VideoUpload from "@/components/video-upload";
+
+const exerciseSchema = z.object({
+  name: z.string().min(1, "Le nom de l'exercice est requis"),
+  muscleGroup: z.string().optional(),
+  instructions: z.string(),
+  videoPublicId: z.string(),
+  short: z.string(),
+  objectifs: z.string(),
+  notes: z.string(),
+})
+
+type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
 export default function NewExercisePage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    name: "",
-    muscleGroup: "",
-    instructions: "",
-    objectifs: "",
-    videoPublicId: "",
-    short: "",
-    notes: ""
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitting, setSubmitting] = useState(false)
   const [videoFile, setVideoFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }))
-    if (errors[name]) {
-      setErrors(prev => {
-        const newErrors = { ...prev }
-        delete newErrors[name]
-        return newErrors
-      })
-    }
-  }
+  const form = useForm<ExerciseFormValues>({
+    resolver: zodResolver(exerciseSchema),
+    defaultValues: {
+      name: "",
+      muscleGroup: "",
+      instructions: "",
+      videoPublicId: "",
+      short: "",
+      objectifs: "",
+      notes: "",
+    },
+  })
 
   const handleVideoUrlChange = (url: string) => {
-    setFormData(prev => ({
-      ...prev,
-      videoPublicId: url,
-    }))
+    form.setValue("videoPublicId", url)
   }
 
   const handleShortUrlChange = (url: string) => {
-    setFormData(prev => ({
-      ...prev,
-      short: url,
-    }))
+    form.setValue("short", url)
   }
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-    if (!formData.name.trim()) {
-      newErrors.name = "Le nom de l'exercice est requis"
-    }
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
-    setLoading(true)
-
+  const onSubmit = async (data: ExerciseFormValues) => {
+    setSubmitting(true)
     try {
-      let finalVideoPublicId = formData.videoPublicId
-
-      if (videoFile) {
-        // No need to upload here, handled by VideoUpload
-      }
-
-      console.log(formData)
       const response = await fetch("/api/admin/exercises", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          videoPublicId: finalVideoPublicId,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       })
 
-      if (response.ok) {
-        toast({
-          title: "Exercice créé",
-          description: "L'exercice a été créé avec succès",
-        })
-        router.push("/admin/exercices")
-      } else {
-        const data = await response.json()
-        toast({
-          title: "Erreur",
-          description: data.error || "Une erreur est survenue lors de la création de l'exercice",
-          variant: "destructive",
-        })
+      if (!response.ok) {
+        const res = await response.json().catch(() => ({}))
+        throw new Error(res.error || "Une erreur est survenue lors de la création de l'exercice")
       }
+
+      toast({ title: "Exercice créé", description: "L'exercice a été créé avec succès" })
+      router.push("/admin/exercices")
     } catch (error) {
-      console.error("Error creating exercise:", error)
       toast({
         title: "Erreur",
         description: error instanceof Error ? error.message : "Une erreur est survenue lors de la création de l'exercice",
         variant: "destructive",
       })
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
@@ -135,108 +103,132 @@ export default function NewExercisePage() {
       </div>
 
       <Card className="max-w-2xl mx-auto">
-        <form onSubmit={handleSubmit}>
-          <CardHeader>
-            <CardTitle>Informations de l'exercice</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="name" className={errors.name ? "text-destructive" : ""}>
-                Nom de l'exercice*
-              </label>
-              <Input
-                id="name"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardHeader>
+              <CardTitle>Informations de l'exercice</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
                 name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={errors.name ? "border-destructive" : ""}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom de l'exercice*</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nom de l'exercice" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
-            </div>
 
-            <div className="space-y-2">
-              <label htmlFor="muscleGroup">Groupe musculaire</label>
-              <Input
-                id="muscleGroup"
+              <FormField
+                control={form.control}
                 name="muscleGroup"
-                value={formData.muscleGroup}
-                onChange={handleChange}
-                placeholder="ex: Quadriceps, Pectoraux, Dos..."
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Groupe musculaire</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ex: Quadriceps, Pectoraux, Dos..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <label htmlFor="instructions">Instructions</label>
-              <Textarea
-                id="instructions"
+              <FormField
+                control={form.control}
                 name="instructions"
-                value={formData.instructions}
-                onChange={handleChange}
-                rows={4}
-                placeholder="Instructions détaillées pour réaliser l'exercice..."
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Instructions</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Instructions détaillées pour réaliser l'exercice..."
+                        className="resize-none"
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <label htmlFor="objectifs">Objectifs</label>
-              <Textarea
-                id="objectifs"
+              <FormField
+                control={form.control}
                 name="objectifs"
-                value={formData.objectifs}
-                onChange={handleChange}
-                rows={4}
-                placeholder="Objectifs de l'exercice..."
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Objectifs</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Objectifs de l'exercice..."
+                        className="resize-none"
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <label htmlFor="notes">Notes</label>
-              <Textarea
-                id="notes"
+              <FormField
+                control={form.control}
                 name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                rows={3}
-                placeholder="Notes personnelles ou remarques sur l'exercice..."
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Notes personnelles ou remarques sur l'exercice..."
+                        className="resize-none"
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <label htmlFor="video">Vidéo de démonstration</label>
-              <VideoUpload
-                videoUrl={formData.videoPublicId}
-                onVideoChange={setVideoFile}
-                onVideoUrlChange={handleVideoUrlChange}
-                inputId="video-upload-main"
-              />
-            </div>
+              <div className="space-y-2">
+                <FormLabel>Vidéo de démonstration</FormLabel>
+                <VideoUpload
+                  videoUrl={form.getValues("videoPublicId")}
+                  onVideoChange={setVideoFile}
+                  onVideoUrlChange={handleVideoUrlChange}
+                  inputId="video-upload-main"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <label htmlFor="short">Vidéo courte</label>
-              <VideoUpload
-                videoUrl={formData.short}
-                onVideoChange={setVideoFile}
-                onVideoUrlChange={handleShortUrlChange}
-                inputId="video-upload-short"
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => router.push("/admin/exercices")}>
-              Annuler
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Création...
-                </>
-              ) : (
-                "Créer l'exercice"
-              )}
-            </Button>
-          </CardFooter>
-        </form>
+              <div className="space-y-2">
+                <FormLabel>Vidéo courte</FormLabel>
+                <VideoUpload
+                  videoUrl={form.getValues("short")}
+                  onVideoChange={setVideoFile}
+                  onVideoUrlChange={handleShortUrlChange}
+                  inputId="video-upload-short"
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => router.push("/admin/exercices")}>Annuler</Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Création...
+                  </>
+                ) : (
+                  "Créer l'exercice"
+                )}
+              </Button>
+            </CardFooter>
+          </form>
+        </Form>
       </Card>
     </div>
   )
