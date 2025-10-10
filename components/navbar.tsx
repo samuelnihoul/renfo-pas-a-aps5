@@ -19,6 +19,9 @@ export function Navbar() {
             <Link href="/" className="hover:underline text-sm font-medium w-full block py-2 md:py-0">
                 Mes Programmes
             </Link>
+            <Link href="/mediatheque" className="hover:underline text-sm font-medium w-full block py-2 md:py-0">
+	    Médiathèque d'exercices
+            </Link>
         </>
     )
 
