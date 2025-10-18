@@ -35,7 +35,17 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
         const response = await fetch(`/api/programs/${id}`)
         if (response.ok) {
           const data = await response.json()
-          setProgram(data[0])
+          const programData = data[0]
+
+          // Normalize routineId to ensure it's an array
+          const routineId = Array.isArray(programData.routineId) ?
+            programData.routineId :
+            (programData.routineId ? [programData.routineId] : []);
+
+          setProgram({
+            ...programData,
+            routineId,
+          })
         } else {
           console.error("Failed to fetch program")
           toast({
