@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
-import { ChevronRight, ChevronDown, ChevronLeft, ChevronsLeft, ChevronsRight, Dumbbell, ListChecks, Calendar, AlertCircle } from "lucide-react"
+import { ChevronRight, ChevronDown, ChevronLeft, ChevronsLeft, ChevronsRight, Dumbbell, ListChecks, Calendar, AlertCircle, HomeIcon } from "lucide-react"
 import { useData } from "@/components/data-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -223,11 +223,12 @@ export default function Home() {
           <button
             onClick={goBackToPrograms}
             className={`px-3 py-1 rounded transition-colors ${currentLevel === 'programs'
-                ? 'bg-blue-100 text-blue-700 font-medium'
-                : 'hover:bg-gray-200'
+              ? 'bg-blue-100 text-blue-700 font-medium'
+              : 'hover:bg-gray-200'
               }`}
           >
-            Programmes
+            {/*Home icon*/}
+            <HomeIcon className="w-4 h-4" />
           </button>
 
           {selectedProgram && (
@@ -236,8 +237,8 @@ export default function Home() {
               <button
                 onClick={goBackToRoutines}
                 className={`px-3 py-1 rounded transition-colors ${currentLevel === 'routines'
-                    ? 'bg-blue-100 text-blue-700 font-medium'
-                    : 'hover:bg-gray-200'
+                  ? 'bg-blue-100 text-blue-700 font-medium'
+                  : 'hover:bg-gray-200'
                   }`}
               >
                 {selectedProgram.name}
@@ -251,8 +252,8 @@ export default function Home() {
               <button
                 onClick={goBackToBlocks}
                 className={`px-3 py-1 rounded transition-colors ${currentLevel === 'blocks'
-                    ? 'bg-blue-100 text-blue-700 font-medium'
-                    : 'hover:bg-gray-200'
+                  ? 'bg-blue-100 text-blue-700 font-medium'
+                  : 'hover:bg-gray-200'
                   }`}
               >
                 {selectedRoutine.name}
@@ -331,16 +332,16 @@ export default function Home() {
               .map((block) => (
                 <Card key={block.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigateToBlock(block)}>
                   <div className={`p-4 sm:p-5 bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 transition-colors ${block.name.includes('Activation') ? 'from-blue-50 to-blue-100' :
-                      block.name.includes('Mobilité') ? 'from-green-50 to-green-100' :
-                        block.name.includes('Développement') ? 'from-orange-50 to-orange-100' :
-                          'from-gray-50 to-gray-100'
+                    block.name.includes('Mobilité') ? 'from-green-50 to-green-100' :
+                      block.name.includes('Développement') ? 'from-orange-50 to-orange-100' :
+                        'from-gray-50 to-gray-100'
                     }`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <ChevronRight className="w-5 h-5 text-gray-600" />
                         <h2 className={`text-lg sm:text-xl font-bold ${block.name.includes('Activation') ? 'text-blue-800' :
-                            block.name.includes('Mobilité') ? 'text-green-800' :
-                              block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
+                          block.name.includes('Mobilité') ? 'text-green-800' :
+                            block.name.includes('Développement') ? 'text-orange-800' : 'text-gray-800'
                           }`}>{block.name}</h2>
                       </div>
                       <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
