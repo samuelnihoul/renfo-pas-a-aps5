@@ -158,68 +158,15 @@ function ErrorAlert() {
 // ======================
 // The home page that displays programs, routines, blocks, and exercises in a hierarchical view
 export default function Home() {
-  // State management for expanded programs, their routines and pagination
-  const [expandedPrograms, setExpandedPrograms] = useState<Record<number, boolean>>({})
-  const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({})
-  const [currentRoutineIndices, setCurrentRoutineIndices] = useState<Record<number, number>>({})
-
-  // UI state for video view and loading indicators
-  const [loadingStates, setLoadingStates] = useState({
-    programs: true,
-    routines: true,
-    blocks: true,
-    exercises: true
-  })
-
-
   // Data fetching and state management from context
   const {
     programs,
-    routines,
-    blocks,
-    exercises,
     loading,
-    error,
-    fetchRoutinesByProgram,
-    fetchBlocksByRoutine,
-    fetchExercisesByBlock
+    error
   } = useData()
 
-  // ======================
-  // SIDE EFFECTS
-  // ======================
-  // Load initial data when component mounts or dependencies change
-  useEffect(() => {
-    /**
-   * Fetches and caches routines for all programs
-   * Updates loading states and error handling
-   */
-    const loadInitialData = async () => {
-      try {
-        // Charger les routines pour chaque programme
-        if (programs.length > 0) {
-          setLoadingStates(prev => ({ ...prev, routines: true }))
-          const routinesMap: Record<number, Routine[]> = {}
-
-          await Promise.all(programs.map(async (program) => {
-            const programRoutines = await fetchRoutinesByProgram(program.id)
-            routinesMap[program.id] = programRoutines
-          }))
-
-          setProgramRoutines(routinesMap)
-        }
-      } catch (error) {
-        console.error("Error loading initial data:", error)
-      } finally {
-        setLoadingStates(prev => ({ ...prev, routines: false }))
-      }
-    }
-
-    loadInitialData()
-  }, [programs, fetchRoutinesByProgram])
-
   // Afficher un indicateur de chargement global si nécessaire
-  if (loading || loadingStates.routines) {
+  if (loading) {
     return (
       <div className="container px-4 py-8 mx-auto flex items-center justify-center min-h-screen">
         <p>Chargement des données...</p>
@@ -235,46 +182,6 @@ export default function Home() {
     )
   }
 
-  /**
-   * Toggles the expanded/collapsed state of a program
-   * @param programId - The ID of the program to toggle
-   */
-  const toggleProgram = (programId: number) => {
-    setExpandedPrograms(prev => ({
-      ...prev,
-      [programId]: !prev[programId]
-    }))
-
-    // Initialize or reset the current routine index when expanding
-    if (!expandedPrograms[programId]) {
-      setCurrentRoutineIndices(prev => ({
-        ...prev,
-        [programId]: 0
-      }))
-    }
-  }
-
-  const goToRoutine = (programId: number, index: number) => {
-    setCurrentRoutineIndices(prev => ({
-      ...prev,
-      [programId]: index
-    }))
-  }
-
-  const goToNextRoutine = (programId: number) => {
-    const currentIndex = currentRoutineIndices[programId] || 0
-    const routines = programRoutines[programId] || []
-    if (currentIndex < routines.length - 1) {
-      goToRoutine(programId, currentIndex + 1)
-    }
-  }
-
-  const goToPrevRoutine = (programId: number) => {
-    const currentIndex = currentRoutineIndices[programId] || 0
-    if (currentIndex > 0) {
-      goToRoutine(programId, currentIndex - 1)
-    }
-  }
 
   return (
     <div className="container px-0 py-4 sm:py-6 mx-auto">

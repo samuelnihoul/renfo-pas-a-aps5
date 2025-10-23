@@ -35,8 +35,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
         const response = await fetch(`/api/programs/${id}`)
         if (response.ok) {
           const data = await response.json()
-          const programData = data[0]
-
+          const programData = Array.isArray(data) ? data[0] : data
           // Normalize routineId to ensure it's an array
           const routineId = Array.isArray(programData.routineId) ?
             programData.routineId :
@@ -80,12 +79,14 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
   }
 
   const handleRoutineSelection = (selectedRoutineIds: number[]) => {
-    if (program) {
+ // Prevent resetting to empty if already set
+    if (selectedRoutineIds.length === 0 && (formData.routineId?.length ?? 0) > 0) {
+      return;
+    }
       setProgram({
         ...program,
         routineId: selectedRoutineIds,
       })
-    }
   }
 
   const handleSaveProgram = async () => {
