@@ -284,7 +284,7 @@ export default function Home() {
                   </div>
                 </div>
                 {block.instructions && (
-                  <p className="text-sm text-gray-600 mt-2">{block.instructions}</p>
+                  <p className="text-sm text-gray-600 mt-2 pb-3">{block.instructions}</p>
                 )}
                 <div className="space-y-2 ml-1">
                   {exercises
