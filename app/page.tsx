@@ -1,16 +1,11 @@
 "use client"
 import { Suspense, useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
-import { ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight, Dumbbell, ListChecks, AlertCircle, HomeIcon } from "lucide-react"
+import { ChevronRight, Dumbbell, ListChecks, AlertCircle, HomeIcon } from "lucide-react"
 import { useData } from "@/components/data-provider"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/components/ui/pagination"
 import {
   Dialog,
   DialogTrigger,
@@ -22,51 +17,55 @@ import {
 // TYPE DEFINITIONS
 // ======================
 type Exercise = {
-  id: number
-  name: string
-  videoPublicId: string | null
-  instructions: string | null
-  objectifs: string | null
-  notes: string | null
-  createdAt: string
-  updatedAt: string
-}
+  id: number;
+  name: string;
+  videoPublicId: string | null;
+  short: string | null;
+  instructions: string | null;
+  objectifs: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type Block = {
-  id: number
-  name: string
-  instructions: string
-  focus: string
-  exerciceId: number[]
-  exerciseNotes: string[]
-  createdAt: string
-  updatedAt: string
-}
+  id: number;
+  name: string;
+  instructions: string;
+  focus: string;
+  exerciceId: number[];
+  exerciseNotes: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 type Routine = {
-  id: number
-  name: string
-  blockId: number[]
-  equipment?: string | null
-  sessionOutcome?: string | null
-  createdAt: string
-  updatedAt: string
-}
+  id: number;
+  name: string;
+  blockId: number[];
+  equipment?: string | null;
+  sessionOutcome?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type Program = {
-  id: number
-  name: string
-  description?: string
-  routineId: number[]
-  createdAt: string
-  updatedAt: string
-  [key: string]: any
-}
+  id: number;
+  name: string;
+  description?: string;
+  routineId: number[];
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: any;
+};
 
 // ======================
 // ERROR ALERT COMPONENT
 // ======================
 function ErrorAlert() {
-  const searchParams = useSearchParams()
-  const error = searchParams.get('error')
-  if (!error) return null
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
+  if (!error) return null;
   return (
     <Alert variant="destructive" className="mb-6">
       <AlertCircle className="h-4 w-4" />
@@ -76,21 +75,22 @@ function ErrorAlert() {
           : 'Une erreur est survenue. Veuillez réessayer.'}
       </AlertDescription>
     </Alert>
-  )
+  );
 }
 
 // ======================
 // MAIN PAGE COMPONENT
 // ======================
 export default function Home() {
-  const [currentLevel, setCurrentLevel] = useState<'programs' | 'routines'>('programs')
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
-  const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null)
-  const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({})
+  const [currentLevel, setCurrentLevel] = useState<'programs' | 'routines' | 'blocks'>('programs');
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
+  const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null);
+  const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({});
   const [loadingStates, setLoadingStates] = useState({
     programs: true,
     routines: true,
-  })
+    blocks: true,
+  });
 
   const {
     programs,
@@ -100,7 +100,7 @@ export default function Home() {
     loading,
     error,
     fetchRoutinesByProgram,
-  } = useData()
+  } = useData();
 
   // ======================
   // SIDE EFFECTS
@@ -109,56 +109,62 @@ export default function Home() {
     const loadInitialData = async () => {
       try {
         if (programs.length > 0) {
-          setLoadingStates(prev => ({ ...prev, routines: true }))
-          const routinesMap: Record<number, Routine[]> = {}
+          setLoadingStates(prev => ({ ...prev, routines: true }));
+          const routinesMap: Record<number, Routine[]> = {};
           await Promise.all(programs.map(async (program) => {
-            const programRoutines = await fetchRoutinesByProgram(program.id)
-            routinesMap[program.id] = programRoutines
-          }))
-          setProgramRoutines(routinesMap)
+            const programRoutines = await fetchRoutinesByProgram(program.id);
+            routinesMap[program.id] = programRoutines;
+          }));
+          setProgramRoutines(routinesMap);
         }
       } catch (error) {
-        console.error("Error loading initial data:", error)
+        console.error("Error loading initial data:", error);
       } finally {
-        setLoadingStates(prev => ({ ...prev, routines: false }))
+        setLoadingStates(prev => ({ ...prev, routines: false }));
       }
-    }
-    loadInitialData()
-  }, [programs, fetchRoutinesByProgram])
+    };
+    loadInitialData();
+  }, [programs, fetchRoutinesByProgram]);
 
   if (loading || loadingStates.routines) {
     return (
       <div className="container px-4 py-8 mx-auto flex items-center justify-center min-h-screen">
         <p>Chargement des données...</p>
       </div>
-    )
+    );
   }
+
   if (error) {
     return (
       <div className="container px-4 py-8 mx-auto flex items-center justify-center min-h-screen">
         <p className="text-red-500">Erreur: {error}</p>
       </div>
-    )
+    );
   }
 
   // Navigation functions
   const navigateToProgram = (program: Program) => {
-    setSelectedProgram(program)
-    setCurrentLevel('routines')
-    setSelectedRoutine(null)
-  }
+    setSelectedProgram(program);
+    setCurrentLevel('routines');
+    setSelectedRoutine(null);
+  };
 
   const navigateToRoutine = (routine: Routine) => {
-    setSelectedRoutine(routine)
-  }
+    setSelectedRoutine(routine);
+    setCurrentLevel('blocks');
+  };
 
   const goBackToPrograms = () => {
-    setCurrentLevel('programs')
-    setSelectedProgram(null)
-    setSelectedRoutine(null)
-  }
+    setCurrentLevel('programs');
+    setSelectedProgram(null);
+    setSelectedRoutine(null);
+  };
 
-  // Render the current view based on the hierarchy level
+  const goBackToRoutines = () => {
+    setCurrentLevel('routines');
+    setSelectedRoutine(null);
+  };
+
   return (
     <div className="container px-0 py-4 sm:py-6 mx-auto">
       <Suspense fallback={null}>
@@ -179,9 +185,14 @@ export default function Home() {
           {selectedProgram && (
             <>
               <ChevronRight className="w-4 h-4 text-gray-400" />
-              <span className="px-3 py-1 rounded bg-blue-100 text-blue-700 font-medium">
+              <button
+                onClick={goBackToRoutines}
+                className={`px-3 py-1 rounded transition-colors ${currentLevel === 'routines'
+                  ? 'bg-blue-100 text-blue-700 font-medium'
+                  : 'hover:bg-gray-200'}`}
+              >
                 {selectedProgram.name}
-              </span>
+              </button>
             </>
           )}
           {selectedRoutine && (
@@ -211,7 +222,7 @@ export default function Home() {
                     <h2 className="text-lg sm:text-xl font-bold text-gray-800">{program.name}</h2>
                   </div>
                   <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
-                    {programRoutines&&programRoutines[program.id]?.length || 0} routines
+                    {programRoutines[program.id]?.length || 0} routines
                   </div>
                 </div>
                 {program.description && (
@@ -225,7 +236,7 @@ export default function Home() {
 
       {/* Routines Level */}
       {currentLevel === 'routines' && selectedProgram && (
-        <div className="space-y-6">
+        <div className="grid gap-4">
           {programRoutines[selectedProgram.id]?.map((routine) => (
             <Card
               key={routine.id}
@@ -254,9 +265,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* Display all blocks and exercises for the selected routine */}
-      {selectedRoutine && (
-        <div className="space-y-4 mt-6">
+      {/* Blocks Level */}
+      {currentLevel === 'blocks' && selectedRoutine && (
+        <div className="space-y-6">
           {blocks
             .filter(block => selectedRoutine.blockId.includes(block.id))
             .map((block) => (
@@ -275,24 +286,31 @@ export default function Home() {
                 {block.instructions && (
                   <p className="text-sm text-gray-600 mt-2">{block.instructions}</p>
                 )}
-                <div className="space-y-2 mt-4">
+                <div className="space-y-2 ml-1">
                   {exercises
                     .filter(ex => block.exerciceId.includes(ex.id))
                     .map((exercise, idx) => (
                       <div
-                        key={exercise.id}
-                        className="flex items-start p-4 bg-white rounded-lg border hover:shadow-md transition-shadow"
+                        key={`${block.id}-${exercise.id}`}
+                        className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
                       >
-                        {exercise.videoPublicId ? (
+                        {exercise.short ? (
                           <Dialog>
                             <DialogTrigger asChild>
-                              <button className="relative w-16 h-16 flex-shrink-0 rounded overflow-hidden mr-4 focus:outline-none group">
+                              <button className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden mr-3 focus:outline-none group">
                                 <video
-                                  src={exercise.videoPublicId}
+                                  src={exercise.short}
                                   className="w-full h-full object-cover"
                                   muted
                                   preload="metadata"
                                   poster="/placeholder.svg"
+                                  onLoadedMetadata={(e) => {
+                                    const video = e.target as HTMLVideoElement;
+                                    video.currentTime = 0.1;
+                                    video.onloadeddata = () => {
+                                      video.pause();
+                                    };
+                                  }}
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -307,7 +325,7 @@ export default function Home() {
                               </DialogTitle>
                               <div className="w-full aspect-video">
                                 <video
-                                  src={exercise.videoPublicId}
+                                  src={exercise.short}
                                   controls
                                   autoPlay
                                   className="w-full h-full object-contain rounded"
@@ -317,21 +335,15 @@ export default function Home() {
                             </DialogContent>
                           </Dialog>
                         ) : (
-                          <div className="w-16 h-16 flex-shrink-0 mr-4 rounded bg-gray-100 flex items-center justify-center">
-                            <Dumbbell className="w-6 h-6 text-gray-400" />
+                          <div className="w-12 h-12 flex-shrink-0 mr-3 rounded bg-gray-100 flex items-center justify-center">
+                            <Dumbbell className="w-4 h-4 text-gray-400" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-lg font-medium text-gray-900 mb-2">{exercise.name}</h4>
-                          {exercise.instructions && (
-                            <p className="text-sm text-gray-600 mb-2">{exercise.instructions}</p>
-                          )}
-                          {exercise.objectifs && (
-                            <p className="text-sm text-gray-600 mb-2"><strong>Objectifs:</strong> {exercise.objectifs}</p>
-                          )}
+                          <h4 className="text-sm font-medium text-gray-900">{exercise.name}</h4>
                           {block.exerciseNotes?.[idx] && (
-                            <p className="text-sm text-blue-600 font-medium">
-                              <strong>Note:</strong> {block.exerciseNotes[idx]}
+                            <p className="text-xs text-gray-600 mt-1">
+                              {block.exerciseNotes[idx]}
                             </p>
                           )}
                         </div>
@@ -343,5 +355,5 @@ export default function Home() {
         </div>
       )}
     </div>
-  )
+  );
 }
