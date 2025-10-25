@@ -257,7 +257,7 @@ export default function Home() {
                   <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
                 )}
                 {routine.sessionOutcome && (
-                  <p className="text-sm text-gray-600 mt-1 ml-8">Objectif: {routine.sessionOutcome}</p>
+                  <p className="text-sm text-gray-600 mt-1 ml-8">Sortie de séance: {routine.sessionOutcome}</p>
                 )}
               </div>
             </Card>
