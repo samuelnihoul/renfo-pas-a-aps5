@@ -11,7 +11,6 @@ export function Navbar() {
 
     // Navigation links
     const navLinks = (
-        <>
             <Link href="/programmes" className="hover:underline text-sm font-medium w-full block py-2 md:py-0">
                 Boutique des Programmes
             </Link>
@@ -21,7 +20,6 @@ export function Navbar() {
             <Link href="/mediatheque" className="hover:underline text-sm font-medium w-full block py-2 md:py-0">
 	    Médiathèque d'exercices
             </Link>
-        </>
     )
 
     // Auth links
@@ -79,21 +77,17 @@ export function Navbar() {
                             <div className="flex flex-col h-full p-6 gap-6">
                                 <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
 				<SheetClose asChild>
-                                <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
+                                <Link asChild href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
                                     <img src="/favicon.ico" alt="Logo" className="h-8 w-8" />
                                     Renfo Pas à Pas
                                 </Link>
 				</SheetClose >
-				<SheetClose asChild>
-                                <nav className="flex flex-col gap-2 border-b pb-4 mb-4">
+                                <nav asChild className="flex flex-col gap-2 border-b pb-4 mb-4">
                                     {navLinks}
                                 </nav>
-				</SheetClose>
-				<SheetClose asChild>
-                                <div className="flex flex-col gap-2 mt-auto">
+                                <div asChild className="flex flex-col gap-2 mt-auto">
                                     {authLinks}
                                 </div>
-				</SheetClose>
                             </div>
                         </SheetContent>
                     </Sheet>
