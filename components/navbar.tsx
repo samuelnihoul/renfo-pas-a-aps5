@@ -1,10 +1,9 @@
 "use client"
-
 import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/sheet"
+import { Sheet, SheetTrigger, SheetContent, SheetTitle,SheetClose} from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 
 export function Navbar() {
@@ -40,7 +39,7 @@ export function Navbar() {
     ) : (
         <div className="flex flex-col md:flex-row gap-2 w-full">
             <Button asChild size="sm" className="w-full md:w-auto">
-                <Link href="/auth/signin">Se connecterr{isAuthenticated+user}</Link>
+                <Link href="/auth/signin">Se connecter</Link>
             </Button>
             <Button asChild size="sm" variant="outline" className="w-full md:w-auto">
                 <Link href="/auth/signup">S'inscrire</Link>
@@ -79,16 +78,22 @@ export function Navbar() {
                         <SheetContent side="left" className="p-0 w-64">
                             <div className="flex flex-col h-full p-6 gap-6">
                                 <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
+				<SheetClose asChild>
                                 <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
                                     <img src="/favicon.ico" alt="Logo" className="h-8 w-8" />
                                     Renfo Pas à Pas
                                 </Link>
+				</SheetClose >
+				<SheetClose asChild>
                                 <nav className="flex flex-col gap-2 border-b pb-4 mb-4">
                                     {navLinks}
                                 </nav>
+				</SheetClose>
+				<SheetClose asChild>
                                 <div className="flex flex-col gap-2 mt-auto">
                                     {authLinks}
                                 </div>
+				</SheetClose>
                             </div>
                         </SheetContent>
                     </Sheet>
