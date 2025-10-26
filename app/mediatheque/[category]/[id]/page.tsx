@@ -95,9 +95,9 @@ export default function ExercisePage({ params }: { params: { category: string; i
 
           <TabsContent value="video" className="p-0">
             <div className="aspect-video bg-muted flex items-center justify-center relative">
-              {exercise.videoUrl ? (
+              {exercise.videoPublicId ? (
                 <video
-                  src={exercise.videoUrl}
+                  src={exercise.videoPublicId}
                   controls
                   preload="metadata"
                   className="w-full h-full object-cover"
