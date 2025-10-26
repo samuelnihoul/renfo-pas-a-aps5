@@ -2,9 +2,10 @@
 
 import React from "react"
 import Link from "next/link"
-import { Dumbbell, ArrowRight } from "lucide-react"
+import { Dumbbell, ArrowRight, Search } from "lucide-react"
 import { useData } from "@/components/data-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Search as SearchComponent } from "@/components/medialab/search"
 
 export default function MediathequePage() {
   const { fetchAllExercises } = useData()
@@ -59,9 +60,12 @@ export default function MediathequePage() {
     <div className="container px-4 py-8 mx-auto">
       <header className="mb-8">
         <h1 className="text-3xl font-bold gradient-text mb-2">Médiathèque d'exercices</h1>
-        <p className="text-muted-foreground">
-          Parcourez les exercices par groupe musculaire
+        <p className="text-muted-foreground mb-6">
+          Parcourez les exercices par groupe musculaire ou effectuez une recherche
         </p>
+        <div className="max-w-2xl mx-auto">
+          <SearchComponent />
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
