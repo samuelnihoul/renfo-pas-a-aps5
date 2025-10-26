@@ -63,7 +63,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
   return (
     <div className="container px-4 py-8 mx-auto">
       <header className="mb-6">
-        <Link href="/">
+        <Link href="/mediatheque">
           <Button variant="ghost" size="sm" className="mb-2 pl-0">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour
@@ -78,10 +78,10 @@ export default function CategoryPage({ params }: { params: { category: string } 
           <Link href={`/mediatheque/${category}/${exercise.id}`} key={exercise.id}>
             <Card>
               <div className="relative">
-                {exercise.videoUrl ? (
+                {exercise.videoPublicId ? (
                   <div className="w-full h-48 relative">
                     <video
-                      src={exercise.videoUrl}
+                      src={exercise.videoPublicId}
                       className="w-full h-full object-cover"
                       poster="/placeholder.svg"
                       muted
