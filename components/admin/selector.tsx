@@ -43,7 +43,7 @@ interface ItemSelectorAndOrganizerProps {
     onItemSelectAction: (selectedExerciseIds: number[], orderIndices?: number[]) => void;
     selectedItemIds?: number[];
 }
-export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, selectedItemIds }: ItemSelectorAndOrganizerProps) {
+export function ItemSelectorAndOrganizer({ items, onItemSelectAction, selectedItemIds }: ItemSelectorAndOrganizerProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [availableItems, setAvailableItems] = useState<Item[]>([]);
@@ -90,17 +90,25 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, se
 
     useEffect(() => {
         if (selectedItemIds && selectedItemIds.length > 0 && availableItems.length > 0 && !isInitialized) {
-            console.log("avaoilable items", availableItems)
-            const selectedItems = availableItems.filter(item =>
-                selectedItemIds.includes(item.id)
-            ).map(item => ({
-                itemId: item.id,
-                itemName: item.name,
-            }));
+            console.log("available items", availableItems);
+            
+            // Créer un objet map pour un accès rapide aux éléments par ID
+            const itemsMap = new Map(availableItems.map(item => [item.id, item]));
+            
+            // Créer la liste des éléments sélectionnés dans le même ordre que selectedItemIds
+            const selectedItems = selectedItemIds
+                .map(id => {
+                    const item = itemsMap.get(id);
+                    return item ? {
+                        itemId: item.id,
+                        itemName: item.name,
+                    } : null;
+                })
+                .filter((item): item is { itemId: number; itemName: string } => item !== null);
 
             setItemList(selectedItems);
             setIsInitialized(true);
-            console.log("selectedItems", selectedItems)
+            console.log("selectedItems", selectedItems);
         }
     }, [selectedItemIds, availableItems, isInitialized]);
     useEffect(() => {
@@ -326,3 +334,8 @@ export default function ItemSelectorAndOrganizer({ items, onItemSelectAction, se
         </div>
     );
 }
+
+// Alias pour la compatibilité avec les imports existants
+export const Selector = ItemSelectorAndOrganizer;
+
+export default ItemSelectorAndOrganizer;
