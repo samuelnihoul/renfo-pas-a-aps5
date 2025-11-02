@@ -75,7 +75,8 @@ export function useAuth() {
 
     const signOut = async () => {
         try {
-            await nextAuthSignOut({ redirect: false })
+            await nextAuthSignOut({ redirect: true })
+document.cookie = `next-auth.session-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
             setUser(null)
             return { success: true }
         } catch (error) {
