@@ -273,20 +273,20 @@ export default function Home() {
             .map((block) => (
               <Card
                 key={block.id}
-                className={`p-4 sm:p-5 ${block.name.includes('Activation') ? 'bg-blue-50' :
-                  block.name.includes('Mobilité') ? 'bg-green-50' :
-                    block.name.includes('Développement') ? 'bg-orange-50' : 'bg-gray-50'}`}
+                className={`p-4 sm:p-5 ${block.name.includes('Activation') ? 'bg-gradient-to-r from-blue-400 to-blue-800 text-white' :
+                  block.name.includes('Mobilité') ? 'bg-gradient-to-r from-green-400 to-green-800 text-white' :
+                    block.name.includes('Développement') ? 'bg-gradient-to-r from-orange-400 to-orange-800 text-white' : 'bg-gray-50'}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <ListChecks className="w-5 h-5 text-gray-600" />
-                    <h3 className="text-lg font-bold text-gray-800">{block.name}</h3>
+                    <ListChecks className="w-5 h-5 " />
+                    <h3 className="text-lg font-bold ">{block.name}</h3>
                   </div>
                 </div>
                 {block.instructions && (
-                  <p className="text-sm text-gray-600 mt-2 pb-3">{block.instructions}</p>
+                  <p className="text-sm mt-2 pb-3">{block.instructions}</p>
                 )}
-                <div className="space-y-2 ml-1">
+                <div className="space-y-2 ml-1 text-black bg-white rounded-xl">
                   {exercises
                     .filter(ex => block.exerciceId.includes(ex.id))
                     .map((exercise, idx) => (
@@ -336,13 +336,13 @@ export default function Home() {
                           </Dialog>
                         ) : (
                           <div className="w-12 h-12 flex-shrink-0 mr-3 rounded bg-gray-100 flex items-center justify-center">
-                            <Dumbbell className="w-4 h-4 text-gray-400" />
+                            <Dumbbell className="w-4 h-4 " />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-gray-900">{exercise.name}</h4>
+                          <h4 className="text-sm font-medium">{exercise.name}</h4>
                           {block.exerciseNotes?.[idx] && (
-                            <p className="text-xs text-gray-600 mt-1">
+                            <p className="text-xs mt-1">
                               {block.exerciseNotes[idx]}
                             </p>
                           )}

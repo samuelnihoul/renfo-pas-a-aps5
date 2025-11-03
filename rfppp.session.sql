@@ -1,2 +1,2 @@
 select *
-from exercises;
+from routines;
