@@ -5,7 +5,16 @@ import { exercises } from "@/db/schema"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, objectifs, instructions, videoUrl, videoPublicId, short, muscleGroup } = body
+    const { 
+      name, 
+      objectifs, 
+      instructions, 
+      videoUrl, 
+      videoPublicId, 
+      thumbnailUrl, 
+      short, 
+      muscleGroup 
+    } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom de l'exercice est requis" }, { status: 400 })
@@ -20,10 +29,11 @@ export async function POST(request: Request) {
         name,
         instructions: instructions || null,
         videoPublicId: videoPublicId || null,
+        thumbnailUrl: thumbnailUrl || null,
         short: short || null,
         objectifs: objectifs || null,
         muscleGroup: muscleGroup || null,
-        createdAt: now, // Use the Date object directly
+        createdAt: now,
       })
       .returning()
 

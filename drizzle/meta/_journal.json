@@ -118,6 +118,20 @@
       "when": 1758442944060,
       "tag": "0016_young_giant_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1762282204841,
+      "tag": "0017_public_red_wolf",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1762282570968,
+      "tag": "0018_watery_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }

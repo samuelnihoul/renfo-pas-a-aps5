@@ -26,12 +26,14 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import VideoUpload from "@/components/video-upload";
+import ThumbnailUpload from "@/components/thumbnail-upload";
 
 const exerciseSchema = z.object({
   name: z.string().min(1, "Le nom de l'exercice est requis"),
   muscleGroup: z.string().optional(),
   instructions: z.string(),
   videoPublicId: z.string(),
+  thumbnailUrl: z.string().optional(),
   short: z.string(),
   objectifs: z.string(),
   notes: z.string(),
@@ -43,6 +45,7 @@ export default function NewExercisePage() {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [videoFile, setVideoFile] = useState<File | null>(null)
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
 
   const form = useForm<ExerciseFormValues>({
     resolver: zodResolver(exerciseSchema),
@@ -51,6 +54,7 @@ export default function NewExercisePage() {
       muscleGroup: "",
       instructions: "",
       videoPublicId: "",
+      thumbnailUrl: "",
       short: "",
       objectifs: "",
       notes: "",
@@ -59,6 +63,10 @@ export default function NewExercisePage() {
 
   const handleVideoUrlChange = (url: string) => {
     form.setValue("videoPublicId", url)
+  }
+
+  const handleThumbnailUrlChange = (url: string) => {
+    form.setValue("thumbnailUrl", url)
   }
 
   const handleShortUrlChange = (url: string) => {
@@ -194,23 +202,48 @@ export default function NewExercisePage() {
                 )}
               />
 
-              <div className="space-y-2">
-                <FormLabel>Vidéo de démonstration</FormLabel>
-                <VideoUpload
-                  videoUrl={form.getValues("videoPublicId")}
-                  onVideoChange={setVideoFile}
-                  onVideoUrlChange={handleVideoUrlChange}
-                  inputId="video-upload-main"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <FormLabel>Vidéo de démonstration</FormLabel>
+                  <VideoUpload
+                    videoUrl={form.getValues("videoPublicId")}
+                    onVideoChange={setVideoFile}
+                    onVideoUrlChange={handleVideoUrlChange}
+                    inputId="video-upload-main"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <FormLabel>Vidéo courte</FormLabel>
+                  <VideoUpload
+                    videoUrl={form.getValues("short")}
+                    onVideoChange={setVideoFile}
+                    onVideoUrlChange={handleShortUrlChange}
+                    inputId="video-upload-short"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <FormLabel>Vidéo courte</FormLabel>
-                <VideoUpload
-                  videoUrl={form.getValues("short")}
-                  onVideoChange={setVideoFile}
-                  onVideoUrlChange={handleShortUrlChange}
-                  inputId="video-upload-short"
+                <FormField
+                  control={form.control}
+                  name="thumbnailUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Miniature (optionnel)</FormLabel>
+                      <FormControl>
+                        <ThumbnailUpload
+                          thumbnailUrl={field.value}
+                          onThumbnailChange={setThumbnailFile}
+                          onThumbnailUrlChange={handleThumbnailUrlChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Si aucune miniature n'est fournie, une sera générée automatiquement à partir de la vidéo.
+                      </p>
+                    </FormItem>
+                  )}
                 />
               </div>
             </CardContent>

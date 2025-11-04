@@ -92,9 +92,10 @@ export const blocks = pgTable(
 export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  videoPublicId: varchar("video_url", { length: 255 }),
+  videoPublicId: varchar("video_public_id", { length: 255 }),
+  thumbnailUrl: varchar("thumbnail_url", { length: 512 }),
   short: varchar("short", { length: 255 }),
-  muscleGroup:varchar("muscleGroup"),
+  muscleGroup: varchar("muscle_group"),
   instructions: text("instructions"),
   objectifs: text("objectifs"),
   notes: text("notes").default("-"),

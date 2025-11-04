@@ -1,0 +1,1 @@
+ALTER TABLE "exercises" ALTER COLUMN "muscle_group" SET DATA TYPE varchar;

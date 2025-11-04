@@ -40,6 +40,7 @@ type Exercise = {
   muscleGroup?: string
   createdAt: string
   updatedAt: string
+  thumbnailUrl?:string
 }
 
 type DataContextType = {
