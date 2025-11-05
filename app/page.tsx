@@ -20,6 +20,7 @@ type Exercise = {
   id: number;
   name: string;
   videoPublicId: string | null;
+  thumbnailUrl: string | null;
   short: string | null;
   instructions: string | null;
   objectifs: string | null;
@@ -294,24 +295,33 @@ export default function Home() {
                         key={`${block.id}-${exercise.id}`}
                         className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
                       >
-                        {exercise.short ? (
+                        {exercise.thumbnailUrl || exercise.short ? (
                           <Dialog>
                             <DialogTrigger asChild>
                               <button className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden mr-3 focus:outline-none group">
-                                <video
-                                  src={exercise.short}
-                                  className="w-full h-full object-cover"
-                                  muted
-                                  preload="metadata"
-                                  poster="/placeholder.svg"
-                                  onLoadedMetadata={(e) => {
-                                    const video = e.target as HTMLVideoElement;
-                                    video.currentTime = 0.1;
-                                    video.onloadeddata = () => {
-                                      video.pause();
-                                    };
-                                  }}
-                                />
+                                {exercise.thumbnailUrl ? (
+                                  <img
+                                    src={exercise.thumbnailUrl}
+                                    alt={exercise.name}
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                  />
+                                ) : (
+                                  <video
+                                    src={exercise.short!}
+                                    className="w-full h-full object-cover"
+                                    muted
+                                    preload="metadata"
+                                    poster="/placeholder.svg"
+                                    onLoadedMetadata={(e) => {
+                                      const video = e.target as HTMLVideoElement;
+                                      video.currentTime = 0.3;
+                                      video.onloadeddata = () => {
+                                        video.pause();
+                                      };
+                                    }}
+                                  />
+                                )}
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-6.518-3.759A1 1 0 007 8.06v7.882a1 1 0 001.234.97l6.518-1.857A1 1 0 0016 14.06V9.94a1 1 0 00-1.248-.772z" />
@@ -324,19 +334,27 @@ export default function Home() {
                                 <span className="sr-only">{exercise.name}</span>
                               </DialogTitle>
                               <div className="w-full aspect-video">
-                                <video
-                                  src={exercise.short}
-                                  controls
-                                  autoPlay
-                                  className="w-full h-full object-contain rounded"
-                                  poster="/placeholder.svg"
-                                />
+                                {exercise.short ? (
+                                  <video
+                                    src={exercise.short}
+                                    controls
+                                    autoPlay
+                                    className="w-full h-full object-contain rounded"
+                                    poster={exercise.thumbnailUrl || "/placeholder.svg"}
+                                  />
+                                ) : (
+                                  <img
+                                    src={exercise.thumbnailUrl}
+                                    alt={exercise.name}
+                                    className="w-full h-full object-contain rounded"
+                                  />
+                                )}
                               </div>
                             </DialogContent>
                           </Dialog>
                         ) : (
                           <div className="w-12 h-12 flex-shrink-0 mr-3 rounded bg-gray-100 flex items-center justify-center">
-                            <Dumbbell className="w-4 h-4 " />
+                            <Dumbbell className="w-4 h-4" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
