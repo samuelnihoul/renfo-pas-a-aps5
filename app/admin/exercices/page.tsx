@@ -1,12 +1,13 @@
 //admin/exercices/page.tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
 import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import type { ColumnDef } from "@tanstack/react-table"
 import { toast } from "@/components/ui/use-toast"
 import {
@@ -30,6 +31,7 @@ export default function ExercisesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [exerciseToDelete, setExerciseToDelete] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const fetchExercises = async () => {
     try {
@@ -167,6 +169,16 @@ export default function ExercisesPage() {
     },
   ]
 
+  const filteredExercises = useMemo(() => {
+    if (!searchTerm.trim()) return exercises;
+    const term = searchTerm.toLowerCase();
+    return exercises.filter(exercise => 
+      exercise.name.toLowerCase().includes(term) ||
+      (exercise.objectifs && exercise.objectifs.toLowerCase().includes(term)) ||
+      (exercise.muscleGroup && exercise.muscleGroup.toLowerCase().includes(term))
+    );
+  }, [exercises, searchTerm]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -189,14 +201,25 @@ export default function ExercisesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Exercices</h1>
-        <Link href="/admin/exercices/nouveau">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Nouvel exercice
-          </Button>
-        </Link>
+      <div className="flex flex-col space-y-4 mb-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Exercices</h1>
+          <Link href="/admin/exercices/nouveau">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nouvel exercice
+            </Button>
+          </Link>
+        </div>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher par nom, objectif ou groupe musculaire..."
+            className="pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
 
       {exercises.length === 0 ? (
