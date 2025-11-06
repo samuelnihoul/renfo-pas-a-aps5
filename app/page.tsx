@@ -315,7 +315,7 @@ export default function Home() {
                                     poster="/placeholder.svg"
                                     onLoadedMetadata={(e) => {
                                       const video = e.target as HTMLVideoElement;
-                                      video.currentTime = 0.3;
+                                      video.currentTime = 1.1;
                                       video.onloadeddata = () => {
                                         video.pause();
                                       };
