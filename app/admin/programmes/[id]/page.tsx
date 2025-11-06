@@ -80,7 +80,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
 
   const handleRoutineSelection = (selectedRoutineIds: number[]) => {
  // Prevent resetting to empty if already set
-    if (selectedRoutineIds.length === 0 && (formData.routineId?.length ?? 0) > 0) {
+    if (selectedRoutineIds.length === 0 && (program.routineId?.length ?? 0) > 0) {
       return;
     }
       setProgram({
