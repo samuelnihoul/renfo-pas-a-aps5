@@ -13,6 +13,7 @@ export const programs = pgTable("programs", {
   name: varchar("name", { length: 255 }).notNull(),
   routineId: integer("routine_id").array(),
   instructions: text("instructions"), // Marche à suivre et appropriation
+  stripeProductId: varchar("stripe_product_id", { length: 255 }), // Stripe Product ID for payments
   ...timestamps
 })
 

@@ -18,6 +18,7 @@ type Program = {
   name: string
   instructions?: string
   routineId: number[]
+  stripeProductId?: string
 }
 
 export default function EditProgramPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
@@ -79,14 +80,16 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
   }
 
   const handleRoutineSelection = (selectedRoutineIds: number[]) => {
- // Prevent resetting to empty if already set
-    if (selectedRoutineIds.length === 0 && (program.routineId?.length ?? 0) > 0) {
+    // Prevent resetting to empty if already set
+    if (selectedRoutineIds.length === 0 && (program?.routineId?.length ?? 0) > 0) {
       return;
     }
+    if (program) {
       setProgram({
         ...program,
         routineId: selectedRoutineIds,
-      })
+      });
+    }
   }
 
   const handleSaveProgram = async () => {
@@ -169,6 +172,20 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
           </div>
 
           <Selector items={"routines"} onItemSelectAction={handleRoutineSelection} selectedItemIds={program.routineId} />
+
+          <div className="space-y-2">
+            <Label htmlFor="stripeProductId">ID du produit Stripe</Label>
+            <Input
+              id="stripeProductId"
+              name="stripeProductId"
+              value={program.stripeProductId || ""}
+              onChange={handleProgramChange}
+              placeholder="prod_xxxxxxxxxxxxxx"
+            />
+            <p className="text-sm text-muted-foreground">
+              L'ID du produit dans le tableau de bord Stripe (ex: prod_xxxxxxxxxxxxxx)
+            </p>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-end">
           <Button onClick={handleSaveProgram} disabled={saving}>

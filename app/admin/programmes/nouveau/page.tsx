@@ -19,7 +19,8 @@ export default function NewProgram() {
   const [formData, setFormData] = useState({
     name: "",
     instructions: "",
-    routineIds: [] as number[]
+    routineIds: [] as number[],
+    stripeProductId: ""
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -144,6 +145,20 @@ export default function NewProgram() {
             </div>
 
             <Selector items={"routines"} onItemSelectAction={handleRoutineSelection} />
+
+            <div className="space-y-2">
+              <Label htmlFor="stripeProductId">ID du produit Stripe</Label>
+              <Input
+                id="stripeProductId"
+                name="stripeProductId"
+                value={formData.stripeProductId}
+                onChange={handleChange}
+                placeholder="prod_xxxxxxxxxxxxxx"
+              />
+              <p className="text-sm text-muted-foreground">
+                L'ID du produit dans le tableau de bord Stripe (ex: prod_xxxxxxxxxxxxxx)
+              </p>
+            </div>
 
             <p className="text-sm text-muted-foreground">* Champs obligatoires</p>
           </CardContent>

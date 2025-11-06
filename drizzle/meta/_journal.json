@@ -132,6 +132,13 @@
       "when": 1762282570968,
       "tag": "0018_watery_shinko_yamashiro",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1762447699175,
+      "tag": "0019_yellow_beyonder",
+      "breakpoints": true
     }
   ]
 }
