@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Sheet, SheetTrigger, SheetContent, SheetTitle, SheetClose } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
-
+import {signOut} from "next-auth/react"
 export function Navbar() {
-    const { user, isAuthenticated, loading, signOut } = useAuth()
+    const { user, isAuthenticated, loading  } = useAuth()
 
     // Define navigation links as an array of objects
     const navItems = [
