@@ -1,2 +1,2 @@
 select *
-from exerci;
+from programs;

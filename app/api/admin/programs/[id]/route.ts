@@ -13,8 +13,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json()
-    console.log(body)
-    const { name, instructions, routineId } = body
+    console.log("Update request body:", body)
+    const { name, instructions, routineId, stripeProductId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
@@ -25,7 +25,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .set({
         name,
         instructions,
-        routineId
+        routineId,
+        stripeProductId: stripeProductId || null
       })
       .where(eq(programs.id, id))
       .returning()

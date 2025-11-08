@@ -7,8 +7,8 @@ import { eq } from "drizzle-orm"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    console.log("body", body)
-    const { name, requiredEquipment, routineIds, instructions } = body
+    console.log("Received request body:", body)
+    const { name, requiredEquipment, routineIds, instructions, stripeProductId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
@@ -28,7 +28,8 @@ export async function POST(request: Request) {
         .values({
           name,
           routineId: routineIds,
-          instructions
+          instructions,
+          stripeProductId: stripeProductId || null
         })
         .returning()
 
