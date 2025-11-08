@@ -1,3 +1,4 @@
+"use client"
 import { useState, useEffect } from "react"
 import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession } from "next-auth/react"
 
