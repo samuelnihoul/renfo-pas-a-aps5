@@ -1,10 +1,10 @@
+"use client"
 import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Sheet, SheetTrigger, SheetContent, SheetTitle, SheetClose } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
-import SignoutButton from "@/components/signout"
 
 export function Navbar() {
     const { user, isAuthenticated, loading, signOut } = useAuth()
@@ -24,14 +24,18 @@ export function Navbar() {
                     {user?.name || user?.email}
                 </span>
                 <SheetClose asChild>
-		<SignoutButton/>
+                    <Button size="sm" variant="outline" onClick={signOut} className="w-full md:w-auto">
+                        Se déconnecter
+                    </Button>
                 </SheetClose>
             </>
         ),
         unauthenticated: (
             <>
                 <SheetClose asChild>
-		<SignoutButton/>
+                    <Button asChild size="sm" className="w-full md:w-auto">
+                        <Link href="/auth/signin">Se connecter</Link>
+                    </Button>
                 </SheetClose>
                 <SheetClose asChild>
                     <Button asChild size="sm" variant="outline" className="w-full md:w-auto">
