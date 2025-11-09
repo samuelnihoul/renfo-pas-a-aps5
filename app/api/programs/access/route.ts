@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
         }
 
         const userId = token.sub || token.id as string || ''
-        const { programId, dayNumber } = await request.json()
+        const { programId } = await request.json()
 
         if (!programId) {
             return NextResponse.json({ error: "programId est requis" }, { status: 400 })
@@ -35,10 +35,6 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ hasAccess: true, reason: "purchased" })
         }
 
-        // Vérifier si c'est le programme 1 et les 2 premières semaines (14 jours)
-        if (programId === 1 && dayNumber && dayNumber <= 14) {
-            return NextResponse.json({ hasAccess: true, reason: "free_trial" })
-        }
 
         // Pas d'accès
         return NextResponse.json({ hasAccess: false, reason: "not_purchased" })
