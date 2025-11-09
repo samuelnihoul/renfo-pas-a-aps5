@@ -139,6 +139,13 @@
       "when": 1762447699175,
       "tag": "0019_yellow_beyonder",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1762705344570,
+      "tag": "0020_chief_argent",
+      "breakpoints": true
     }
   ]
 }
