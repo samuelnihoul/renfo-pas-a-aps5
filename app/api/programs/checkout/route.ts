@@ -27,21 +27,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Programme non trouvé" }, { status: 404 })
         }
 
-        // Prix des programmes (en euros)
-        const programPrices: Record<number, number> = {
-            1: 29.99, // Programme 1
-            2: 39.99, // Programme 2
-            3: 49.99, // Programme 3
+        if (!program[0].stripeProductId) {
+            return NextResponse.json(
+                { error: "Ce programme n'est pas encore disponible à l'achat" }, 
+                { status: 400 }
+            )
         }
-
-        const price = programPrices[programId] || 29.99
 
         // Créer la session de paiement
         const session = await createCheckoutSession({
             userId: userId,
             programId,
             programName: program[0].name,
-            price,
+            stripeProductId: program[0].stripeProductId,
         })
 
         return NextResponse.json({ sessionId: session.id, url: session.url })

@@ -13,7 +13,7 @@ export const programs = pgTable("programs", {
   name: varchar("name", { length: 255 }).notNull(),
   routineId: integer("routine_id").array(),
   instructions: text("instructions"), // Marche à suivre et appropriation
-  stripeProductId: varchar("stripe_product_id", { length: 255 }), // Stripe Product ID for payments
+  stripeProductId: varchar("stripe_product_id", { length: 255 }).default("-"), // Stripe Product ID for payments
   ...timestamps
 })
 
@@ -108,8 +108,8 @@ export const userPrograms = pgTable("user_programs", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id", { length: 255 }).notNull(),
   programId: integer("program_id").notNull(),
+  stripeProductId: varchar("stripe_product_id", { length: 255 }).notNull(),
   purchaseDate: timestamp("purchase_date", { withTimezone: true }).defaultNow(),
-  // Possibilité d'ajouter d'autres champs (ex: prix, statut, etc.)
   ...timestamps
 })
 

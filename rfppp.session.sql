@@ -1,2 +1,1 @@
-select *
-from programs;
+UPDATE programs set stripe_product_id='-' where id=1

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe"
 import { db } from "@/db"
-import { userPrograms } from "@/db/schema"
+import { userPrograms, programs } from "@/db/schema"
 import { headers } from "next/headers"
 import { eq, and } from "drizzle-orm"
 
@@ -31,11 +31,28 @@ export async function POST(request: NextRequest) {
         if (event.type === "checkout.session.completed") {
             const session = event.data.object as any
 
-            const { userId, programId } = session.metadata
+            const { userId, programId, stripeProductId } = session.metadata
 
-            if (!userId || !programId) {
-                console.error("Metadata manquante dans la session Stripe")
-                return NextResponse.json({ error: "Metadata manquante" }, { status: 400 })
+            if (!userId || !programId || !stripeProductId) {
+                console.error("Métadonnées manquantes dans la session Stripe")
+                return NextResponse.json({ error: "Métadonnées manquantes" }, { status: 400 })
+            }
+
+            // Vérifier que le programme existe et correspond au produit Stripe
+            const program = await db
+                .select()
+                .from(programs)
+                .where(eq(programs.id, Number.parseInt(programId)))
+                .limit(1)
+
+            if (!program.length) {
+                console.error("Programme non trouvé")
+                return NextResponse.json({ error: "Programme non trouvé" }, { status: 404 })
+            }
+
+            if (program[0].stripeProductId !== stripeProductId) {
+                console.error("L'ID du produit Stripe ne correspond pas au programme")
+                return NextResponse.json({ error: "Incohérence des données du programme" }, { status: 400 })
             }
 
             // Vérifier si l'utilisateur a déjà acheté ce programme
@@ -58,6 +75,8 @@ export async function POST(request: NextRequest) {
             await db.insert(userPrograms).values({
                 userId,
                 programId: Number.parseInt(programId),
+                stripeProductId,
+                purchaseDate: new Date()
             })
 
             console.log(`Achat enregistré: Utilisateur ${userId} a acheté le programme ${programId}`)

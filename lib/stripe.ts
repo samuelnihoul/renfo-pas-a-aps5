@@ -13,25 +13,37 @@ export const createCheckoutSession = async ({
     userId,
     programId,
     programName,
-    price,
+    stripeProductId,
 }: {
     userId: string
     programId: number
     programName: string
-    price: number
+    stripeProductId: string
 }) => {
+    // Vérifier si le produit existe dans Stripe
+    try {
+        await stripe.products.retrieve(stripeProductId);
+    } catch (error) {
+        console.error("Stripe product not found:", error);
+        throw new Error("Product not found in Stripe");
+    }
+
+    // Récupérer le prix du produit depuis Stripe
+    const prices = await stripe.prices.list({
+        product: stripeProductId,
+        active: true,
+        limit: 1,
+    });
+
+    if (prices.data.length === 0) {
+        throw new Error("No active price found for this product");
+    }
+
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
             {
-                price_data: {
-                    currency: "eur",
-                    product_data: {
-                        name: programName,
-                        description: `Accès complet au programme ${programName}`,
-                    },
-                    unit_amount: price * 100, // Stripe utilise les centimes
-                },
+                price: prices.data[0].id,
                 quantity: 1,
             },
         ],
@@ -41,8 +53,9 @@ export const createCheckoutSession = async ({
         metadata: {
             userId,
             programId: programId.toString(),
+            stripeProductId,
         },
-    })
+    });
 
-    return session
-} 
+    return session;
+}
