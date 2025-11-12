@@ -1,6 +1,6 @@
 "use client"
 import { Suspense, useState, useEffect } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { ChevronRight, Dumbbell, ListChecks, AlertCircle, HomeIcon, Lock } from "lucide-react"
 import { useData } from "@/components/data-provider"
 import { Card } from "@/components/ui/card"
@@ -13,9 +13,6 @@ import {
   DialogTrigger,
   DialogContent,
   DialogTitle,
-  DialogDescription,
-  DialogHeader,
-  DialogFooter
 } from "@/components/ui/dialog"
 
 // ======================
@@ -26,6 +23,7 @@ type Exercise = {
   name: string;
   videoPublicId: string | null;
   thumbnailUrl: string | null;
+  short: string | null;
   instructions: string | null;
   objectifs: string | null;
   notes: string | null;
@@ -87,24 +85,19 @@ function ErrorAlert() {
 // MAIN PAGE COMPONENT
 // ======================
 export default function Home() {
-  const router = useRouter();
   const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [purchasedPrograms, setPurchasedPrograms] = useState<Program[]>([]);
   const [currentLevel, setCurrentLevel] = useState<'programs' | 'routines' | 'blocks'>('programs');
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null);
   const [programRoutines, setProgramRoutines] = useState<Record<number, Routine[]>>({});
-  const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
   const [loadingStates, setLoadingStates] = useState({
-    programs: true,
     routines: true,
-    blocks: true,
-    purchasedPrograms: true,
   });
+  const [purchasedLoading, setPurchasedLoading] = useState(true);
 
   const {
     programs,
-    routines,
     blocks,
     exercises,
     loading,
@@ -116,7 +109,7 @@ export default function Home() {
   useEffect(() => {
     const fetchPurchasedPrograms = async () => {
       if (!isAuthenticated || !user) {
-        setLoadingStates(prev => ({ ...prev, purchasedPrograms: false }));
+        setPurchasedLoading(false);
         return;
       }
 
@@ -128,20 +121,28 @@ export default function Home() {
       } catch (error) {
         console.error('Error fetching purchased programs:', error);
       } finally {
-        setLoadingStates(prev => ({ ...prev, purchasedPrograms: false }));
+        setPurchasedLoading(false);
       }
     };
 
     fetchPurchasedPrograms();
   }, [isAuthenticated, user]);
 
+  // Reset routines loading when no purchases
+  useEffect(() => {
+    if (!purchasedLoading && purchasedPrograms.length === 0) {
+      setProgramRoutines({});
+      setLoadingStates(prev => ({ ...prev, routines: false }));
+    }
+  }, [purchasedLoading, purchasedPrograms.length]);
+
   // Load routines for purchased programs
   useEffect(() => {
     const loadRoutinesForPurchasedPrograms = async () => {
-      if (purchasedPrograms.length === 0) return;
+      if (purchasedLoading || purchasedPrograms.length === 0) return;
 
+      setLoadingStates(prev => ({ ...prev, routines: true }));
       try {
-        setLoadingStates(prev => ({ ...prev, routines: true }));
         const routinesMap: Record<number, Routine[]> = {};
         
         await Promise.all(purchasedPrograms.map(async (program) => {
@@ -158,9 +159,18 @@ export default function Home() {
     };
 
     loadRoutinesForPurchasedPrograms();
-  }, [purchasedPrograms, fetchRoutinesByProgram]);
+  }, [purchasedPrograms, purchasedLoading, fetchRoutinesByProgram]);
 
-  if (loading || authLoading || loadingStates.purchasedPrograms) {
+  // Reset selection if program is no longer available
+  useEffect(() => {
+    if (selectedProgram && !purchasedPrograms.some(program => program.id === selectedProgram.id)) {
+      setCurrentLevel('programs');
+      setSelectedProgram(null);
+      setSelectedRoutine(null);
+    }
+  }, [purchasedPrograms, selectedProgram]);
+
+  if (loading || authLoading || purchasedLoading || (purchasedPrograms.length > 0 && loadingStates.routines)) {
     return (
       <div className="container px-4 py-8 mx-auto flex items-center justify-center min-h-screen">
         <p>Chargement de vos programmes...</p>
@@ -195,14 +205,6 @@ export default function Home() {
 
   // Navigation functions
   const navigateToProgram = (program: Program) => {
-    // Check if program is purchased
-    const isPurchased = purchasedPrograms.some(p => p.id === program.id);
-    
-    if (!isPurchased) {
-      setIsPurchaseDialogOpen(true);
-      return;
-    }
-    
     setSelectedProgram(program);
     setCurrentLevel('routines');
     setSelectedRoutine(null);
@@ -224,109 +226,10 @@ export default function Home() {
     setSelectedRoutine(null);
   };
 
-  const renderPrograms = () => {
-    if (purchasedPrograms.length === 0) {
-      return (
-        <div className="text-center py-12">
-          <Lock className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">Aucun programme acheté</h3>
-          <p className="text-muted-foreground mb-6">
-            Vous n'avez pas encore accès à de programmes. Parcourez notre catalogue pour en découvrir plus.
-          </p>
-          <Button asChild>
-            <Link href="/programmes">Découvrir les programmes</Link>
-          </Button>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold flex items-center">
-          <Dumbbell className="mr-2 h-6 w-6" />
-          Mes Programmes
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {purchasedPrograms.map((program) => (
-            <Card
-              key={program.id}
-              className="p-4 hover:bg-accent/50 transition-colors cursor-pointer"
-              onClick={() => navigateToProgram(program)}
-            >
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium">{program.name}</h3>
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-              </div>
-              {program.description && (
-                <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                  {program.description}
-                </p>
-              )}
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderRoutines = () => {
-    return (
-      <div className="grid gap-4">
-        {programRoutines[selectedProgram.id]?.map((routine) => (
-          <Card
-            key={routine.id}
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => navigateToRoutine(routine)}
-          >
-            <div className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <ChevronRight className="w-5 h-5 text-gray-600" />
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-800">{routine.name}</h2>
-                </div>
-                <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
-                  {routine.blockId.length} blocs
-                </div>
-              </div>
-              {routine.equipment && (
-                <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
-              )}
-              {routine.sessionOutcome && (
-                <p className="text-sm text-gray-600 mt-1 ml-8">Sortie de séance: {routine.sessionOutcome}</p>
-              )}
-            </div>
-          </Card>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div className="container px-0 py-4 sm:py-6 mx-auto">
       <Suspense fallback={null}>
         <ErrorAlert />
-        
-        {/* Purchase Required Dialog */}
-        <Dialog open={isPurchaseDialogOpen} onOpenChange={setIsPurchaseDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Accès limité</DialogTitle>
-              <DialogDescription>
-                Vous devez acheter ce programme pour y accéder.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsPurchaseDialogOpen(false)}>
-                Annuler
-              </Button>
-              <Button asChild>
-                <Link href="/programmes">
-                  Voir les programmes
-                </Link>
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </Suspense>
 
       {/* Horizontal Tree Hierarchy Navigation */}
@@ -353,11 +256,88 @@ export default function Home() {
               </button>
             </>
           )}
+          {selectedRoutine && (
+            <>
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <span className="px-3 py-1 rounded bg-blue-100 text-blue-700 font-medium">
+                {selectedRoutine.name}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
-      {currentLevel === 'programs' && renderPrograms()}
-      {currentLevel === 'routines' && selectedProgram && renderRoutines()}
+      {/* Programs Level */}
+      {currentLevel === 'programs' && (
+        purchasedPrograms.length === 0 ? (
+          <div className="text-center py-12">
+            <Lock className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">Aucun programme acheté</h3>
+            <p className="text-muted-foreground mb-6">
+              Vous n'avez pas encore accès à de programmes. Parcourez notre catalogue pour en découvrir plus.
+            </p>
+            <Button asChild>
+              <Link href="/programmes">Découvrir les programmes</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {purchasedPrograms.map((program) => (
+              <Card
+                key={program.id}
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => navigateToProgram(program)}
+              >
+                <div className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <ChevronRight className="w-5 h-5 text-gray-600" />
+                      <h2 className="text-lg sm:text-xl font-bold text-gray-800">{program.name}</h2>
+                    </div>
+                    <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
+                      {programRoutines[program.id]?.length ?? 0} routines
+                    </div>
+                  </div>
+                  {program.description && (
+                    <p className="text-sm text-gray-600 mt-2 ml-8">{program.description}</p>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )
+      )}
+
+      {/* Routines Level */}
+      {currentLevel === 'routines' && selectedProgram && (
+        <div className="grid gap-4">
+          {programRoutines[selectedProgram.id]?.map((routine) => (
+            <Card
+              key={routine.id}
+              className="cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigateToRoutine(routine)}
+            >
+              <div className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <ChevronRight className="w-5 h-5 text-gray-600" />
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-800">{routine.name}</h2>
+                  </div>
+                  <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
+                    {routine.blockId.length} blocs
+                  </div>
+                </div>
+                {routine.equipment && (
+                  <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
+                )}
+                {routine.sessionOutcome && (
+                  <p className="text-sm text-gray-600 mt-1 ml-8">Sortie de séance: {routine.sessionOutcome}</p>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Blocks Level */}
       {currentLevel === 'blocks' && selectedRoutine && (
@@ -468,3 +448,4 @@ export default function Home() {
     </div>
   );
 }
+
