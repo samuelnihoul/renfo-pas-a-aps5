@@ -10,7 +10,7 @@ try {
     const { pathname } = request.nextUrl
 
     // Protected routes
-    const isProtected = pathname.startsWith('/admin')
+    const isProtected = pathname.startsWith('/admin') || pathname.startsWith('/mediatheque')
 
     if (isProtected) {
       // Use default NextAuth token reading with production-safe options
@@ -28,22 +28,23 @@ try {
         return NextResponse.redirect(signInUrl)
       }
 
-      // Check if user has admin privileges
-      const isAdmin = Boolean(token.isAdmin)
-      console.log('Token found:', {
-        email: token.email,
-        isAdmin: token.isAdmin,
-        hasAdminFlag: 'isAdmin' in token
-      })
+      // For admin routes, check admin privileges
+      if (pathname.startsWith('/admin')) {
+        const isAdmin = Boolean(token.isAdmin)
+        console.log('Admin route - checking admin privileges:', {
+          email: token.email,
+          isAdmin: token.isAdmin,
+          hasAdminFlag: 'isAdmin' in token
+        })
 
-      if (!isAdmin) {
-        console.log('User is not admin, redirecting to home')
-        const homeUrl = new URL('/', request.url)
-        homeUrl.searchParams.set('error', 'unauthorized')
-        return NextResponse.redirect(homeUrl)
+        if (!isAdmin) {
+          console.log('User is not admin, redirecting to home')
+          const homeUrl = new URL('/', request.url)
+          homeUrl.searchParams.set('error', 'unauthorized')
+          return NextResponse.redirect(homeUrl)
+        }
+        console.log('Admin access granted')
       }
-
-      console.log('Admin access granted')
     }
 
     return NextResponse.next()
@@ -55,6 +56,6 @@ try {
 }
 
 export const config = {
-  // Only run middleware on admin routes
-  matcher: ['/admin/:path*'],
+  // Run middleware on protected routes
+  matcher: ['/admin/:path*', '/mediatheque/:path*'],
 }
