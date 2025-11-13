@@ -277,7 +277,7 @@ export default function Home() {
               Vous n'avez pas encore accès à de programmes. Parcourez notre catalogue pour en découvrir plus.
             </p>
             <Button asChild>
-              <Link href="/programmes">Découvrir les programmes</Link>
+              <Link href="/programmes">Boutique de programmes</Link>
             </Button>
           </div>
         ) : (
