@@ -211,15 +211,6 @@ export default function ExercisesPage() {
             </Button>
           </Link>
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher par nom, objectif ou groupe musculaire..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
       </div>
 
       {exercises.length === 0 ? (
@@ -235,7 +226,12 @@ export default function ExercisesPage() {
           </CardContent>
         </Card>
       ) : (
-        <DataTable columns={columns} data={exercises} searchKey="name" searchPlaceholder="Rechercher un exercice..." />
+        <DataTable 
+          columns={columns} 
+          data={exercises} 
+          searchKey={["name", "objectifs", "muscleGroup"]}
+          searchPlaceholder="Rechercher par nom, objectif ou groupe musculaire..."
+        />
       )}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
