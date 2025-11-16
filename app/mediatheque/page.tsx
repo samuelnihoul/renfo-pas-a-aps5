@@ -2,21 +2,27 @@
 
 import React from "react"
 import Link from "next/link"
-import { Dumbbell, ArrowRight, Search } from "lucide-react"
+import { Dumbbell, ArrowRight, Search, AlertTriangle } from "lucide-react"
 import { useData } from "@/components/data-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search as SearchComponent } from "@/components/medialab/search"
+import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useSession } from "next-auth/react"
+import { useHasPurchasedProgram } from "@/hooks/use-has-purchased-program"
 
 export default function MediathequePage() {
+  const { data: session } = useSession()
+  const { hasPurchased, loading: loadingPurchase } = useHasPurchasedProgram(session?.user?.id || '')
   const { fetchAllExercises } = useData()
   const [muscleGroups, setMuscleGroups] = React.useState<{[key: string]: number}>({})
-  const [loading, setLoading] = React.useState(true)
+  const [loadingExercises, setLoadingExercises] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     const loadMuscleGroups = async () => {
       try {
-        setLoading(true)
+        setLoadingExercises(true)
         const exercises = await fetchAllExercises()
         
         // Group exercises by muscle group and count them
@@ -33,17 +39,39 @@ export default function MediathequePage() {
         setError("Erreur lors du chargement des groupes musculaires")
         console.error(err)
       } finally {
-        setLoading(false)
+        setLoadingExercises(false)
       }
     }
 
     loadMuscleGroups()
   }, [fetchAllExercises])
 
-  if (loading) {
+  if (loadingPurchase || loadingExercises) {
     return (
       <div className="container px-4 py-8 mx-auto flex items-center justify-center min-h-screen">
-        <p>Chargement des groupes musculaires...</p>
+        <p>Chargement...</p>
+      </div>
+    )
+  }
+
+  // Si l'utilisateur n'a pas acheté de programme
+  if (!hasPurchased) {
+    return (
+      <div className="container px-4 py-8 mx-auto max-w-4xl">
+        <Alert variant="default" className="mb-8">
+          <AlertTriangle className="h-5 w-5" />
+          <AlertTitle>Accès limité</AlertTitle>
+          <AlertDescription className="mt-2">
+            <p className="mb-4">
+              La médiathèque d'exercices est réservée aux utilisateurs ayant acheté un programme.
+            </p>
+            <Button asChild variant="outline" className="mt-2">
+              <Link href="/programs">
+                Voir les programmes disponibles
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
       </div>
     )
   }
