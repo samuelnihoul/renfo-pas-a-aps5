@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
             programId,
             programName: program[0].name,
             stripeProductId: program[0].stripeProductId,
-	    allow_promotion_codes:true
+	    allowPromotionCodes:true
         })
 
         return NextResponse.json({ sessionId: session.id, url: session.url })

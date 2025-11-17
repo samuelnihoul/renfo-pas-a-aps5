@@ -1,1 +1,1 @@
-select * from user_programs
+select * from users
