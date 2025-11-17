@@ -50,6 +50,7 @@ export const createCheckoutSession = async ({
         mode: "payment",
         success_url: `${process.env.NEXT_PUBLIC_APP_URL}/programmes?success=true&programId=${programId}`,
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/programmes?canceled=true`,
+	allow_promotion_codes:true,
         metadata: {
             userId,
             programId: programId.toString(),
