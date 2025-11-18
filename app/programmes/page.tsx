@@ -59,13 +59,23 @@ export default function ProgrammesPage() {
                     <p className="text-lg text-muted-foreground mb-4">
                         Connectez-vous pour accéder aux programmes d'entraînement
                     </p>
-                    <div className="space-x-4">
+                    <div className="space-x-4 mb-8">
                         <Button asChild>
                             <Link href="/auth/signin">Se connecter</Link>
                         </Button>
                         <Button variant="outline" asChild>
                             <Link href="/auth/signup">S'inscrire</Link>
                         </Button>
+                    </div>
+                    <div className="max-w-3xl mx-auto">
+                        <h2 className="text-2xl font-semibold mb-4">Découvrez notre liste de programmes professionnels</h2>
+                        <div className="border rounded-lg overflow-hidden shadow-lg">
+                            <img 
+                                src="/listdepro.png" 
+                                alt="Liste des programmes professionnels" 
+                                className="w-full h-auto"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
