@@ -116,7 +116,7 @@ export default function ProgrammePage({ params }: { params: { id: string } | Pro
 
         <div className="space-y-4">
           {program.days.map((day: any) => (
-            <Link href={`/programmes/${id}/session/${day.id}`} key={day.id}>
+            <Link href={`/programmes`} key={day.id}>
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2">
