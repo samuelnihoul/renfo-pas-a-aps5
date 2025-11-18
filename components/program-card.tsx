@@ -64,7 +64,7 @@ export function ProgramCard({ program, userId, hasAccess, accessReason }: Progra
         if (hasAccess) {
             return (
                 <Button asChild className="w-full">
-                    <a href={`/programmes/${program.id}`} className="w-full text-center">Commencer</a>
+                    <a href={`/programmes`} className="w-full text-center">Commencer</a>
                 </Button>
             )
         }
