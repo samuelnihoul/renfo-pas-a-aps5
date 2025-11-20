@@ -1,2 +1,3 @@
-DELETE FROM users WHERE email = 'nivl@tutanota.com';
-DELETE FROM users WHERE email = 'vdkv39@gmail.com';
+UPDATE users
+SET "isAdmin" = true
+WHERE email IN ('flavienguais@gmail.com', 'n.vandel@protonmail.com');

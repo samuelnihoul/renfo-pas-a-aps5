@@ -330,9 +330,15 @@ export default function Home() {
                 {routine.equipment && (
                   <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
                 )}
-                {routine.sessionOutcome && (
-                  <p className="text-sm text-gray-600 mt-1 ml-8">Sortie de séance: {routine.sessionOutcome}</p>
-                )}
+              </div>
+              {routine.sessionOutcome && (
+                <div className="bg-gray-100 p-4 sm:p-5 rounded-b-lg border-t border-gray-200">
+                  <div className="flex items-start gap-2">
+                    <Dumbbell className="w-4 h-4 mt-0.5 text-gray-600 flex-shrink-0" />
+                    <p className="text-sm text-gray-700"><span className="font-medium">Sortie de séance :</span> {routine.sessionOutcome}</p>
+                  </div>
+                </div>
+              )}
               </div>
             </Card>
           ))}
@@ -342,6 +348,7 @@ export default function Home() {
       {/* Blocks Level */}
       {currentLevel === 'blocks' && selectedRoutine && (
         <div className="space-y-6">
+          {/* Regular Blocks */}
           {blocks
             .filter(block => selectedRoutine.blockId.includes(block.id))
             .map((block) => (
@@ -353,8 +360,8 @@ export default function Home() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <ListChecks className="w-5 h-5 " />
-                    <h3 className="text-lg font-bold ">{block.name}</h3>
+                    <ListChecks className="w-5 h-5" />
+                    <h3 className="text-lg font-bold">{block.name}</h3>
                   </div>
                 </div>
                 {block.instructions && (
@@ -443,6 +450,19 @@ export default function Home() {
                 </div>
               </Card>
             ))}
+          
+          {/* Sortie de Séance Block */}
+          {selectedRoutine.sessionOutcome && (
+            <Card className="bg-gray-100 border-gray-200">
+              <div className="p-4 sm:p-5">
+                <div className="flex items-center gap-3">
+                  <Dumbbell className="w-5 h-5 text-gray-600" />
+                  <h3 className="text-lg font-bold text-gray-800">Sortie de séance</h3>
+                </div>
+                <p className="mt-2 text-gray-700">{selectedRoutine.sessionOutcome}</p>
+              </div>
+            </Card>
+          )}
         </div>
       )}
     </div>
