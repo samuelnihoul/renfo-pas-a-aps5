@@ -317,7 +317,7 @@ export default function Home() {
               className="cursor-pointer hover:shadow-lg transition-shadow"
               onClick={() => navigateToRoutine(routine)}
             >
-              <div className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-colors">
+              <div className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-colors rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <ChevronRight className="w-5 h-5 text-gray-600" />
@@ -330,15 +330,6 @@ export default function Home() {
                 {routine.equipment && (
                   <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
                 )}
-              </div>
-              {routine.sessionOutcome && (
-                <div className="bg-gray-100 p-4 sm:p-5 rounded-b-lg border-t border-gray-200">
-                  <div className="flex items-start gap-2">
-                    <Dumbbell className="w-4 h-4 mt-0.5 text-gray-600 flex-shrink-0" />
-                    <p className="text-sm text-gray-700"><span className="font-medium">Sortie de séance :</span> {routine.sessionOutcome}</p>
-                  </div>
-                </div>
-              )}
               </div>
             </Card>
           ))}
@@ -452,7 +443,7 @@ export default function Home() {
             ))}
           
           {/* Sortie de Séance Block */}
-          {selectedRoutine.sessionOutcome && (
+          {selectedRoutine?.sessionOutcome && (
             <Card className="bg-gray-100 border-gray-200">
               <div className="p-4 sm:p-5">
                 <div className="flex items-center gap-3">
@@ -468,4 +459,3 @@ export default function Home() {
     </div>
   );
 }
-
