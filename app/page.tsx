@@ -311,28 +311,61 @@ export default function Home() {
       {/* Routines Level */}
       {currentLevel === 'routines' && selectedProgram && (
         <div className="grid gap-4">
-          {programRoutines[selectedProgram.id]?.map((routine) => (
-            <Card
-              key={routine.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigateToRoutine(routine)}
-            >
-              <div className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-colors rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <ChevronRight className="w-5 h-5 text-gray-600" />
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-800">{routine.name}</h2>
+          {(() => {
+            const routinesList = programRoutines[selectedProgram.id] || [];
+            
+            // Si aucune routine, retourner vide
+            if (routinesList.length === 0) {
+              return null;
+            }
+            
+            // Récupérer le programme complet depuis le contexte pour avoir routineId
+            const fullProgram = programs.find(p => p.id === selectedProgram.id);
+            const routineIdOrder = fullProgram?.routineId;
+            
+            // Si routineIdOrder existe et n'est pas vide, trier selon l'ordre
+            let routinesToDisplay = routinesList;
+            
+            if (routineIdOrder && routineIdOrder.length > 0) {
+              // Créer un Map pour un accès rapide aux routines par ID
+              const routinesMap = new Map(
+                routinesList.map(routine => [routine.id, routine])
+              );
+              
+              // Créer la liste des routines dans le même ordre que routineIdOrder
+              const orderedRoutines = routineIdOrder
+                .map(id => routinesMap.get(id))
+                .filter((routine): routine is Routine => routine !== undefined);
+              
+              // Si on a des routines ordonnées, les utiliser, sinon fallback sur la liste originale
+              if (orderedRoutines.length > 0) {
+                routinesToDisplay = orderedRoutines;
+              }
+            }
+            
+            return routinesToDisplay.map((routine) => (
+              <Card
+                key={routine.id}
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => navigateToRoutine(routine)}
+              >
+                <div className="p-4 sm:p-5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-colors rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <ChevronRight className="w-5 h-5 text-gray-600" />
+                      <h2 className="text-lg sm:text-xl font-bold text-gray-800">{routine.name}</h2>
+                    </div>
+                    <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
+                      {routine.blockId.length} blocs
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600 bg-white/80 px-3 py-1 rounded-full border">
-                    {routine.blockId.length} blocs
-                  </div>
+                  {routine.equipment && (
+                    <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
+                  )}
                 </div>
-                {routine.equipment && (
-                  <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
-                )}
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ));
+          })()}
         </div>
       )}
 
@@ -340,9 +373,16 @@ export default function Home() {
       {currentLevel === 'blocks' && selectedRoutine && (
         <div className="space-y-6">
           {/* Regular Blocks */}
-          {blocks
-            .filter(block => selectedRoutine.blockId.includes(block.id))
-            .map((block) => (
+          {(() => {
+            // Créer un Map pour un accès rapide aux blocks par ID
+            const blocksMap = new Map(blocks.map(block => [block.id, block]));
+            
+            // Créer la liste des blocks dans le même ordre que selectedRoutine.blockId
+            const orderedBlocks = (selectedRoutine.blockId || [])
+              .map(id => blocksMap.get(id))
+              .filter((block): block is Block => block !== undefined);
+            
+            return orderedBlocks.map((block) => (
               <Card
                 key={block.id}
                 className={`p-4 sm:p-5 ${block.name.includes('Activation') ? 'bg-gradient-to-r from-blue-400 to-blue-800 text-white' :
@@ -359,9 +399,16 @@ export default function Home() {
                   <p className="text-sm mt-2 pb-3">{block.instructions}</p>
                 )}
                 <div className="space-y-2 ml-1 text-black bg-white rounded-xl">
-                  {exercises
-                    .filter(ex => block.exerciceId.includes(ex.id))
-                    .map((exercise, idx) => (
+                  {(() => {
+                    // Créer un Map pour un accès rapide aux exercices par ID
+                    const exercisesMap = new Map(exercises.map(ex => [ex.id, ex]));
+                    
+                    // Créer la liste des exercices dans le même ordre que block.exerciceId
+                    const orderedExercises = (block.exerciceId || [])
+                      .map(id => exercisesMap.get(id))
+                      .filter((ex): ex is Exercise => ex !== undefined);
+                    
+                    return orderedExercises.map((exercise, idx) => (
                       <div
                         key={`${block.id}-${exercise.id}`}
                         className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
@@ -437,10 +484,12 @@ export default function Home() {
                           )}
                         </div>
                       </div>
-                    ))}
+                    ));
+                  })()}
                 </div>
               </Card>
-            ))}
+            ));
+          })()}
           
           {/* Sortie de Séance Block */}
           {selectedRoutine?.sessionOutcome && (
@@ -459,3 +508,4 @@ export default function Home() {
     </div>
   );
 }
+
