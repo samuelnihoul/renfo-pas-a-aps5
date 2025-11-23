@@ -404,15 +404,33 @@ export default function Home() {
                 )}
                 <div className="space-y-2 ml-1 text-black bg-white rounded-xl">
                   {(() => {
-                    // Créer un Map pour un accès rapide aux exercices par ID
-                    const exercisesMap = new Map(exercises.map(ex => [ex.id, ex]));
+                    // Filtrer les exercices qui appartiennent à ce block
+                    const blockExercises = exercises.filter(ex => block.exerciceId?.includes(ex.id) || false);
                     
-                    // Créer la liste des exercices dans le même ordre que block.exerciceId
-                    const orderedExercises = (block.exerciceId || [])
-                      .map(id => exercisesMap.get(id))
-                      .filter((ex): ex is Exercise => ex !== undefined);
+                    // Si aucun exercice, retourner vide
+                    if (blockExercises.length === 0) {
+                      return null;
+                    }
                     
-                    return orderedExercises.map((exercise, idx) => (
+                    // Si block.exerciceId existe et n'est pas vide, trier selon l'ordre
+                    let exercisesToDisplay = blockExercises;
+                    
+                    if (block.exerciceId && block.exerciceId.length > 0) {
+                      // Créer un Map pour un accès rapide aux exercices par ID
+                      const exercisesMap = new Map(blockExercises.map(ex => [ex.id, ex]));
+                      
+                      // Créer la liste des exercices dans le même ordre que block.exerciceId
+                      const orderedExercises = block.exerciceId
+                        .map(id => exercisesMap.get(id))
+                        .filter((ex): ex is Exercise => ex !== undefined);
+                      
+                      // Si on a des exercices ordonnés, les utiliser, sinon fallback sur la liste originale
+                      if (orderedExercises.length > 0) {
+                        exercisesToDisplay = orderedExercises;
+                      }
+                    }
+                    
+                    return exercisesToDisplay.map((exercise, idx) => (
                       <div
                         key={`${block.id}-${exercise.id}`}
                         className="flex items-start p-2 rounded hover:bg-gray-50 transition-colors"
