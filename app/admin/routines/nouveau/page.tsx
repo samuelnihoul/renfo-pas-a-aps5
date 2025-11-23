@@ -21,6 +21,7 @@ export default function NewRoutine() {
     blockId: [],
     name: "",
     equipment: "",
+    instructions: "",
     sessionOutcome: "",
   })
 
@@ -138,6 +139,18 @@ export default function NewRoutine() {
                 value={formData.equipment || ""}
                 onChange={handleChange}
                 placeholder="Listez le matériel nécessaire pour cette routine..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="instructions">Instructions</Label>
+              <Textarea
+                id="instructions"
+                name="instructions"
+                value={formData.instructions || ""}
+                onChange={handleChange}
+                placeholder="Ajoutez les instructions pour cette routine..."
                 rows={3}
               />
             </div>

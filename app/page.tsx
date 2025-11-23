@@ -47,6 +47,7 @@ type Routine = {
   name: string;
   blockId: number[];
   equipment?: string | null;
+  instructions?: string | null;
   sessionOutcome?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -361,6 +362,9 @@ export default function Home() {
                   </div>
                   {routine.equipment && (
                     <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
+                  )}
+                  {routine.instructions && (
+                    <p className="text-sm text-gray-600 mt-2 ml-8">Instructions: {routine.instructions}</p>
                   )}
                 </div>
               </Card>

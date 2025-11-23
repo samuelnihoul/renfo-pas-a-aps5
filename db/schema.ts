@@ -70,6 +70,7 @@ export const routines = pgTable(
       .notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     equipment: text("equipment"),
+    instructions: text("instructions"),
     sessionOutcome: text("session_outcome"),
     ...timestamps
   },

@@ -28,6 +28,7 @@ type Routine = {
   name: string
   blockId: number[]
   equipment?: string | null
+  instructions?: string | null
   sessionOutcome?: string | null
 }
 
@@ -44,6 +45,7 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
     name: "",
     blockId: [],
     equipment: "",
+    instructions: "",
     sessionOutcome: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -70,6 +72,7 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
             name: routineData.name || "",
             blockId,
             equipment: routineData.equipment || "",
+            instructions: routineData.instructions || "",
             sessionOutcome: routineData.sessionOutcome || ""
           })
           
@@ -278,6 +281,18 @@ export default function EditRoutinePage({ params }: { params: Promise<{ id: stri
                 value={formData.equipment || ""}
                 onChange={handleInputChange}
                 placeholder="Listez le matériel nécessaire pour cette routine..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="instructions">Instructions</Label>
+              <Textarea
+                id="instructions"
+                name="instructions"
+                value={formData.instructions || ""}
+                onChange={handleInputChange}
+                placeholder="Ajoutez les instructions pour cette routine..."
                 rows={3}
               />
             </div>

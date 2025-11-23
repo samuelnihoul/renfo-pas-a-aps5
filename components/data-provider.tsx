@@ -14,6 +14,9 @@ type Routine = {
   id: number
   blockId: number[]
   name: string
+  equipment?: string | null
+  instructions?: string | null
+  sessionOutcome?: string | null
   createdAt: string
   updatedAt: string
 }
