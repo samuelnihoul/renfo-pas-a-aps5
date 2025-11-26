@@ -41,7 +41,7 @@ const exerciseSchema = z.object({
 
 type ExerciseFormValues = z.infer<typeof exerciseSchema>
 
-export function NewExercisePage() {
+export default function NewExercisePage() {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [videoFile, setVideoFile] = useState<File | null>(null)
