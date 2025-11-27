@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     console.log("Received request body:", body)
-    const { name, requiredEquipment, routineIds, instructions, stripeProductId } = body
+    const { name, requiredEquipment, routineIds, instructions, shopDescription, stripeProductId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
           name,
           routineId: routineIds,
           instructions,
+          shopDescription,
           stripeProductId: stripeProductId || null
         })
         .returning()

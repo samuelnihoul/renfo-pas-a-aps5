@@ -19,6 +19,7 @@ export default function NewProgram() {
   const [formData, setFormData] = useState({
     name: "",
     instructions: "",
+    shopDescription: "",
     routineIds: [] as number[],
     stripeProductId: ""
   })
@@ -141,6 +142,18 @@ export default function NewProgram() {
                 onChange={handleChange}
                 placeholder="Grandes lignes du programme, infos importantes, conseils..."
                 rows={4}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="shopDescription">Description boutique</Label>
+              <Textarea
+                id="shopDescription"
+                name="shopDescription"
+                value={formData.shopDescription}
+                onChange={handleChange}
+                placeholder="Description affichée dans la boutique/programmes achetés..."
+                rows={3}
               />
             </div>
 

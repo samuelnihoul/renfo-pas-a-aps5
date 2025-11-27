@@ -24,6 +24,7 @@ type Program = {
   id: number
   name: string
   instructions?: string
+  shopDescription?: string
 }
 
 export default function ProgramsPage() {
@@ -112,6 +113,11 @@ export default function ProgramsPage() {
     {
       accessorKey: "name",
       header: "Nom",
+    },
+    {
+      accessorKey: "shopDescription",
+      header: "Description boutique",
+      cell: ({ row }) => row.original.shopDescription || <span className="text-muted-foreground italic">-</span>,
     },
     {
       accessorKey: "instructions",

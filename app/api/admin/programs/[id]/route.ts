@@ -14,7 +14,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     const body = await request.json()
     console.log("Update request body:", body)
-    const { name, instructions, routineId, stripeProductId } = body
+    const { name, instructions, shopDescription, routineId, stripeProductId } = body
 
     if (!name) {
       return NextResponse.json({ error: "Le nom du programme est requis" }, { status: 400 })
@@ -25,6 +25,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .set({
         name,
         instructions,
+        shopDescription,
         routineId,
         stripeProductId: stripeProductId || null
       })

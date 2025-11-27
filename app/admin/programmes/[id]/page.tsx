@@ -17,6 +17,7 @@ type Program = {
   id: number
   name: string
   instructions?: string
+  shopDescription?: string
   routineId: number[]
   stripeProductId?: string
 }
@@ -44,6 +45,7 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
 
           setProgram({
             ...programData,
+            shopDescription: programData.shopDescription || "",
             routineId,
           })
         } else {
@@ -168,6 +170,18 @@ export default function EditProgramPage({ params }: { params: Promise<{ id: stri
               onChange={handleProgramChange}
               placeholder="Grandes lignes du programme, infos importantes, conseils..."
               rows={4}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="shopDescription">Description boutique</Label>
+            <Textarea
+              id="shopDescription"
+              name="shopDescription"
+              value={program.shopDescription || ""}
+              onChange={handleProgramChange}
+              placeholder="Description affichée dans la boutique/programmes achetés..."
+              rows={3}
             />
           </div>
 

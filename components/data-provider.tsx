@@ -6,6 +6,8 @@ type Program = {
   id: number
   name: string
   routineId: number[]
+  shopDescription?: string | null
+  instructions?: string | null
   createdAt: string
   updatedAt: string
 }

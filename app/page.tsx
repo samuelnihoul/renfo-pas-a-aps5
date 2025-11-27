@@ -57,6 +57,7 @@ type Program = {
   id: number;
   name: string;
   description?: string;
+  shopDescription?: string | null;
   routineId: number[];
   createdAt: string;
   updatedAt: string;
@@ -299,8 +300,10 @@ export default function Home() {
                       {programRoutines[program.id]?.length ?? 0} routines
                     </div>
                   </div>
-                  {program.description && (
-                    <p className="text-sm text-gray-600 mt-2 ml-8">{program.description}</p>
+                  {(program.shopDescription || program.description) && (
+                    <p className="text-sm text-gray-600 mt-2 ml-8">
+                      {program.shopDescription || program.description}
+                    </p>
                   )}
                 </div>
               </Card>

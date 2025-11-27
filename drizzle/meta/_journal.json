@@ -153,6 +153,13 @@
       "when": 1763920639566,
       "tag": "0021_lying_taskmaster",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1764278773211,
+      "tag": "0022_spotty_khan",
+      "breakpoints": true
     }
   ]
 }
