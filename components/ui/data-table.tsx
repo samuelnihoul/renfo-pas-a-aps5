@@ -124,16 +124,46 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-          Précédent
-        </Button>
-        <span className="text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} sur {table.getPageCount()}
-        </span>
-        <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-          Suivant
-        </Button>
+      <div className="flex items-center justify-between px-2 py-4">
+        <div className="text-sm text-muted-foreground">
+          {table.getFilteredRowModel().rows.length} élément{table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm" onClick={() => table.firstPage()} disabled={!table.getCanPreviousPage()}>
+            «
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+            ‹
+          </Button>
+          <div className="flex items-center space-x-1">
+            <span className="text-sm text-muted-foreground px-2">
+              Page
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={table.getPageCount()}
+              value={table.getState().pagination.pageIndex + 1}
+              onChange={(e) => {
+                const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                table.setPageIndex(Math.min(Math.max(0, page), table.getPageCount() - 1));
+                if (onPageChange) {
+                  onPageChange(Math.min(Math.max(0, page), table.getPageCount() - 1));
+                }
+              }}
+              className="w-12 h-9 text-sm border rounded-md text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            <span className="text-sm text-muted-foreground px-1">
+              sur {table.getPageCount()}
+            </span>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+            ›
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => table.lastPage()} disabled={!table.getCanNextPage()}>
+            »
+          </Button>
+        </div>
       </div>
     </div>
   )
