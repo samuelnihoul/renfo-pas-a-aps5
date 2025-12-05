@@ -125,9 +125,7 @@ export function DataTable<TData, TValue>({
               onChange={(e) => {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
                 table.setPageIndex(Math.min(Math.max(0, page), table.getPageCount() - 1));
-                if (onPageChange) {
-                  onPageChange(Math.min(Math.max(0, page), table.getPageCount() - 1));
-                }
+               
               }}
               className="w-12 h-9 text-sm border rounded-md text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
