@@ -10,6 +10,7 @@ interface ProgramCardProps {
     program: {
         id: number
         name: string
+        shopDescription?: string
     }
     userId: string
     hasAccess: boolean
@@ -106,6 +107,11 @@ export function ProgramCard({ program, userId, hasAccess, accessReason }: Progra
                         {getAccessBadge()}
                     </div>
                 </div>
+                {program.shopDescription && (
+                    <CardDescription className="mt-2 text-sm text-muted-foreground line-clamp-3">
+                        {program.shopDescription}
+                    </CardDescription>
+                )}
             </CardHeader>
             <CardContent className="px-4 py-3 sm:px-6 sm:py-4">
                 {program.id === 1 && (

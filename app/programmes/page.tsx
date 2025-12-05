@@ -68,7 +68,7 @@ export default function ProgrammesPage() {
                         </Button>
                     </div>
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="text-2xl font-semibold mb-4">Découvrez notre liste de programmes professionnels</h2>
+                        <h2 className="text-2xl font-semibold mb-4">Nos programmes</h2>
                         <div className="border rounded-lg overflow-hidden shadow-lg">
                             <img 
                                 src="/listdepro.png" 
