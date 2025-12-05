@@ -5,21 +5,25 @@ import { ilike, or, sql } from 'drizzle-orm'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const query = searchParams.get('q')?.toLowerCase() || ''
+  const query = searchParams.get('q')?.trim() || ''
 
   if (!query) {
     return NextResponse.json([])
   }
 
   try {
+    // Use unaccent for better French accent handling
+    await db.execute(sql`CREATE EXTENSION IF NOT EXISTS unaccent`)
+    
     const searchTerm = `%${query}%`
     
+    // Using raw SQL with unaccent for better accent-insensitive search
     const results = await db
       .select()
       .from(exercises)
       .where(
         or(
-          ilike(exercises.name, searchTerm),
+          sql`unaccent(${exercises.name}::text) ILIKE unaccent(${searchTerm})`,
         )
       )
       .limit(10)
