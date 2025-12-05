@@ -10,8 +10,9 @@ import {
   getSortedRowModel,
   type ColumnFiltersState,
   getFilteredRowModel,
+  type PaginationState,
 } from "@tanstack/react-table"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
@@ -22,6 +23,8 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   searchKey?: string | string[]
   searchPlaceholder?: string
+  initialPageIndex?: number
+  onPageChange?: (pageIndex: number) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -29,9 +32,20 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   searchPlaceholder = "Rechercher...",
+  initialPageIndex = 0,
+  onPageChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState("")
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: initialPageIndex,
+    pageSize: 10,
+  })
+
+  // Update pagination when initialPageIndex changes
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, pageIndex: initialPageIndex }))
+  }, [initialPageIndex])
 
   const table = useReactTable({
     data,
@@ -42,9 +56,17 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
+    onPaginationChange: (updater) => {
+      const newPagination = typeof updater === 'function' ? updater(pagination) : updater
+      setPagination(newPagination)
+      if (onPageChange && newPagination.pageIndex !== pagination.pageIndex) {
+        onPageChange(newPagination.pageIndex)
+      }
+    },
     state: {
       sorting,
       globalFilter,
+      pagination,
     },
     globalFilterFn: (row, columnId, filterValue) => {
       if (!searchKey) return true;
@@ -106,6 +128,9 @@ export function DataTable<TData, TValue>({
         <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           Précédent
         </Button>
+        <span className="text-sm text-muted-foreground">
+          Page {table.getState().pagination.pageIndex + 1} sur {table.getPageCount()}
+        </span>
         <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
           Suivant
         </Button>

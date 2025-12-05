@@ -2,6 +2,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Plus, Pencil, Trash2, Loader2, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,8 @@ import { Exercise } from "@/db/schema"
 
 
 export default function ExercisesPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -32,6 +35,12 @@ export default function ExercisesPage() {
   const [exerciseToDelete, setExerciseToDelete] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  
+  // Get page index from URL params
+  const pageIndex = useMemo(() => {
+    const page = searchParams.get('page')
+    return page ? parseInt(page, 10) - 1 : 0
+  }, [searchParams])
 
   const fetchExercises = async () => {
     try {
@@ -146,10 +155,11 @@ export default function ExercisesPage() {
       header: "Actions",
       cell: ({ row }) => {
         const exercise = row.original
+        const currentPage = searchParams.get('page') || '1'
 
         return (
           <div className="flex items-center gap-2">
-            <Link href={`/admin/exercices/${exercise.id}`}>
+            <Link href={`/admin/exercices/${exercise.id}?page=${currentPage}`}>
               <Button variant="ghost" size="icon" title="Modifier">
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -168,6 +178,17 @@ export default function ExercisesPage() {
       },
     },
   ]
+
+  const handlePageChange = (newPageIndex: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (newPageIndex === 0) {
+      params.delete('page')
+    } else {
+      params.set('page', String(newPageIndex + 1))
+    }
+    // Use replace to avoid adding to history and keep URL in sync
+    router.replace(`/admin/exercices?${params.toString()}`, { scroll: false })
+  }
 
   const filteredExercises = useMemo(() => {
     if (!searchTerm.trim()) return exercises;
@@ -231,6 +252,8 @@ export default function ExercisesPage() {
           data={exercises} 
           searchKey={["name", "objectifs", "muscleGroup"]}
           searchPlaceholder="Rechercher par nom, objectif ou groupe musculaire..."
+          initialPageIndex={pageIndex}
+          onPageChange={handlePageChange}
         />
       )}
 

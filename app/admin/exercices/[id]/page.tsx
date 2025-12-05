@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import React, { useState, useEffect, useMemo } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2, ArrowLeft, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,11 +47,28 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
   const awaitedParams = React.use(params)
   const id = awaitedParams.id
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  // Get page from URL params to preserve pagination
+  const backUrl = useMemo(() => {
+    const page = searchParams.get('page')
+    const url = page ? `/admin/exercices?page=${page}` : '/admin/exercices'
+    return url
+  }, [searchParams])
+
+  const handleBack = () => {
+    // Use window.location as fallback if router doesn't work correctly
+    if (typeof window !== 'undefined') {
+      window.location.href = backUrl
+    } else {
+      router.replace(backUrl)
+    }
+  }
 
   const form = useForm<ExerciseFormValues>({
     resolver: zodResolver(exerciseSchema),
@@ -151,7 +168,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
         description: "L'exercice a été mis à jour avec succès",
       })
 
-      router.push("/admin/exercices")
+      router.replace(backUrl)
     } catch (err) {
       console.error("Error updating exercise:", err)
       toast({
@@ -176,7 +193,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
   return (
     <div>
       <div className="flex items-center mb-6">
-        <Button variant="ghost" size="sm" className="gap-1" onClick={() => router.push("/admin/exercices")}>
+        <Button variant="ghost" size="sm" className="gap-1" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4" />
           Retour
         </Button>
@@ -322,7 +339,7 @@ export default function EditExercisePage({ params }: { params: Promise<{ id: str
               </div>
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => router.push("/admin/exercices")}>
+              <Button type="button" variant="outline" onClick={handleBack}>
                 Annuler
               </Button>
               <Button type="submit" disabled={submitting}>
