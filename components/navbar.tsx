@@ -11,6 +11,7 @@ export function Navbar() {
 
     // Define navigation links as an array of objects
     const navItems = [
+        { href: "https://renfopasapas.club", label: "Page d'accueil" },
         { href: "/programmes", label: "Boutique des Programmes" },
         { href: "/", label: "Mes Programmes" },
         { href: "/mediatheque", label: "Médiathèque d'exercices" },
