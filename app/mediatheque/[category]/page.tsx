@@ -18,7 +18,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
   const [error, setError] = useState<string | null>(null)
 
   // Capitaliser la première lettre de la catégorie
-  const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
+  const categoryName = decodeURIComponent(category.charAt(0).toUpperCase()) + decodeURIComponent(category.slice(1))
 
   useEffect(() => {
     const loadExercises = async () => {
