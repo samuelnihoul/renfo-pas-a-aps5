@@ -106,7 +106,11 @@ export default function Home() {
     error,
     fetchRoutinesByProgram,
   } = useData();
-
+// Ajoutez ce useEffect dans le composant Home, avec les autres hooks
+useEffect(() => {
+  // Faire défiler vers le haut à chaque changement de niveau
+  window.scrollTo(0, 0);
+}, [currentLevel]);
   // Fetch purchased programs
   useEffect(() => {
     const fetchPurchasedPrograms = async () => {
