@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import {Textarea} from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft } from "lucide-react"
@@ -239,7 +240,7 @@ export default function EditBlockPage({ params }: { params: { id: string } }) {
 
                         <div className="space-y-2">
                             <Label htmlFor="instructions">Instructions</Label>
-                            <Input
+                            <Textarea
                                 id="instructions"
                                 name="instructions"
                                 value={formData.instructions || ""}

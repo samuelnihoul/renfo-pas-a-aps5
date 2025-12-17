@@ -371,7 +371,9 @@ useEffect(() => {
                     <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
                   )}
                   {routine.instructions && (
-                    <p className="text-sm text-gray-600 mt-2 ml-8">Instructions: {routine.instructions}</p>
+                    <div className="text-sm text-gray-600 mt-2 ml-8 whitespace-pre-wrap">
+                      Instructions: {routine.instructions}
+                    </div>
                   )}
                 </div>
               </Card>
