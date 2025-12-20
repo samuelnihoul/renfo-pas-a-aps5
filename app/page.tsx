@@ -371,9 +371,7 @@ useEffect(() => {
                     <p className="text-sm text-gray-600 mt-2 ml-8">Matériel: {routine.equipment}</p>
                   )}
                   {routine.instructions && (
-                    <div className="text-sm text-gray-600 mt-2 ml-8 whitespace-pre-wrap">
-                      Instructions: {routine.instructions}
-                    </div>
+                    <p className="text-sm text-gray-600 mt-2 ml-8">Instructions: {routine.instructions}</p>
                   )}
                 </div>
               </Card>
@@ -409,7 +407,7 @@ useEffect(() => {
                   </div>
                 </div>
                 {block.instructions && (
-                  <p className="text-sm mt-2 pb-3">{block.instructions}</p>
+                  <div className="text-sm mt-2 pb-3 whitespace-pre-wrap">{block.instructions}</div>
                 )}
                 <div className="space-y-2 ml-1 text-black bg-white rounded-xl">
                   {(() => {
